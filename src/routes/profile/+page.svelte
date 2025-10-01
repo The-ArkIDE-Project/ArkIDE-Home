@@ -1873,7 +1873,7 @@
         border-radius: 0.5rem;
     }
     .scratch-modal-title {
-        background: #00c3ff;
+        background: #0011ff;
         color: white;
         font-size: 1rem;
         display: flex;

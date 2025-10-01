@@ -44,7 +44,7 @@
 	const isAprilFirst = isAprilFools();
 	const randomColor = (() => {
 		const colors = [
-			"#00c3ff",
+			"#0011ff",
 			"#ff4c4c",
 			"#66757f",
 			"#ffd000",

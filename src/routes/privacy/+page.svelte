@@ -392,7 +392,7 @@ Language.onChange((lang) => {
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 12rem;
         color: white;
         display: flex;

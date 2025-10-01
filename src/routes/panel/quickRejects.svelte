@@ -87,7 +87,7 @@
         References an Unsafe External Platform</button>
         <button on:click={() => event("Your project was removed because you are attempting to sell products through it without using one of the services specified in the Uploading Guidelines. We fully respect that you are trying to profit, but we want to be sure our users are not being scammed and receive the promised product.")}>
         Attempts to Sell an Untrusted Product</button>
-        <button on:click={() => event("Your project was removed as it promotes political ideologies, parties, candidates, or causes. PenguinMod is not a platform for primarily political projects or messages. Please read the uploading guidelines for more information.")}>
+        <button on:click={() => event("Your project was removed as it promotes political ideologies, parties, candidates, or causes. ArkIDE is not a platform for primarily political projects or messages. Please read the uploading guidelines for more information.")}>
         Political Project</button>
         <button on:click={() => event("Your project was removed because it included profanity in its title, instructions, notes, or thumbnail. Please keep explicit language out of those areas.")}>
         Profanity in Title/Notes</button>

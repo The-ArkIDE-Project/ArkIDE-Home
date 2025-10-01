@@ -126,7 +126,7 @@
             <h2>Advertisements</h2>
             <p>
                 We may use Google AdSense to display advertisements on PenguinMod. These ads are provided by Google
-                and are subject to Google's policies. PenguinMod is not responsible for the content of these ads.
+                and are subject to Google's policies. ArkIDE is not responsible for the content of these ads.
             </p>
 
             <h2>Security</h2>
@@ -145,14 +145,14 @@
                 any issues, damages, or consequences arising from the use of the website.
             </p>
             <p>
-                PenguinMod is not liable for any direct, indirect, incidental, consequential,
+                ArkIDE is not liable for any direct, indirect, incidental, consequential,
                 or special damages, including but not limited to loss of data, revenue, or profits.
             </p>
 
             <h2>Use at Your Own Risk</h2>
             <p>
                 Despite above security measures, users must acknowledge that they are using PenguinMod at their own risk.
-                PenguinMod is not responsible for any harm, loss, or damage to users' devices, data, or any other property.
+                ArkIDE is not responsible for any harm, loss, or damage to users' devices, data, or any other property.
             </p>
 
             <h2>Warranties</h2>
@@ -209,7 +209,7 @@
         }
     
         .section-info {
-            background: #00c3ffad;
+            background: #0004ffad;
             height: 12rem;
             color: white;
             display: flex;

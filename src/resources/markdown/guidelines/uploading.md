@@ -265,7 +265,7 @@ You also cannot:
 - Encourage or make reference to shooting buildings in real life
 
 # Political content
-Please note PenguinMod is not a platform for primarily political projects or messages.
+Please note ArkIDE is not a platform for primarily political projects or messages.
 
 Projects that primarily exist to promote political ideologies, parties, candidates, or causes are not allowed on PenguinMod.
 

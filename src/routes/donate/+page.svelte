@@ -199,7 +199,7 @@
 
                 <p class="small">
                     <LocalizedText
-                        text="PenguinMod is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
+                        text="ArkIDE is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
                         key="home.footer.notaffiliated"
                         lang={currentLang}
                     />
@@ -301,7 +301,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 12rem;
         color: white;
         display: flex;

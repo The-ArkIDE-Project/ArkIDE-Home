@@ -192,7 +192,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 8.5rem;
         color: white;
         display: flex;

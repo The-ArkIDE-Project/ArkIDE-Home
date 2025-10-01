@@ -345,7 +345,7 @@
     .file-area {
         border-radius: 20px;
         padding: 20px;
-        border: 2px dashed #00c3ff;
+        border: 2px dashed #0011ff;
         stroke-dasharray: 4px 4px;
     }
     .rizz-grid {

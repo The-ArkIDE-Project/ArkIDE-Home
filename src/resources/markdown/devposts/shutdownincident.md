@@ -46,7 +46,7 @@ We sent multiple emails they responded to only once, asking our use-case and not
 We also did not manage to get any of our calls answered, they simply hung up after a short hold time.
 
 ## Our Responsibility
-PenguinMod is not liable for any loss of data, but we still should have setup backups for your accounts & projects before anything like this could have happened.
+ArkIDE is not liable for any loss of data, but we still should have setup backups for your accounts & projects before anything like this could have happened.
 We also now understand that hosting a large project like this one should not have been done on a free service.
 
 Since this incident, we have moved from using free-tier accounts and are now spending money on a Virtual Private Server.

@@ -369,7 +369,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 6rem;
         color: white;
         display: flex;
@@ -484,7 +484,7 @@
     }
     .dropdown-option-default:focus,
     .dropdown-option-default:hover {
-        background: #00c3ff;
+        background: #0011ff;
     }
 
     .dropdown-option-remix:focus,

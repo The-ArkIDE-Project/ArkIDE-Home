@@ -1387,7 +1387,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 6rem;
         color: white;
         display: flex;
@@ -1539,7 +1539,7 @@
     }
 
     .recommended-tag {
-        background: #00c3ff;
+        background: #0011ff;
         border: 1px solid rgba(0, 0, 0, 0.15);
         border-radius: 4px;
         padding: 2px 4px;
@@ -1582,7 +1582,7 @@
 
     .file-picker {
         display: block;
-        background-color: #00c3ff;
+        background-color: #0011ff;
         color: white;
         border-radius: 1000px;
         width: 100%;

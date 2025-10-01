@@ -273,7 +273,7 @@
     }
     
     .send-email[data-canCreate=true] {
-        background: #00c3ff;
+        background: #0011ff;
         cursor: pointer;
         color: white;
     }

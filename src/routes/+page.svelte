@@ -384,13 +384,7 @@
         {/if}
 
         <div class="section-links">
-            <Button link={LINK.packager}>
-                <LocalizedText
-                    text="Packager"
-                    key="home.footer.sections.website.packager"
-                    lang={currentLang}
-                />
-            </Button>
+
             <Button link={LINK.credits}>
                 <LocalizedText
                     text="Credits"
@@ -398,13 +392,7 @@
                     lang={currentLang}
                 />
             </Button>
-            <Button link={"/donate"}>
-                <LocalizedText
-                    text="Donate"
-                    key="home.footer.sections.donate"
-                    lang={currentLang}
-                />
-            </Button>
+
             <Button label="GitHub" link={LINK.github} />
             <Button link={LINK.wiki}>
                 <LocalizedText
@@ -436,7 +424,7 @@
     <p style="width: 100%; text-align: center;">
         <i>
             <LocalizedText
-                text="Scratch Note: Please don't mention PenguinMod on Scratch, we have different rules compared to Scratch! 😅"
+                text="Scratch Note: Please don't mention ArkIDE on Scratch, we have different rules compared to Scratch! 😅"
                 key="home.scratchnote"
                 lang={currentLang}
             />
@@ -444,40 +432,8 @@
     </p>
 
     <div class="section-categories">
+        <!-- svelte-ignore empty-block -->
         {#if !loggedIn}
-            <ContentCategory
-                header={TranslationHandler.text(
-                    "home.sections.whatsnew",
-                    currentLang
-                )}
-                seemore={`https://discord.com/channels/1033551490331197462/1038252360184643674`}
-            >
-                <div class="category-content">
-                    {#if updates.length > 0}
-                        {#each updates as update}
-                            <UserDisplay
-                                link={`https://discord.com/channels/1033551490331197462/1038252360184643674`}
-                                userLink={`https://discord.com/channels/1033551490331197462/1038252360184643674`}
-                                text={update.cleanContent}
-                                author={update.authorName}
-                                image={update.authorImage}
-                            />
-                            <a target="_blank" href={update.image}>
-                                <button class="update-image-wrapper">
-                                    <img
-                                        src={update.image}
-                                        alt={update.cleanContent}
-                                        title={update.cleanContent}
-                                        class="update-image"
-                                    />
-                                </button>
-                            </a>
-                        {/each}
-                    {:else}
-                        <LoadingSpinner />
-                    {/if}
-                </div>
-            </ContentCategory>
         {:else}
             <div class="welcome-back-card">
                 <img
@@ -679,23 +635,15 @@
                 <!-- NOTE: This section is entirely hard-coded for time-relevant stuff, but avoid making new classes for a topic. -->
                 <div class="category-news">
                     <div class="category-news-content">
-                        <h2 style="margin-block:4px;">PenguinJam Super has been ranked!</h2>
+                        <h2 style="margin-block:4px;">Welcome to ArkIDE</h2>
                         <div style="width:100%">
                             <p>
-                                Sorry for missing this news post, but PenguinJam Super has been ranked!
+                                ArkIDE is a block-based coding website built off of PenguinMod and TurboWarp.
                                 <br />
-                                We've ranked all 18 entries! See the project below to see all of the projects.
+                                This is a passion project of mine to learn more web development and homelabbing (yes im hosting my own server).
                                 <br />
-                                Remember, projects that used both tags or didn't follow the theme were ignored.
+                                Remember, ArkIDE is in beta, so expect bugs and missing features. And that ArkIDE is NOT affiliated with Scratch, Turbowarp, or Penguinmod. This is a seperate project.
                             </p>
-                            <p style="margin-block-start:4px;">
-                                <a href="https://projects.penguinmod.com/5992257996">PenguinJam Super 2025 Official Rankings</a>
-                            </p>
-                            <img
-                                src="/events/news/penguinjamsuper2025.png"
-                                alt="PenguinJam Super 2025"
-                                style="width:100%;"
-                            />
                         </div>
                     </div>
                     <div class="category-footer">
@@ -993,7 +941,7 @@
     <div class="footer">
         <p>
             <LocalizedText
-                text="PenguinMod is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
+                text="ArkIDE is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
                 key="home.footer.notaffiliated"
                 lang={currentLang}
             />
@@ -1126,7 +1074,7 @@
         width: 100%;
         padding: 24px 0px 48px;
         border-top: rgba(0, 0, 0, 0.3) 1px solid;
-        background: #00c3ff15;
+        background: #0004ff15;
         font-weight: bold;
         margin-top: 4px;
         /* border-top-left-radius: 20%; */
@@ -1186,7 +1134,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #0026ffad;
         height: 24rem;
         color: white;
         display: flex;
@@ -1200,7 +1148,7 @@
         justify-content: space-around;
     }
     .section-links {
-        background: #00c3ff28;
+        background: #0011ff28;
         color: white;
         display: flex;
         flex-direction: row;

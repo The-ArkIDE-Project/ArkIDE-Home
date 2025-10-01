@@ -865,7 +865,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 6rem;
         color: white;
         display: flex;
@@ -1045,7 +1045,7 @@
 
     .file-picker {
         display: block;
-        background-color: #00c3ff;
+        background-color: #0011ff;
         color: white;
         border-radius: 1000px;
         width: 100%;

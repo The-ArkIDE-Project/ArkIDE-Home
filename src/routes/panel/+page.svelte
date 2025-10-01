@@ -2149,7 +2149,7 @@
     }
 
     .section-info {
-        background: #00c3ffad;
+        background: #001affad;
         height: 6rem;
         color: white;
         display: flex;
@@ -2243,7 +2243,7 @@
     .project-sidebar {
         display: flex;
         flex-direction: column;
-        background: #00c3ff22;
+        background: #0026ff22;
     }
     .project-sidebar-actions {
         display: flex;
