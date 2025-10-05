@@ -216,7 +216,7 @@
                 src="/penguins/signin.svg"
                 alt="Profiles"
             />
-            <h1 style="margin-block:4px">PenguinMod</h1>
+            <h1 style="margin-block:4px">ArkIDE</h1>
             <p>
                 <LocalizedText
                     text="Login with your personal account"
