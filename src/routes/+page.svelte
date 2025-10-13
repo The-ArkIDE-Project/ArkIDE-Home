@@ -1002,7 +1002,7 @@
                         lang={currentLang}
                     />
                 </p>
-                <a target="_blank" href={"https://github.com/PenguinMod/PenguinMod-Home/issues"}>
+                <a target="_blank" href={"https://github.com/arc360alt/ArkIDE-Home/issues"}>
                     <LocalizedText
                         text="Report an issue"
                         key="home.footer.sections.info.reportissue"

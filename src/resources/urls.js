@@ -94,7 +94,7 @@ export default {
     /**
      * PenguinMod's github page
      */
-    github: "https://github.com/PenguinMod/",
+    github: "https://github.com/arc360alt/arkide-new",
 
     /**
      * PenguinMod's basic API
