@@ -1,6 +1,6 @@
 import { mockRequest } from "./emojis-compat";
 
-const emojiHtmlUrl = 'https://gextapi.derpygamer2142.com/emojis';
+const emojiHtmlUrl = 'https://library.arkide.site/emojis.json';
 const useLocalCopy = false;
 
 class EmojiHandler {
