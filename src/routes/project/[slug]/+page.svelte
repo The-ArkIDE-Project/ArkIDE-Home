@@ -97,7 +97,7 @@
         // if we match a URL that should show a redirect, change the href attribute
         if (!doesntShowRedirectURLs.some(regex => href.match(regex))) {
             const base64 = encodeURIComponent(btoa(href));
-            tokens[idx].attrSet('href', `https://penguinmod.com/redirect?t=${base64}`);
+            tokens[idx].attrSet('href', `https://arkide.site/redirect?t=${base64}`);
         }
 
         // disables clicking on non-verified links

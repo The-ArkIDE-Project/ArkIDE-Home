@@ -1016,7 +1016,7 @@
                         lang={currentLang}
                     />
                 </a>
-                <a target="_blank" href={`https://penguinmod.com/redirect?t=${encodeURIComponent(btoa(LINK.discord))}`}>Discord</a>
+                <a target="_blank" href={`https://arkide.site/redirect?t=${encodeURIComponent(btoa(LINK.discord))}`}>Discord</a>
             </div>
             <div class="footer-section">
                 <p>
