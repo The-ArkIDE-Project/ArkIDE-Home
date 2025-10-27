@@ -99,7 +99,7 @@ export default {
     /**
      * PenguinMod's basic API
      */
-    basicApi: "https://penguinmod-basic-api.derpygamer2142.com/",
+    basicApi: "https://no/",
 
     /**
      * The admin panel for pm projects api
