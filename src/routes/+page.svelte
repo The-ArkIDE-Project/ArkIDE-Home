@@ -286,8 +286,8 @@
     <meta name="title" content="ArkIDE - Home" />
     <meta property="og:title" content="ArkIDE - Home" />
     <meta property="twitter:title" content="ArkIDE - Home">
-    <meta name="description" content="The area where featured projects and community stuff & info is shown.">
-    <meta property="twitter:description" content="The area where featured projects and community stuff & info is shown.">
+    <meta name="description" content="the ArkIDE Project Hosting Website Thing">
+    <meta property="twitter:description" content="the ArkIDE Project Hosting Website Thing">
     <meta property="og:url" content="https://penguinmod.com/">
     <meta property="twitter:url" content="https://penguinmod.com/">
     <meta name="google-site-verification" content="07oAYybKa_CH2le7AvPJkNNtwhZSq_G0V4d9P7AIZYE" />

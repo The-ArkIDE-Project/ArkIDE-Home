@@ -1,18 +1,20 @@
-# PenguinMod Moderation Expectations
+# ArkIDE Moderation Expectations
 These guidelines define exactly how you should handle interacting with projects, the website, and users.
 Please read ***the entire document*** to understand everything about moderation.
 
-## I am a PenguinMod user, not moderator
-Please see the [Uploading Guidelines](https://penguinmod.com/guidelines/uploading), you ***will only receive update notifications for the Uploading Guidelines***, not the moderator guidelines.
+## INSOMNIA64 STOP CHANGING PROJECT DISCRIPTIONS WHEN THERES NOTHING WRONG WITH IT
+
+## I am a ArkIDE user, not moderator
+Please see the [Uploading Guidelines](https://ArkIDE.com/guidelines/uploading), you ***will only receive update notifications for the Uploading Guidelines***, not the moderator guidelines.
 This document will not serve much of a purpose to non-moderators and will refer to many moderator-only aspects of the website, meaning you cannot do most of the things listed.
 
 ## Our expectations
-When moderating PenguinMod, we expect you to handle conflicts, disagreements, spam, etc with a mature and formal fashion.
+When moderating ArkIDE, we expect you to handle conflicts, disagreements, spam, etc with a mature and formal fashion.
 If you are talking to users, please use English with minimal spelling mistakes or weird grammar (acronyms, onomatopoeias, etc) to make sure the messages can be translated properly across most languages. ***Avoid*** using weird formatting (markdown), hyperlinks (URLs), or unnecessary symbols in your messages as well.
 
 Profanity (curse/swear words) or inappropriate messages ***will not be tolerated.***
 
-On top of this, ***do not do anything that intentionally creates problems for the PenguinMod team.***
+On top of this, ***do not do anything that intentionally creates problems for the ArkIDE team.***
 This means abusing the moderation tools we give you or intentionally hitting usage limits to cause harm to a project, user, or the platform.
 
 ## What if another moderator is breaking the rules?
@@ -44,7 +46,7 @@ When discussing things like gore, violent content, or sexual content, avoid givi
 It's appropriate to say things like:
 - "the content is too violent"
 - "the content depicts or encourages suicide"
-- "the content is too sexual for PenguinMod"
+- "the content is too sexual for ArkIDE"
 
 but *do not* give details like:
 - "the characters are being stabbed with extremely gory blood and their lungs are flying out of their body"
@@ -72,7 +74,8 @@ However, you shouldn't allow a moderation message for something inappropriate to
 
 # Test Accounts
 These accounts are exempt from *most* punishment as they are used by developers or automatically used for testing:
-- PenguinMod
+- ark
+- ark2
 - PenguinBot
 - PenguinJam
 - JeremyGamer13
@@ -81,7 +84,7 @@ These accounts are exempt from *most* punishment as they are used by developers 
 Specifically, unless you see one of these accounts uploading NSFW, gore, or anything of the sort, don't do anything to them.
 
 # What punishments do I give for violating the Uploading Guidelines?
-## Base requirements for a project + Projects that display websites (iframes) + PenguinMod Mods / Forks
+## Base requirements for a project + Projects that display websites (iframes) + ArkIDE Mods / Forks
 For the iframe rule, the project must actually be based around iframes.
 - Hard Delete the project and use the quick reject for these.
 - No user punishment required.
@@ -102,17 +105,17 @@ Non-PM related Copyright is not enforced at the moment. We will let you know if 
 - Remove the project (soft-delete) and use the quick reject for these.
 - No user punishment until they've uploaded two of these.
 - 1hr temp ban (1st), 1hr temp ban (2nd), 12hr temp ban (3rd), 24hr temp ban (4th) 48hrs after that (5th+)
-## Preventing or Removing access to parts of PenguinMod + Use other platforms sparingly
+## Preventing or Removing access to parts of ArkIDE + Use other platforms sparingly
 If the project mentions or shows another platform, that platform should be generally unsafe for users <13 in-order for this rule to apply.
 Mentions or displays of pornography/mainly pornography websites should be handled more strictly here.
 - Remove the project (soft-delete) and use the quick reject for this.
 - No user punishment until they've uploaded one of these.
 - 1hr temp ban (1st), 2hr temp ban (2nd), 12hr temp ban (3rd), 24hr temp ban (4th) 48hrs after that (5th+)
-## Exploiting or Abusing PenguinMod systems
+## Exploiting or Abusing ArkIDE systems
 This includes user mentions, such as their profile/posts. This also includes encouraging abusing/exploiting systems.
 - Hard delete the project and mention which point is being violated.
 - Mass reporting is nothing (1st), 4hr tempban (2nd), 12hr temp ban (3rd), 24hr temp ban (4th), and account ban (5th)
-- Impersonation can be an account deletion if the account is empty, and a ban if it is of PenguinMod staff or so.
+- Impersonation can be an account deletion if the account is empty, and a ban if it is of ArkIDE staff or so.
 - Avoiding rate-limits/limits is nothing (1st), 1hr tempban (2nd), 6hr temp ban (3rd), 24hr temp ban (4th), and account ban (5th)
 - Avoiding account punishments or deletions is an instant ban or deletion on the alternate account. You may count this as another offense for the original punishment.
 - Anything not mentioned is a 12hr temp ban (1st), 24hr temp ban (2nd), and account ban (3rd)
