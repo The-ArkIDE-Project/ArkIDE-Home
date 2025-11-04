@@ -424,7 +424,7 @@
     <p style="width: 100%; text-align: center;">
         <i>
             <LocalizedText
-                text="Scratch Note: Please don't mention ArkIDE on Scratch, we have different rules compared to Scratch! 😅"
+                text="ArkIDE is feeling chrismas-y. Even though at the time of writing its november lol."
                 key="home.scratchnote"
                 lang={currentLang}
             />
