@@ -104,5 +104,10 @@ export default {
     /**
      * The admin panel for pm projects api
      */
-    adminPanel: "https://penguinmod.com/panel"
+    adminPanel: "https://arkide.site/panel",
+
+    /**
+     * The link to the Desktop App
+     */
+    desktop: "/desktop"
 }

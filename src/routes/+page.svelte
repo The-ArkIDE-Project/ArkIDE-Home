@@ -394,10 +394,17 @@
             </Button>
 
             <Button label="GitHub" link={LINK.github} />
-            <Button link={LINK.wiki}>
+                <Button link={LINK.desktop}>
                 <LocalizedText
-                    text="Community Wiki"
-                    key="home.footer.sections.community.wiki"
+                    text="ArkIDE Desktop"
+                    key="home.footer.sections.website.desktop"
+                    lang={currentLang}
+                />
+            </Button>
+            <Button link={LINK.discord}>
+                <LocalizedText
+                    text="Community Discord"
+                    key="home.footer.sections.website.discord"
                     lang={currentLang}
                 />
             </Button>
@@ -999,6 +1006,13 @@
                     <LocalizedText
                         text="Packager"
                         key="home.footer.sections.website.packager"
+                        lang={currentLang}
+                    />
+                </a>
+                <a href={LINK.desktop}>
+                    <LocalizedText
+                        text="Packager"
+                        key="home.footer.sections.website.desktop"
                         lang={currentLang}
                     />
                 </a>
