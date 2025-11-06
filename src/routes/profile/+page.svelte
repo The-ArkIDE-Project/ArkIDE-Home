@@ -1516,46 +1516,11 @@ Promise.all([
                     </div>
                 </ContentCategory>
 
+<!-- "Followers" Section actually showing Following -->
 {#if followingList.length > 0}
-    <ContentCategory
-        header="Followers"
-        style="width:calc(90% - 10px);"
-        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
-    >
+    <ContentCategory header="Followers" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
-            {#each followingList as followed}
-                <a href={`/profile?user=${encodeURIComponent(followed.username)}`} class="following-user-link">
-                    <div class="following-user">
-                        <img
-                            src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${followed.username}`}
-                            alt={followed.username}
-                            class="following-user-pfp"
-                        />
-                        <span class="following-user-name">{followed.username}</span>
-                    </div>
-                </a>
-            {/each}
-        </div>
-    </ContentCategory>
-{:else}
-    <ContentCategory
-        header="Followers"
-        style="width:calc(90% - 10px);"
-        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
-    >
-        <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
-            <p style="opacity:0.5">Not following anyone yet.</p>
-        </div>
-    </ContentCategory>
-{/if}
-{#if followingList.length > 0}
-    <ContentCategory
-        header="Following"
-        style="width:calc(90% - 10px);"
-        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
-    >
-        <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
-            {#each followerslist as following}
+            {#each followingList as following}
                 <a href={`/profile?user=${encodeURIComponent(following.username)}`} class="following-user-link">
                     <div class="following-user">
                         <img
@@ -1570,11 +1535,33 @@ Promise.all([
         </div>
     </ContentCategory>
 {:else}
-    <ContentCategory
-        header="Following"
-        style="width:calc(90% - 10px);"
-        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
-    >
+    <ContentCategory header="Followers" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <p style="opacity:0.5">Not following anyone yet.</p>
+        </div>
+    </ContentCategory>
+{/if}
+
+<!-- "Following" Section actually showing Followers -->
+{#if followerslist.length > 0}
+    <ContentCategory header="Following" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
+            {#each followerslist as follower}
+                <a href={`/profile?user=${encodeURIComponent(follower.username)}`} class="following-user-link">
+                    <div class="following-user">
+                        <img
+                            src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${follower.username}`}
+                            alt={follower.username}
+                            class="following-user-pfp"
+                        />
+                        <span class="following-user-name">{follower.username}</span>
+                    </div>
+                </a>
+            {/each}
+        </div>
+    </ContentCategory>
+{:else}
+    <ContentCategory header="Following" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
             <p style="opacity:0.5">Not following anyone yet.</p>
         </div>
