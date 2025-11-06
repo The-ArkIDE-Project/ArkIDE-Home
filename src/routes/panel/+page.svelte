@@ -978,10 +978,13 @@
             });
     }
 
-    let showUserPerms = false;
+let showUserPerms = false;
     let listOfAdmins = [];
     let listOfMods = [];
-    const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
+    let showAllUsers = false;
+    let allUsersList = [];
+    let allUsersLoading = false;
+const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
         .then(users => {
             listOfAdmins = users.admins;
             listOfMods = users.mods;
@@ -990,6 +993,20 @@
             console.error(err);
             alert(`Failed to get permited users; ${err}`);
         });
+
+    const loadAllUsers = () => {
+        allUsersLoading = true;
+        ProjectClient.getAllUsers()
+            .then(users => {
+                allUsersList = users;
+                allUsersLoading = false;
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(`Failed to get all users; ${err}`);
+                allUsersLoading = false;
+            });
+    };
 
     function putOnWatchlist(enabled) {
         ProjectClient.putOnWatchlist(userSelectionData.username, enabled)
@@ -1725,6 +1742,41 @@
                 </div>
             </div>
 
+<br>
+
+            <div class="card">
+                <h2 style="margin-block-start:0">All Users</h2>
+                <p>View all users currently registered on the website</p>
+                <Button on:click={loadAllUsers}>Load All Users</Button>
+                <Button on:click={() => showAllUsers = !showAllUsers}>
+                    {showAllUsers ? 'Hide' : 'Show'} All Users
+                </Button>
+                
+                {#if allUsersLoading}
+                    <LoadingSpinner />
+                {:else if showAllUsers}
+                    <div class="all-users-list">
+                        {#each allUsersList as user}
+                            <div class="user-list-item">
+                                <img
+                                    src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user.username}`}
+                                    alt={user.username}
+                                    class="user-list-pfp"
+                                />
+                                <div class="user-list-info">
+                                    <a href={`/profile?user=${user.username}`} target="_blank">
+                                        {user.username}
+                                    </a>
+                                    {#if user.id}
+                                        <span class="user-list-id">ID: {user.id}</span>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+
             <br>
 
             <div class="card">
@@ -2341,13 +2393,70 @@
         filter: initial;
     }
 
-    .guidelines-link {
+.guidelines-link {
         background: transparent;
         border: 0;
         color: dodgerblue;
         text-decoration: underline;
         cursor: pointer;
         margin-top: 16px;
+    }
+
+    .all-users-list {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 8px;
+        margin-top: 16px;
+    }
+    :global(body.dark-mode) .all-users-list {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .user-list-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 4px;
+    }
+    :global(body.dark-mode) .user-list-item {
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+    }
+    .user-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .user-list-pfp {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        margin-right: 12px;
+    }
+
+    .user-list-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-list-info a {
+        font-weight: bold;
+        color: dodgerblue;
+        text-decoration: none;
+    }
+    .user-list-info a:hover {
+        text-decoration: underline;
+    }
+
+    .user-list-id {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 2px;
+    }
+    :global(body.dark-mode) .user-list-id {
+        color: #aaa;
     }
 
     

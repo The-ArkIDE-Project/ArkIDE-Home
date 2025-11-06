@@ -41,7 +41,27 @@ class ProjectApi {
                 });
         });
     }
-
+getFollowing(username) {
+    return fetch(`https://arkideapi.arc360hub.com/api/v1/users/meta/getfollowers?username=${encodeURIComponent(username)}`)
+        .then(r => r.json());
+}
+getFollowers(username) {
+    return fetch(`http://arkideapi.arc360hub.com/api/v1/users/meta/getfollowing?username=${encodeURIComponent(username)}`)
+        .then(r => r.json());
+}
+async getAllUsers() {
+    const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/getAllUsers`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
+        },
+    });
+    if (!response.ok) {
+        throw await response.text();
+    }
+    return await response.json();
+}
     static getUsernameById(id) {
         return new Promise((resolve, reject) => {
             const url = `${OriginApiUrl}/api/v1/users/getusername?ID=${id}`;

@@ -55,6 +55,8 @@
     let isRankingUpMenu = false;
     let isAttemptingRankUp = false;
     let profileFeaturedProject = null;
+    let followingList = [];
+    let followerslist = [];
     
     let isProfilePrivate = false;
     let isProfilePublicToFollowers = false;
@@ -205,6 +207,31 @@
                 } else if (!profileFeatured && projects.all[0]) {
                     profileFeaturedProject = projects.all[0];
                 }
+// Fetch both lists concurrently
+Promise.all([
+    ProjectClient.getFollowers(user),
+    ProjectClient.getFollowing(user)
+])
+.then(([followers, following]) => {
+    // Followers
+    if (Array.isArray(followers) && followers.length > 0) {
+        followerslist = followers.filter(u => u && u.username && u.username !== "undefined");
+    } else {
+        followerslist = [];
+    }
+
+    // Following
+    if (Array.isArray(following) && following.length > 0) {
+        followingList = following.filter(u => u && u.username && u.username !== "undefined");
+    } else {
+        followingList = [];
+    }
+})
+.catch(() => {
+    // If either fails, safely set empty arrays
+    followerslist = [];
+    followingList = [];
+});
             });
         };
 
@@ -904,14 +931,21 @@
             {#if user}
                 <div class="section-user">
                     <div class="section-user-header">
-                        <div class="subuser-section">
+<div class="subuser-section">
                             <div class="user-username">
-                                <img
-                                    style="border-color:{isDonator ? "#a237db" : "#efefef"}"
-                                    src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
-                                    alt="Profile"
-                                    class="profile-picture"
-                                />
+                                <div class="profile-picture-container">
+                                    <img
+                                        src="/hat.png"
+                                        alt="Christmas Hat"
+                                        class="christmas-hat"
+                                    />
+                                    <img
+                                        style="border-color:{isDonator ? "#a237db" : "#efefef"}"
+                                        src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
+                                        alt="Profile"
+                                        class="profile-picture"
+                                    />
+                                </div>
                                 <div class="user-after-image">
                                     {#if isDonator}
                                         <h1 class="donator-color">{fullProfile.real_username || user}</h1>
@@ -1481,6 +1515,72 @@
                         {/if}
                     </div>
                 </ContentCategory>
+
+{#if followingList.length > 0}
+    <ContentCategory
+        header="Followers"
+        style="width:calc(90% - 10px);"
+        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
+    >
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
+            {#each followingList as followed}
+                <a href={`/profile?user=${encodeURIComponent(followed.username)}`} class="following-user-link">
+                    <div class="following-user">
+                        <img
+                            src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${followed.username}`}
+                            alt={followed.username}
+                            class="following-user-pfp"
+                        />
+                        <span class="following-user-name">{followed.username}</span>
+                    </div>
+                </a>
+            {/each}
+        </div>
+    </ContentCategory>
+{:else}
+    <ContentCategory
+        header="Followers"
+        style="width:calc(90% - 10px);"
+        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
+    >
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <p style="opacity:0.5">Not following anyone yet.</p>
+        </div>
+    </ContentCategory>
+{/if}
+{#if followingList.length > 0}
+    <ContentCategory
+        header="Following"
+        style="width:calc(90% - 10px);"
+        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
+    >
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
+            {#each followerslist as following}
+                <a href={`/profile?user=${encodeURIComponent(following.username)}`} class="following-user-link">
+                    <div class="following-user">
+                        <img
+                            src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${following.username}`}
+                            alt={following.username}
+                            class="following-user-pfp"
+                        />
+                        <span class="following-user-name">{following.username}</span>
+                    </div>
+                </a>
+            {/each}
+        </div>
+    </ContentCategory>
+{:else}
+    <ContentCategory
+        header="Following"
+        style="width:calc(90% - 10px);"
+        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
+    >
+        <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <p style="opacity:0.5">Not following anyone yet.</p>
+        </div>
+    </ContentCategory>
+{/if}
+
             </div>
             <div class="section-serious-actions">
                 {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
@@ -1893,12 +1993,26 @@
         background: #111;
     }
 
+.profile-picture-container {
+        position: relative;
+        display: inline-block;
+    }
     .profile-picture {
         border-radius: 15px;
         height: 80px;
         width: 80px;
         border-style: solid;
         border-width: 2px;
+    }
+    .christmas-hat {
+        position: absolute;
+        top: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90px;
+        height: auto;
+        z-index: 10;
+        pointer-events: none;
     }
     :global(html[dir="rtl"]) .profile-picture {
         margin-right: initial;
@@ -1948,6 +2062,41 @@
         flex-direction: column;
         justify-content: center;
     }
+.following-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+    height: 100%;
+    width: 100%;
+    align-items: stretch;
+}
+.following-user-link {
+    text-decoration: none;
+    color: inherit;
+}
+.following-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.following-user:hover {
+    background: rgba(0,0,0,0.05);
+}
+.following-user-pfp {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.following-user-name {
+    font-weight: bold;
+    font-size: 1.4em;
+}
+    
     .section-user-stats {
         height: 295px;
         width: 32%;
