@@ -118,7 +118,7 @@
                 </Button>
             </div>
 
-            <p class="version-text">Latest version: 1.9.0</p>
+            <p class="version-text">Latest version: 1.10.0</p>
         </div>
 
         <div class="content-section">
