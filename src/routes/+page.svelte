@@ -652,6 +652,8 @@
                         <h2 style="margin-block:4px;">Welcome to ArkIDE</h2>
                         <div style="width:100%">
                             <p>
+                                Note: If you want to use Sharkpool Extensions but their blocked, use this website: <a href=" https://arkfs.arc360hub.com/folder/sharkpool-extensions/">ArkFS sharkpool-extensions Folder</a>
+                                <br />
                                 ArkIDE is a block-based coding website built off of PenguinMod and TurboWarp.
                                 <br />
                                 This is a passion project of mine to learn more web development and homelabbing (yes im hosting my own server).
