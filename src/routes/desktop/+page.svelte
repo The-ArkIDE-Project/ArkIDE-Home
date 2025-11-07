@@ -30,7 +30,7 @@
     };
 
     let selectedOS = "windows";
-    let version = "1.9.0";
+    let version = "1.10.0";
     let selectedArch = "x86";
 
     function handleDownload(os, arch) {
