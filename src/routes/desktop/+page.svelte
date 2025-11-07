@@ -20,12 +20,12 @@
     // Download links - replace these with your actual download URLs
     const downloads = {
         windows: {
-            x86: "https://github.com/arc360alt/ArkIDE-Desktop/releases/download/v1.9.0/Ark.IDE.Setup.1.9.0.exe",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.10.0/Ark.IDE.Setup.1.10.0.exe",
             // arm64: "https://example.com/arkide-windows-arm64.exe"
         },
         linux: {
-            x86: "https://github.com/arc360alt/ArkIDE-Desktop/releases/download/v1.9.0/Ark.IDE-1.9.0-x86.AppImage",
-            arm64: "https://github.com/arc360alt/ArkIDE-Desktop/releases/download/v1.9.0/Ark.IDE-1.9.0-arm64.AppImage"
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.10.0/Ark.IDE-1.10.0.AppImage",
+            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.10.0/Ark.IDE-1.10.0-arm64.AppImage"
         }
     };
 
