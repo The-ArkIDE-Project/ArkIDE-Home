@@ -19,7 +19,7 @@
     });
 </script>
 
-<div class="section" {style}>
+<div class="section content-category" {style}>
     {#if header}
         <div class="header">
             <p style="margin-block: 6px;"><b>{header}</b></p>
@@ -40,36 +40,53 @@
 </div>
 
 <style>
-    a {
-        color: dodgerblue;
-    }
+a {
+	color: dodgerblue;
+}
 
-    .section {
-        width: 30%;
-        margin: 10px;
-        border-radius: 8px;
-        border-width: 1px;
-        border-color: rgba(0, 0, 0, 0.3);
-        border-style: solid;
-        padding: 4px;
-    }
-    .header {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        margin: 0 0.35rem;
-    }
-    .container {
-        height: 312px;
-        margin: 6px;
-        overflow: auto;
-    }
+/* Shared base */
+.section.content-category {
+	width: 30%;
+	margin: 10px;
+	border-radius: 12px;
+	padding: 6px;
+	border: 1px solid transparent;
+	transition: background 0.3s ease, border-color 0.3s ease;
+	backdrop-filter: blur(10px) saturate(150%);
+	-webkit-backdrop-filter: blur(10px) saturate(150%);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-    :global(body.dark-mode) .section {
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-    :global(body.dark-mode) .header {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
+/* Light mode */
+:global(body:not(.dark-mode)) .section.content-category {
+	background: rgba(255, 255, 255, 0.6);
+	border-color: rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode */
+:global(body.dark-mode) .section.content-category {
+	background: rgba(17, 17, 17, 0.4);
+	border-color: rgba(255, 255, 255, 0.15);
+	box-shadow: 0 2px 12px rgba(43, 43, 43, 0.5);
+}
+
+.header {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 0 0.35rem;
+}
+
+:global(body.dark-mode) .header {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.container {
+	height: 312px;
+	margin: 6px;
+	overflow: auto;
+}
 </style>
+

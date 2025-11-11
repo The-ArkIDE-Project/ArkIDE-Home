@@ -55,6 +55,15 @@
     let isRankingUpMenu = false;
     let isAttemptingRankUp = false;
     let profileFeaturedProject = null;
+    let backgroundImageUrl = '';
+
+    $: {
+        if (profileFeaturedProject && profileFeaturedProject !== 'none' && profileFeaturedProject.id) {
+            backgroundImageUrl = `${ProjectApi.OriginApiUrl}/api/v1/projects/getproject?projectID=${profileFeaturedProject.id}&requestType=thumbnail`;
+        } else {
+            backgroundImageUrl = '';
+        }
+    }
     let followingList = [];
     let followerslist = [];
     
@@ -927,7 +936,12 @@ Promise.all([
             !wasNotFound
             || isForceView
         }
-        <div class="background">
+            <div 
+                class="background" 
+                data-has-image={backgroundImageUrl ? 'true' : 'false'}
+                style={backgroundImageUrl ? `--bg-image: url('${backgroundImageUrl}');` : ''}
+            >
+            
             {#if user}
                 <div class="section-user">
                     <div class="section-user-header">
@@ -1475,15 +1489,15 @@ Promise.all([
                         </div>
                     </div>
                 </div>
-                <ContentCategory
-                    header={TranslationHandler.text(
-                        "profile.projects.all",
-                        currentLang
-                    )}
-                    style="width:calc(90% - 10px);"
-                    stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
-                    seemore={`/search?q=by%3A${user}`}
-                >
+                    <ContentCategory
+                        header={TranslationHandler.text(
+                            "profile.projects.all",
+                            currentLang
+                        )}
+                        style="width:calc(90% - 10px);"
+                        stylec="height: 244px;overflow-x:auto;overflow-y:hidden;"
+                        seemore={`/search?q=by%3A${user}`}
+                    >
                     <div class="project-list">
                         {#if projects.all.length > 0}
                             {#if projects.all[0] !== "none"}
@@ -1665,11 +1679,58 @@ Promise.all([
         width: 100%;
         min-width: 1000px;
     }
-    .background {
-        margin: auto;
-        width: 80%;
-        max-width: 1920px;
-    }
+.background {
+    margin: auto;
+    width: 80%;
+    max-width: 1920px;
+    position: relative;
+}
+
+.background::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-color: #0a0a0a;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(20px) brightness(0.3);
+    transform: scale(1.1);
+}
+
+:global(body:not(.dark-mode)) .background::before {
+    filter: blur(20px) brightness(1.2);
+    background-color: #f5f5f5;
+}
+
+.background[data-has-image="true"]::before {
+    background-image: var(--bg-image);
+}
+
+.background::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0.5) 0%, 
+        rgba(0, 0, 0, 0.3) 50%, 
+        rgba(0, 0, 0, 0.5) 100%);
+}
+
+:global(body:not(.dark-mode)) .background::after {
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.5) 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0.5) 100%);
+}
 
     .user-stat-box {
         height: 50%;
@@ -1702,7 +1763,7 @@ Promise.all([
         width: 64px;
         height: 64px;
         border-radius: 1024px;
-        border: 2px solid rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         background: transparent;
         display: flex;
         flex-direction: column;
@@ -1740,7 +1801,7 @@ Promise.all([
         height: 100%;
         display: none;
         border-radius: 8px;
-        border: 2px solid rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         z-index: 4999;
     }
     :global(html[dir="rtl"]) .emoji-picker-list {
@@ -1780,11 +1841,11 @@ Promise.all([
         border: 0;
         padding: 0 4px;
         margin: 0;
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(17, 17, 17, 0.4);
         border-radius: 8px;
     }
     :global(body.dark-mode) .emoji-picker-search-container input {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(17, 17, 17, 0.4);
         color: white;
     }
     .emoji-picker-search-icon {
@@ -2048,6 +2109,24 @@ Promise.all([
         display: flex;
         flex-direction: column;
         justify-content: center;
+        background: rgba(17, 17, 17, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    :global(body:not(.dark-mode)) .section-user-header {
+        background: rgba(255, 255, 255, 0.6);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    :global(body.dark-mode) .section-user-header {
+        background: rgba(17, 17, 17, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-color: rgba(255, 255, 255, 0.2);
     }
 .following-list {
     display: flex;
@@ -2089,10 +2168,24 @@ Promise.all([
         width: 32%;
         border-radius: 8px;
         border-width: 1px;
-        border-color: rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
         border-style: solid;
         padding: 6px;
         position: relative;
+        background: rgba(17, 17, 17, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    :global(body:not(.dark-mode)) .section-user-stats {
+        background: rgba(255, 255, 255, 0.6);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    :global(body.dark-mode) .section-user-stats {
+        background: rgba(17, 17, 17, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .profile-bio {
         width: calc(100% - 6px);
@@ -2105,7 +2198,7 @@ Promise.all([
         background: rgba(0, 0, 0, 0.15);
     }
     :global(body.dark-mode) .profile-bio-line {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(17, 17, 17, 0.4);
     }
 
     .user-ordering-stats {
@@ -2364,4 +2457,138 @@ Promise.all([
         flex-wrap: wrap;
         justify-content: center;
     }
+    :global(body.dark-mode) :global(.content-category) {
+    background: rgba(17, 17, 17, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+:global(body.dark-mode) :global(.content-category) {
+    background: rgba(17, 17, 17, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+.blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.blob-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, transparent 70%);
+    top: 10%;
+    left: 10%;
+    animation: float1 20s ease-in-out infinite;
+}
+
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.5) 0%, transparent 70%);
+    top: 50%;
+    right: 15%;
+    animation: float2 18s ease-in-out infinite 2s;
+}
+
+.blob-3 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(29, 78, 216, 0.4) 0%, transparent 70%);
+    bottom: 15%;
+    left: 50%;
+    animation: float3 22s ease-in-out infinite 4s;
+}
+
+:global(body:not(.dark-mode)) .blob-1 {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+}
+
+:global(body:not(.dark-mode)) .blob-2 {
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+}
+
+:global(body:not(.dark-mode)) .blob-3 {
+    background: radial-gradient(circle, rgba(29, 78, 216, 0.2) 0%, transparent 70%);
+}
+
+@keyframes float1 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(100px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-50px, 80px) scale(0.9);
+    }
+}
+
+@keyframes float2 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(-80px, 60px) scale(1.15);
+    }
+    66% {
+        transform: translate(70px, -40px) scale(0.95);
+    }
+}
+
+@keyframes float3 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(60px, 70px) scale(0.9);
+    }
+    66% {
+        transform: translate(-90px, -30px) scale(1.1);
+    }
+}
+/* ContentCategory background for dark mode */
+:global(body.dark-mode) :global(.content-category) {
+    background: rgba(17, 17, 17, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ContentCategory background for light mode */
+:global(body:not(.dark-mode)) :global(.content-category) {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+/* --- Shared style for all ContentCategory boxes --- */
+:global(.content-category) {
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 12px;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Light mode background */
+:global(body:not(.dark-mode)) :global(.content-category) {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode background */
+:global(body.dark-mode) :global(.content-category) {
+    background: rgba(20, 20, 20, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
 </style>

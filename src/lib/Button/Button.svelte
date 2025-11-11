@@ -62,7 +62,7 @@
         border-radius: 4px;
         outline-width: 2px;
         outline-style: solid;
-        outline-color: rgba(0, 195, 255, 0.35);
+        outline-color: rgba(0, 4, 255, 0.35);
         color: white;
         background-color: #0011ff;
         cursor: pointer;
