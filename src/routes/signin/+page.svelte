@@ -68,13 +68,21 @@
     const togglePasswordView = () => {
         showingPassword = !showingPassword;
     };
-
     async function login() {
         const token = await Authentication.verifyPassword(username, password, captcha_token);
 
         if (token) {
+            // Store in localStorage
             localStorage.setItem("username", username);
             localStorage.setItem("token", token);
+            
+            // Set cookie that works across all arkide.site subdomains
+            // Cookie will last for 30 days
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            
+            document.cookie = `arkide_username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax; Secure`;
+            
             return true;
         }
 
@@ -133,8 +141,16 @@
 
             const { username, token } = event.data;
 
+            // Store in localStorage
             localStorage.setItem("username", username);
             localStorage.setItem("token", token);
+            
+            // Set cookie that works across all arkide.site subdomains
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            
+            document.cookie = `arkide_username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax; Secure`;
+            document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax; Secure`;
 
             if (embed) {
                 const opener = window.opener || window.parent;
