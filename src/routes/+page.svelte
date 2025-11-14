@@ -675,11 +675,10 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Overhauls the homepage</li>
-                                <li>Fixes the follower lists in the user profiles to look better</li>
-                                <li>More animations and blur becuase yes</li>
-                                <li>New loading screen Tips</li>
-                                <li>Fix the embed for the editor (the voting embed on the editor)</li>
+                                <li>Add comments to the editor page</li>
+                                <li>Change some stuff in the admin panel to handel comment reporting</li>
+                                <li>Fix the Vote Frame in the editor to have more height</li>
+                                <li>A bunch of backend changes to add comments</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
