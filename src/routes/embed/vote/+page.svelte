@@ -426,7 +426,20 @@ function formatTime(timestamp) {
             {#each comments as comment (comment.id)}
                 <div class="comment">
                     <div class="comment-header">
-                        <span class="comment-author">{comment.username}</span>
+                        <div class="comment-author-info">
+                            <img 
+                                src={`https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=${comment.username}`}
+                                alt={comment.username}
+                                class="comment-pfp"
+                            />
+                            <a 
+                                href={`https://arkide.site/profile?user=${comment.username}`}
+                                class="comment-author"
+                                target="_blank"
+                            >
+                                {comment.username}
+                            </a>
+                        </div>
                         <span class="comment-time">
                             {formatTime(comment.createdAt)}
                             {#if comment.edited}
@@ -824,5 +837,37 @@ function formatTime(timestamp) {
 }
 .load-more:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+.comment-author-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-pfp {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.comment-author {
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.9);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.comment-author:hover {
+    color: #0074d9;
+    text-decoration: underline;
+}
+
+:global(body.dark-mode) .comment-author {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+:global(body.dark-mode) .comment-author:hover {
+    color: #4dabf7;
 }
 </style>
