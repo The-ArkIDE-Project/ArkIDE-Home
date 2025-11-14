@@ -119,6 +119,7 @@
             userLiked = false;
             userVoted = false;
             loaded = true;
+            loadComments(); // ADD THIS LINE
             console.log("what", username, token)
             return;
         }
@@ -150,6 +151,7 @@
         ProjectClient.setToken(privateCode);
         Authentication.usernameFromCode(username, privateCode).then(({ isAdmin, isApprover}) => {
             loggedIn = true;
+            loadComments();
             loggedInAdmin = isAdmin || isApprover;
         });
     });
@@ -385,72 +387,118 @@ function formatTime(timestamp) {
         <LoadingSpinner />
     {/if}
 </div>
-<div class="comments-section">
-    <h2>Comments ({commentCount})</h2>
-    
-    {#if loggedIn}
-        <div class="comment-box">
-            <textarea 
-                bind:value={newComment}
-                placeholder="Write a comment..."
-                maxlength="500"
-                rows="3"
-            ></textarea>
-            <div class="comment-actions">
-                <span class="char-count">{newComment.length}/500</span>
-                <button on:click={postComment} disabled={newComment.trim().length === 0}>
-                    Post Comment
-                </button>
-            </div>
+{#if loaded}
+    <div class="comments-section">
+        <div class="comments-header">
+            <h2>Comments</h2>
+            <span class="comment-count">{commentCount}</span>
         </div>
-    {:else}
-        <p class="login-prompt">Log in to comment</p>
-    {/if}
-
-    <div class="comments-list">
-        {#each comments as comment (comment.id)}
-            <div class="comment">
-                <div class="comment-header">
-                    <span class="comment-author">{comment.username}</span>
-                    <span class="comment-time">
-                        {formatTime(comment.createdAt)}
-                        {#if comment.edited}
-                            <span class="edited">(edited)</span>
-                        {/if}
-                    </span>
-                </div>
-                
-                {#if editingComment === comment.id}
-                    <textarea 
-                        bind:value={editContent}
-                        maxlength="500"
-                        rows="3"
-                    ></textarea>
-                    <div class="comment-actions">
-                        <button on:click={() => saveEdit(comment.id)}>Save</button>
-                        <button on:click={() => editingComment = null}>Cancel</button>
-                    </div>
-                {:else}
-                    <p class="comment-content">{comment.content}</p>
-                    
-                    <div class="comment-buttons">
-                        {#if loggedInAdmin || (loggedIn && comment.username === localStorage.getItem("username"))}
-                            <button class="small-btn" on:click={() => startEdit(comment)}>Edit</button>
-                            <button class="small-btn delete" on:click={() => deleteComment(comment.id)}>Delete</button>
-                        {/if}
-                        <button class="small-btn" on:click={() => reportComment(comment.id)}>Report</button>
-                    </div>
-                {/if}
-            </div>
-        {/each}
         
-        {#if hasMoreComments}
-            <button class="load-more" on:click={loadMoreComments}>
-                Load More Comments
-            </button>
+        {#if loggedIn}
+            <div class="comment-box">
+                <textarea 
+                    bind:value={newComment}
+                    placeholder="Write a comment..."
+                    maxlength="500"
+                    rows="3"
+                ></textarea>
+                <div class="comment-actions">
+                    <span class="char-count">{newComment.length}/500</span>
+                    <button 
+                        class="post-btn" 
+                        on:click={postComment} 
+                        disabled={newComment.trim().length === 0}
+                        title="Post Comment"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        {:else}
+            <div class="login-prompt">
+                <p>Log in to post comments</p>
+            </div>
         {/if}
+
+        <div class="comments-list">
+            {#each comments as comment (comment.id)}
+                <div class="comment">
+                    <div class="comment-header">
+                        <span class="comment-author">{comment.username}</span>
+                        <span class="comment-time">
+                            {formatTime(comment.createdAt)}
+                            {#if comment.edited}
+                                <span class="edited">(edited)</span>
+                            {/if}
+                        </span>
+                    </div>
+                    
+                    {#if editingComment === comment.id}
+                        <textarea 
+                            bind:value={editContent}
+                            maxlength="500"
+                            rows="3"
+                            class="edit-textarea"
+                        ></textarea>
+                        <div class="comment-buttons">
+                            <button class="icon-btn save-btn" on:click={() => saveEdit(comment.id)} title="Save">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn cancel-btn" on:click={() => editingComment = null} title="Cancel">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                    {:else}
+                        <p class="comment-content">{comment.content}</p>
+                        
+                        <div class="comment-buttons">
+                            {#if loggedInAdmin || (loggedIn && comment.username === localStorage.getItem("username"))}
+                                <button class="icon-btn edit-btn" on:click={() => startEdit(comment)} title="Edit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-btn" on:click={() => deleteComment(comment.id)} title="Delete">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                    </svg>
+                                </button>
+                            {/if}
+                            <button class="icon-btn report-btn" on:click={() => reportComment(comment.id)} title="Report">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </button>
+                        </div>
+                    {/if}
+                </div>
+            {/each}
+            
+            {#if comments.length === 0}
+                <div class="no-comments">
+                    <p>No comments yet. Be the first to comment!</p>
+                </div>
+            {/if}
+            
+            {#if hasMoreComments}
+                <button class="load-more" on:click={loadMoreComments}>
+                    Load More Comments
+                </button>
+            {/if}
+        </div>
     </div>
-</div>
+{/if}
 
 <style>
 	* {
@@ -581,37 +629,56 @@ function formatTime(timestamp) {
 	.view:hover {
 		box-shadow: 0 0 25px rgba(47, 0, 255, 0.6);
 	}
-    .comments-section {
-    margin-top: 40px;
+.comments-section {
+    margin: 20px auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
+    max-width: 800px;
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 20px;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
-
 :global(body.dark-mode) .comments-section {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
-.comments-section h2 {
-    margin: 0 0 20px 0;
-    font-size: 1.5rem;
-}
-
-.comment-box {
+.comments-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
 }
+.comments-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.comment-count {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+:global(body.dark-mode) .comment-count {
+    background: rgba(255, 255, 255, 0.15);
+}
 
-.comment-box textarea {
+.comment-box textarea,
+.edit-textarea {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.1);
-    color: inherit;
     font-family: inherit;
     font-size: 1rem;
     resize: vertical;
+    box-sizing: border-box;
+}
+:global(body.dark-mode) .comment-box textarea,
+:global(body.dark-mode) .edit-textarea {
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .comment-actions {
@@ -620,26 +687,31 @@ function formatTime(timestamp) {
     align-items: center;
     margin-top: 8px;
 }
-
 .char-count {
     font-size: 0.9rem;
     opacity: 0.7;
 }
-
-.comment-actions button {
-    padding: 8px 20px;
+.post-btn {
+    padding: 8px 12px;
     border-radius: 8px;
     border: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.post-btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+:global(body.dark-mode) .post-btn {
+    background: rgba(255, 255, 255, 0.15);
+}
+:global(body.dark-mode) .post-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
 }
 
-.comment-actions button:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.comment-actions button:disabled {
+.post-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -647,6 +719,12 @@ function formatTime(timestamp) {
 .login-prompt {
     text-align: center;
     padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.login-prompt p {
+    margin: 0;
     opacity: 0.7;
 }
 
@@ -655,11 +733,15 @@ function formatTime(timestamp) {
     flex-direction: column;
     gap: 16px;
 }
-
 .comment {
     padding: 16px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.08);
     border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+:global(body.dark-mode) .comment {
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .comment-header {
@@ -668,64 +750,67 @@ function formatTime(timestamp) {
     margin-bottom: 8px;
     font-size: 0.9rem;
 }
-
 .comment-author {
     font-weight: bold;
 }
-
 .comment-time {
+    opacity: 0.7;
+    font-size: 0.85rem;
+}
+.edited {
+    font-style: italic;
     opacity: 0.7;
 }
 
-.edited {
-    font-style: italic;
-    opacity: 0.6;
-}
-
 .comment-content {
-    margin: 8px 0;
-    line-height: 1.5;
+    margin: 8px 0 12px 0;
+    line-height: 1.6;
     word-wrap: break-word;
+    text-align: left;
+    white-space: pre-wrap;
 }
 
 .comment-buttons {
     display: flex;
     gap: 8px;
-    margin-top: 8px;
 }
-
-.small-btn {
-    padding: 4px 12px;
-    font-size: 0.85rem;
+.icon-btn {
+    padding: 6px 10px;
     border-radius: 6px;
     border: none;
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
 }
-
-.small-btn:hover {
+.icon-btn:hover {
     background: rgba(255, 255, 255, 0.2);
 }
-
-.small-btn.delete {
-    background: rgba(255, 0, 0, 0.2);
-}
-
-.small-btn.delete:hover {
+.delete-btn:hover {
     background: rgba(255, 0, 0, 0.3);
 }
+.report-btn:hover {
+    background: rgba(255, 165, 0, 0.3);
+}
 
+.no-comments {
+    text-align: center;
+    padding: 40px 20px;
+    opacity: 0.6;
+}
 .load-more {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
     border: none;
     background: rgba(255, 255, 255, 0.1);
+    color: rgba(0, 0, 0, 0.9);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    font-weight: bold;
 }
-
+:global(body.dark-mode) .load-more {
+    color: rgba(255, 255, 255, 0.9);
+}
 .load-more:hover {
     background: rgba(255, 255, 255, 0.2);
 }
