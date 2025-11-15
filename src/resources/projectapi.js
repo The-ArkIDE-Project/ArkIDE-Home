@@ -386,6 +386,21 @@ async getAllUsers() {
         }).bind(this))
     }
 
+    async getComment(commentId) {
+    const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/projects/comments/${commentId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw await response.text();
+    }
+    
+    return await response.json();
+}
+
     setToken(p) {
         this.token = p;
     }

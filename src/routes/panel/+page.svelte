@@ -196,7 +196,7 @@
             unapprovedProjects = unapprovedProjs;
         });
     }
-    function openReportsMenu(type) {
+    async function openReportsMenu(type) {
         unapprovedProjects = [];
         contentWithReports = [];
         
@@ -206,10 +206,23 @@
             apiType = 2; // Comments use type 2
         }
         
-        ProjectClient.getTypeWithReports(apiType, 0).then((projectsWithReports) => {
-            contentWithReports = projectsWithReports;
-            console.log(contentWithReports)
-        });
+        const projectsWithReports = await ProjectClient.getTypeWithReports(apiType, 0);
+        
+        // Auto-load comment data for comment reports
+        if (type === "comment") {
+            for (const report of projectsWithReports) {
+                try {
+                    const commentData = await ProjectClient.getComment(report.target);
+                    report.commentData = commentData;
+                } catch (err) {
+                    console.error("Failed to load comment:", err);
+                    report.commentData = { username: "Error", content: "Failed to load comment" };
+                }
+            }
+        }
+        
+        contentWithReports = projectsWithReports;
+        console.log(contentWithReports);
     }
     // function deleteProject(id, name) {
     //     const code = prompt(
@@ -2098,7 +2111,17 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
         {:else if dropdownSelectMenu.value === "comment"}
             <button
                 class="reports-user-button"
-                on:click={() => {
+                on:click={async () => {
+                    // Load comment details
+                    if (!content.commentData) {
+                        try {
+                            const commentData = await ProjectClient.getComment(content.target);
+                            content.commentData = commentData;
+                        } catch (err) {
+                            console.error("Failed to load comment:", err);
+                        }
+                    }
+                    
                     loadReportDetails(content.target);
                     if (selectedReportDetailed === idx) {
                         selectedReportDetailed = -1;
@@ -2109,10 +2132,12 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
             >
                 <div class="reports-user-content">
                     <p style="font-weight: bold;">
-                        Comment ID: {content.target}
+                        Comment by {content.commentData?.username || 'Loading...'}
                     </p>
                     <p style="font-size: 0.85em; opacity: 0.8;">
-                        {content.report.substring(0, 50)}{content.report.length > 50 ? '...' : ''}
+                        {content.commentData?.content ? 
+                            (content.commentData.content.substring(0, 50) + (content.commentData.content.length > 50 ? '...' : '')) 
+                            : 'Loading comment...'}
                     </p>
                 </div>
             </button>
@@ -2123,7 +2148,17 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                     {:else}
                         <h5>Reported by: <a href={`https://penguinmod.com/profile?user=${content.reporter}`}>{content.reporter}</a></h5>
                         <p><strong>Comment ID:</strong> {content.target}</p>
-                        <p><strong>Reason:</strong></p>
+                        {#if content.commentData}
+                            <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
+                            <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
+                            <p><strong>Comment Text:</strong></p>
+                            <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 4px;">
+                                {content.commentData.content}
+                            </p>
+                        {:else}
+                            <p>Loading comment details...</p>
+                        {/if}
+                        <p><strong>Report Reason:</strong></p>
                         <p style="white-space:pre-wrap">
                             {content.report}
                         </p>
