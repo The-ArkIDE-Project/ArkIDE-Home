@@ -69,7 +69,7 @@ export default {
     /**
      * PenguinMod's packager page
      */
-    packager: `${PUBLIC_STUDIO_URL}/ArkIDE-Packager/`,
+    packager: `https://packager.arkide.site/`,
 
     /**
      * PenguinMod's unofficial wiki

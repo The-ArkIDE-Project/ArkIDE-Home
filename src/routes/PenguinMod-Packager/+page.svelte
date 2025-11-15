@@ -3,7 +3,7 @@
     import { PUBLIC_STUDIO_URL } from "$env/static/public";
     onMount(() => {
         window.location.href =
-            `${PUBLIC_STUDIO_URL}/PenguinMod-Packager`;
+            `https://packager.arkide.site/`;
     });
 </script>
 
@@ -19,7 +19,7 @@
 </svelte:head>
 <div>
     If you are not redirected automatically,
-    <a href="{PUBLIC_STUDIO_URL}/PenguinMod-Packager">click here</a>
+    <a href="https://packager.arkide.site/">click here</a>
 </div>
 
 <style>

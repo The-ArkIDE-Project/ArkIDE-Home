@@ -325,7 +325,7 @@ Language.onChange((lang) => {
             <br>
             <br>
             Arkide will not ask the user to confirm this action if the project is compiled using
-            <a href="{PUBLIC_STUDIO_URL}/Arkide-Packager/">the Arkide packager.</a>
+            <a href="https://packager.arkide.site/">the Arkide packager.</a>
             <br>
             In this case it is up to the user's browser to prompt the user if they would like to allow the website
             to access their location.
