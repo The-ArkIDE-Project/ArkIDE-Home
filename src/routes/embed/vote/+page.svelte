@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import Authentication from "../../../resources/authentication.js";
     import ProjectApi from "../../../resources/projectapi.js";
+    import EmojiHandler from "../../../resources/emojis.js";
     const ProjectClient = new ProjectApi();
 
     // Components
@@ -25,6 +26,13 @@
     let loaded = false;
     let loggedIn = true;
     let loggedInAdmin = false;
+
+    // emoji handeling
+
+    let emojiMap = {};
+    let emojisLoaded = false;
+    let showEmojiPicker = false;
+    let commentTextarea;
 
     let projectId = 0;
 
@@ -99,6 +107,9 @@
         const projId = String(params.get("id"));
         projectId = projId;
         
+        // Load emojis
+        loadEmojis();
+        
         ProjectApi.getProjectMeta(projId)
             .then((meta) => {
                 likes = numberCast(meta.loves);
@@ -119,7 +130,7 @@
             userLiked = false;
             userVoted = false;
             loaded = true;
-            loadComments(); // ADD THIS LINE
+            loadComments();
             console.log("what", username, token)
             return;
         }
@@ -317,6 +328,54 @@ function formatTime(timestamp) {
     if (days < 7) return `${days}d ago`;
     return date.toLocaleDateString();
 }
+async function loadEmojis() {
+    try {
+        const emojis = await EmojiHandler.fetch();
+        // Create a map of emoji names to their data
+        emojis.forEach(emoji => {
+            emojiMap[emoji.name] = emoji;
+        });
+        emojisLoaded = true;
+    } catch (err) {
+        console.error("Failed to load emojis:", err);
+    }
+}
+
+function parseEmojis(text) {
+    if (!emojisLoaded || !text) return text;
+    
+    // Match :emojiname: pattern
+    return text.replace(/:([a-zA-Z0-9_-]+):/g, (match, emojiName) => {
+        if (emojiMap[emojiName]) {
+            return `<img src="https://library.arkide.site/files/emojis/${emojiName}.png" alt="${emojiName}" class="emoji-inline" title=":${emojiName}:" />`;
+        }
+        return match; // Return original if emoji not found
+    });
+}
+function insertEmoji(emojiName) {
+    const emojiCode = `:${emojiName}:`;
+    if (commentTextarea) {
+        const start = commentTextarea.selectionStart;
+        const end = commentTextarea.selectionEnd;
+        const text = newComment;
+        newComment = text.substring(0, start) + emojiCode + text.substring(end);
+        
+        // Set cursor position after inserted emoji
+        setTimeout(() => {
+            commentTextarea.selectionStart = commentTextarea.selectionEnd = start + emojiCode.length;
+            commentTextarea.focus();
+        }, 0);
+    } else {
+        newComment += emojiCode;
+    }
+    showEmojiPicker = false;
+}
+function getEmojiList() {
+    return Object.keys(emojiMap).map(name => ({
+        name,
+        url: `https://library.arkide.site/files/emojis/${name}.png`
+    }));
+}
 </script>
 
 <div class="main">
@@ -397,13 +456,24 @@ function formatTime(timestamp) {
         {#if loggedIn}
             <div class="comment-box">
                 <textarea 
+                    bind:this={commentTextarea}
                     bind:value={newComment}
                     placeholder="Write a comment..."
                     maxlength="500"
                     rows="3"
                 ></textarea>
                 <div class="comment-actions">
-                    <span class="char-count">{newComment.length}/500</span>
+                    <div class="left-actions">
+                        <span class="char-count">{newComment.length}/500</span>
+                        <button 
+                            class="emoji-picker-btn" 
+                            on:click={() => showEmojiPicker = !showEmojiPicker}
+                            title="Add emoji"
+                            type="button"
+                        >
+                            😊
+                        </button>
+                    </div>
                     <button 
                         class="post-btn" 
                         on:click={postComment} 
@@ -415,6 +485,27 @@ function formatTime(timestamp) {
                         </svg>
                     </button>
                 </div>
+                
+                {#if showEmojiPicker && emojisLoaded}
+                    <div class="emoji-picker">
+                        <div class="emoji-picker-header">
+                            <span>Pick an emoji</span>
+                            <button class="emoji-close" on:click={() => showEmojiPicker = false}>×</button>
+                        </div>
+                        <div class="emoji-grid">
+                            {#each getEmojiList() as emoji}
+                                <button 
+                                    class="emoji-item" 
+                                    on:click={() => insertEmoji(emoji.name)}
+                                    title=":{emoji.name}:"
+                                    type="button"
+                                >
+                                    <img src={emoji.url} alt={emoji.name} />
+                                </button>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
             </div>
         {:else}
             <div class="login-prompt">
@@ -469,7 +560,7 @@ function formatTime(timestamp) {
                             </button>
                         </div>
                     {:else}
-                        <p class="comment-content">{comment.content}</p>
+                        <p class="comment-content">{@html parseEmojis(comment.content)}</p>
                         
                         <div class="comment-buttons">
                             {#if loggedInAdmin || (loggedIn && comment.username === localStorage.getItem("username"))}
@@ -869,5 +960,159 @@ function formatTime(timestamp) {
 
 :global(body.dark-mode) .comment-author:hover {
     color: #4dabf7;
+}
+.emoji-inline {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+}
+.emoji-inline {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+}
+
+.left-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.emoji-picker-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:global(body.dark-mode) .emoji-picker-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.emoji-picker-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+:global(body.dark-mode) .emoji-picker-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.emoji-picker {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    max-width: 320px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+:global(body.dark-mode) .emoji-picker {
+    background: rgba(30, 30, 30, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.emoji-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+:global(body.dark-mode) .emoji-picker-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.emoji-picker-header span {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.emoji-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+    height: auto;
+    color: rgba(0, 0, 0, 0.6);
+    transition: color 0.2s ease;
+}
+
+:global(body.dark-mode) .emoji-close {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.emoji-close:hover {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+:global(body.dark-mode) .emoji-close:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 6px;
+}
+
+.emoji-item {
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:global(body.dark-mode) .emoji-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.emoji-item:hover {
+    background: rgba(0, 0, 0, 0.15);
+    transform: scale(1.15);
+}
+
+:global(body.dark-mode) .emoji-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.emoji-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.comment-box {
+    position: relative;
 }
 </style>
