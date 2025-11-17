@@ -1793,16 +1793,16 @@ Promise.all([
         transition-duration: 0s;
     }
     .emoji-picker-list {
-        position: absolute;
-        top: 8px;
-        left: calc(100% + 8px);
+        position: fixed;
+        top: auto;
+        left: auto;
         background: white;
         width: 320px;
-        height: 100%;
+        height: 320px;
         display: none;
         border-radius: 12px;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        z-index: 4999;
+        z-index: 9999;
     }
     :global(html[dir="rtl"]) .emoji-picker-list {
         left: initial;
@@ -2239,6 +2239,7 @@ Promise.all([
         border-style: solid;
         padding: 6px;
         position: relative;
+        z-index: 1;
         background: rgba(17, 17, 17, 0.4);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
