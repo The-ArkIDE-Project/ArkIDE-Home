@@ -676,10 +676,8 @@
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
                                 <li>Add comments to the editor page</li>
-                                <li>Change some stuff in the admin panel to handel comment reporting</li>
-                                <li>Fix the Vote Frame in the editor to have more height</li>
-                                <li>A bunch of backend changes to add comments</li>
                                 <li>Update the TOS page and add a lil suprise in there</li>
+                                <li>Add ArkIDE Custom Emoji's support to the comments</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
