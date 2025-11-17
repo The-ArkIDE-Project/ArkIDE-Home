@@ -1014,10 +1014,10 @@ function getEmojiList() {
 
 .emoji-picker {
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 0;
     right: 0;
-    margin-bottom: 10px;
+    margin-top: 10px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -1119,5 +1119,27 @@ function getEmojiList() {
 
 .comment-box {
     position: relative;
+}
+.comment-content .emoji-inline {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+    object-fit: contain;
+}
+:global(.emoji-inline) {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+    object-fit: contain;
 }
 </style>
