@@ -969,20 +969,15 @@ function getEmojiList() {
     color: #4dabf7;
 }
 .emoji-inline {
-    width: 20px;
-    height: 20px;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
     vertical-align: middle;
     display: inline-block;
     margin: 0 2px;
     user-select: none;
-}
-.emoji-inline {
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
-    display: inline-block;
-    margin: 0 2px;
-    user-select: none;
+    object-fit: contain;
 }
 
 .left-actions {
@@ -1021,16 +1016,19 @@ function getEmojiList() {
     position: absolute;
     bottom: 100%;
     left: 0;
+    right: 0;
     margin-bottom: 10px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     padding: 12px;
-    max-width: 320px;
+    width: 100%;
+    max-width: 100%;
     max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
     backdrop-filter: blur(10px);
+    box-sizing: border-box;
 }
 
 :global(body.dark-mode) .emoji-picker {
