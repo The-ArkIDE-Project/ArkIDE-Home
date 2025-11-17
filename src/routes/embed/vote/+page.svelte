@@ -331,10 +331,15 @@ function formatTime(timestamp) {
 async function loadEmojis() {
     try {
         const emojis = await EmojiHandler.fetch();
-        // Create a map of emoji names to their data
-        emojis.forEach(emoji => {
-            emojiMap[emoji.name] = emoji;
+        console.log("Loaded emojis:", emojis); // Debug
+        
+        // The emojis are just an array of strings (names)
+        emojis.forEach(emojiName => {
+            if (typeof emojiName === 'string') {
+                emojiMap[emojiName] = true; // Just mark it as existing
+            }
         });
+        console.log("Emoji map:", emojiMap); // Debug
         emojisLoaded = true;
     } catch (err) {
         console.error("Failed to load emojis:", err);
@@ -371,10 +376,12 @@ function insertEmoji(emojiName) {
     showEmojiPicker = false;
 }
 function getEmojiList() {
-    return Object.keys(emojiMap).map(name => ({
+    // emojiMap keys are the emoji names
+    const list = Object.keys(emojiMap).map(name => ({
         name,
         url: `https://library.arkide.site/files/emojis/${name}.png`
     }));
+    return list;
 }
 </script>
 
