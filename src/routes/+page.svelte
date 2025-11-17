@@ -678,6 +678,7 @@
                                 <li>Add comments to the editor page</li>
                                 <li>Update the TOS page and add a lil suprise in there</li>
                                 <li>Add ArkIDE Custom Emoji's support to the comments</li>
+                                <li>Add a search bar to the editor to find blocks easier</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
