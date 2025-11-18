@@ -834,7 +834,7 @@ Promise.all([
                 <img src="/penguins/rankup.svg" alt="Rank up" />
                 <p style="text-align:center;">
                     <LocalizedText
-                        text="Let's see if you can become a real penguin!"
+                        text="Let's see if you can become a real Butterfly!"
                         key="profile.rankup.message1"
                         lang={currentLang}
                     />
