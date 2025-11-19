@@ -679,6 +679,7 @@
                                 <li>Update the TOS page and add a lil suprise in there</li>
                                 <li>Add ArkIDE Custom Emoji's support to the comments</li>
                                 <li>Add a search bar to the editor to find blocks easier</li>
+                                <li>The amount of votes needed to get featured has been nerfed (original: 1, new: 10)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
