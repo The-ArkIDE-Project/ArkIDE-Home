@@ -675,10 +675,10 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add comments to the editor page</li>
-                                <li>Update the TOS page and add a lil suprise in there</li>
-                                <li>Add ArkIDE Custom Emoji's support to the comments</li>
-                                <li>Add a search bar to the editor to find blocks easier</li>
+                                <li>Add working Google Authentication</li>
+                                <li>Fix email verification (VERIFY YOUR EMAILS!!!)</li>
+                                <li>Fix a wierd discord webhook issue that would crash the servers</li>
+                                <li>General improvment to the backend server</li>
                                 <li>The amount of votes needed to get featured has been nerfed (original: 1, new: 10)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
