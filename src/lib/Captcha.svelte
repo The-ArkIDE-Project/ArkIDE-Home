@@ -72,7 +72,7 @@
 {:else}
     <div
         class="cf-turnstile"
-        data-sitekey="0x4AAAAAAA0-uEePyt9NmTMl"
+        data-sitekey="0x4AAAAAACCGRUg6dAwVN1Ai"
         data-callback="on_captcha_complete"
         data-expired-callback="on_captcha_expired"
         data-error-callback="on_captcha_error"
