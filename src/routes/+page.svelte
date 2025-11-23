@@ -677,9 +677,9 @@
                             <ul>
                                 <li>Add working Google Authentication</li>
                                 <li>Fix email verification (VERIFY YOUR EMAILS!!!)</li>
-                                <li>Fix a wierd discord webhook issue that would crash the servers</li>
-                                <li>General improvment to the backend server</li>
-                                <li>The amount of votes needed to get featured has been nerfed (original: 1, new: 10)</li>
+                                <li>Add replies feature to the comment section (you can now reply to other comments)</li>
+                                <li>You can now @ users by doing "@(ARKIDE USERNAME)" Replacing (ARKIDE USERNAME) With the name of the user you wanna @</li>
+                                <li>API Backend changes to make the replying feature work</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
