@@ -2152,7 +2152,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                             <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
                             <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
                             <p><strong>Comment Text:</strong></p>
-                            <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 4px;">
+                            <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px;">
                                 {content.commentData.content}
                             </p>
                         {:else}
@@ -2352,7 +2352,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
         margin: 4px;
         padding: 4px;
         border: rgba(0, 0, 0, 0.25) 1px solid;
-        border-radius: 4px;
+        border-radius: 8px;
         background: white;
         display: flex;
         flex-direction: row;
@@ -2367,7 +2367,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
     .reports-user-button img {
         width: 32px;
         height: 32px;
-        border-radius: 4px;
+        border-radius: 8px;
     }
     .reports-project-button img {
         width: 48px;
@@ -2386,7 +2386,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
         margin: 4px;
         padding: 4px;
         border: rgba(0, 0, 0, 0.25) 1px solid;
-        border-radius: 4px;
+        border-radius: 8px;
         background: white;
         width: calc(100% - 20px);
     }
