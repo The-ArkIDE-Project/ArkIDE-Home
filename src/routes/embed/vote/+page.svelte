@@ -202,24 +202,34 @@ async function loadComments() {
         console.error("Failed to load comments:", err);
     }
 }
-
 async function postComment() {
     if (!newComment.trim()) return;
     
-    // Check if comment starts with @username
+    // Check if we're replying to a specific comment
     let parentId = null;
     let content = newComment.trim();
-    const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
     
-    if (mentionMatch) {
-        const mentionedUser = mentionMatch[1];
-        const restOfComment = mentionMatch[2];
-        
-        // Find the comment by this user to reply to
-        const parentComment = comments.find(c => c.username === mentionedUser);
-        if (parentComment) {
-            parentId = parentComment.id;
-            content = restOfComment; // Remove the @mention from content
+    if (replyingTo && replyingTo.commentId) {
+        // Using the reply button - we know exactly which comment to reply to
+        parentId = replyingTo.commentId;
+        // Remove the @mention from the content
+        const mentionMatch = content.match(/^@\w+\s+(.+)/);
+        if (mentionMatch) {
+            content = mentionMatch[1];
+        }
+    } else {
+        // Manual @mention - find the most recent top-level comment by that user
+        const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
+        if (mentionMatch) {
+            const mentionedUser = mentionMatch[1];
+            const restOfComment = mentionMatch[2];
+            
+            const userComments = comments.filter(c => c.username === mentionedUser && !c.parentId);
+            const parentComment = userComments[0];
+            if (parentComment) {
+                parentId = parentComment.id;
+                content = restOfComment;
+            }
         }
     }
     
@@ -305,7 +315,7 @@ async function deleteComment(commentId) {
 
 function replyToComment(comment) {
     newComment = `@${comment.username} `;
-    replyingTo = comment.username;
+    replyingTo = { username: comment.username, commentId: comment.id };
     if (commentTextarea) {
         commentTextarea.focus();
         commentTextarea.setSelectionRange(newComment.length, newComment.length);
@@ -393,7 +403,7 @@ function parseMentions(text) {
     
     // Match @username pattern (not at the start, since those are handled as replies)
     return text.replace(/(?<!^)@(\w+)/g, (match, username) => {
-        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
+        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank" data-username="${username}">@${username}</a>`;
     });
 }
 
@@ -510,7 +520,7 @@ function getEmojiList() {
             <div class="comment-box">
                 {#if replyingTo}
                     <div class="replying-to">
-                        <span>Replying to @{replyingTo}</span>
+                        <span>Replying to @{replyingTo.username}</span>
                         <button class="cancel-reply" on:click={() => { replyingTo = null; newComment = ""; }}>×</button>
                     </div>
                 {/if}
@@ -1359,5 +1369,33 @@ function getEmojiList() {
 
 .reply-btn:hover {
     background: rgba(0, 123, 255, 0.2);
+}
+.mention-link {
+    color: #0074d9;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 116, 217, 0.1);
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.mention-link:hover {
+    color: #0056a8;
+    background: rgba(0, 116, 217, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 116, 217, 0.2);
+}
+
+:global(body.dark-mode) .mention-link {
+    color: #4dabf7;
+    background: rgba(74, 171, 247, 0.15);
+}
+
+:global(body.dark-mode) .mention-link:hover {
+    color: #74c0fc;
+    background: rgba(74, 171, 247, 0.25);
+    box-shadow: 0 2px 4px rgba(74, 171, 247, 0.3);
 }
 </style>
