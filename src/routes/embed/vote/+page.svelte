@@ -179,6 +179,7 @@ let hasMoreComments = true;
 let newComment = "";
 let editingComment = null;
 let editContent = "";
+let replyingTo = null;
 
 const API_URL = "https://arkideapi.arc360hub.com";
 
@@ -203,6 +204,23 @@ async function loadComments() {
 async function postComment() {
     if (!newComment.trim()) return;
     
+    // Check if comment starts with @username
+    let parentId = null;
+    let content = newComment.trim();
+    const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
+    
+    if (mentionMatch) {
+        const mentionedUser = mentionMatch[1];
+        const restOfComment = mentionMatch[2];
+        
+        // Find the comment by this user to reply to
+        const parentComment = comments.find(c => c.username === mentionedUser);
+        if (parentComment) {
+            parentId = parentComment.id;
+            content = restOfComment; // Remove the @mention from content
+        }
+    }
+    
     try {
         const response = await fetch(`${API_URL}/api/v1/projects/comments`, {
             method: "POST",
@@ -212,12 +230,14 @@ async function postComment() {
             },
             body: JSON.stringify({
                 projectId: projectId,
-                content: newComment.trim()
+                content: content,
+                parentId: parentId
             })
         });
         
         if (response.ok) {
             newComment = "";
+            replyingTo = null;
             commentPage = 0;
             await loadComments();
         } else {
@@ -278,6 +298,15 @@ async function deleteComment(commentId) {
         }
     } catch (err) {
         alert("Failed to delete comment");
+    }
+}
+
+function replyToComment(comment) {
+    newComment = `@${comment.username} `;
+    replyingTo = comment.username;
+    if (commentTextarea) {
+        commentTextarea.focus();
+        commentTextarea.setSelectionRange(newComment.length, newComment.length);
     }
 }
 
@@ -356,6 +385,21 @@ function parseEmojis(text) {
         }
         return match; // Return original if emoji not found
     });
+}
+function parseMentions(text) {
+    if (!text) return text;
+    
+    // Match @username pattern (not at the start, since those are handled as replies)
+    return text.replace(/(?<!^)@(\w+)/g, (match, username) => {
+        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
+    });
+}
+
+function parseContent(text) {
+    // First parse emojis, then mentions
+    let parsed = parseEmojis(text);
+    parsed = parseMentions(parsed);
+    return parsed;
 }
 function insertEmoji(emojiName) {
     const emojiCode = `:${emojiName}:`;
@@ -462,10 +506,16 @@ function getEmojiList() {
         
         {#if loggedIn}
             <div class="comment-box">
+                {#if replyingTo}
+                    <div class="replying-to">
+                        <span>Replying to @{replyingTo}</span>
+                        <button class="cancel-reply" on:click={() => { replyingTo = null; newComment = ""; }}>×</button>
+                    </div>
+                {/if}
                 <textarea 
                     bind:this={commentTextarea}
                     bind:value={newComment}
-                    placeholder="Write a comment..."
+                    placeholder={replyingTo ? `Reply to @${replyingTo}...` : "Write a comment..."}
                     maxlength="500"
                     rows="3"
                 ></textarea>
@@ -521,7 +571,7 @@ function getEmojiList() {
         {/if}
 
         <div class="comments-list">
-            {#each comments as comment (comment.id)}
+            {#each comments.filter(c => !c.parentId) as comment (comment.id)}
                 <div class="comment">
                     <div class="comment-header">
                         <div class="comment-author-info">
@@ -566,10 +616,17 @@ function getEmojiList() {
                                 </svg>
                             </button>
                         </div>
-                    {:else}
-                        <p class="comment-content">{@html parseEmojis(comment.content)}</p>
+{:else}
+                        <p class="comment-content">{@html parseContent(comment.content)}</p>
                         
                         <div class="comment-buttons">
+                            {#if loggedIn}
+                                <button class="icon-btn reply-btn" on:click={() => replyToComment(comment)} title="Reply">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                    </svg>
+                                </button>
+                            {/if}
                             {#if loggedInAdmin || (loggedIn && comment.username === localStorage.getItem("username"))}
                                 <button class="icon-btn edit-btn" on:click={() => startEdit(comment)} title="Edit">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -591,11 +648,89 @@ function getEmojiList() {
                                     <line x1="12" y1="17" x2="12.01" y2="17"/>
                                 </svg>
                             </button>
-                        </div>
-                    {/if}
-                </div>
-            {/each}
-            
+                        </div> <!-- closes comment-buttons -->
+                    {/if} <!-- closes the {:else} block for editingComment -->
+                
+                {#if comments.filter(c => c.parentId === comment.id).length > 0}
+                    <div class="replies">
+                        {#each comments.filter(c => c.parentId === comment.id) as reply (reply.id)}
+                            <div class="comment reply">
+                                <div class="comment-header">
+                                    <div class="comment-author-info">
+                                        <img 
+                                            src={`https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=${reply.username}`}
+                                            alt={reply.username}
+                                            class="comment-pfp"
+                                        />
+                                        <a 
+                                            href={`https://arkide.site/profile?user=${reply.username}`}
+                                            class="comment-author"
+                                            target="_blank"
+                                        >
+                                            {reply.username}
+                                        </a>
+                                    </div> <!-- closes comment-author-info -->
+                                    <span class="comment-time">
+                                        {formatTime(reply.createdAt)}
+                                        {#if reply.edited}
+                                            <span class="edited">(edited)</span>
+                                        {/if}
+                                    </span>
+                                </div> <!-- closes comment-header -->
+                                
+                                {#if editingComment === reply.id}
+                                    <textarea 
+                                        bind:value={editContent}
+                                        maxlength="500"
+                                        rows="3"
+                                        class="edit-textarea"
+                                    ></textarea>
+                                    <div class="comment-buttons">
+                                        <button class="icon-btn save-btn" on:click={() => saveEdit(reply.id)} title="Save">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="20 6 9 17 4 12"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn cancel-btn" on:click={() => editingComment = null} title="Cancel">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                                <line x1="6" y1="6" x2="18" y2="18"/>
+                                            </svg>
+                                        </button>
+                                    </div> <!-- closes comment-buttons -->
+                                {:else}
+                                    <p class="comment-content">{@html parseContent(reply.content)}</p>
+                                    
+                                    <div class="comment-buttons">
+                                        {#if loggedInAdmin || (loggedIn && reply.username === localStorage.getItem("username"))}
+                                            <button class="icon-btn edit-btn" on:click={() => startEdit(reply)} title="Edit">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                            <button class="icon-btn delete-btn" on:click={() => deleteComment(reply.id)} title="Delete">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polyline points="3 6 5 6 21 6"/>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                                </svg>
+                                            </button>
+                                        {/if}
+                                        <button class="icon-btn report-btn" on:click={() => reportComment(reply.id)} title="Report">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                            </svg>
+                                        </button>
+                                    </div> 
+                                {/if} 
+                            </div> 
+                        {/each} 
+                    </div> 
+                {/if} 
+            </div> 
+            {/each} 
             {#if comments.length === 0 && commentCount === 0}
                 <div class="no-comments">
                     <p>No comments yet. Be the first to comment!</p>
@@ -1141,5 +1276,86 @@ function getEmojiList() {
     margin: 0 2px;
     user-select: none;
     object-fit: contain;
+}
+.replies {
+    margin-left: 40px;
+    margin-top: 12px;
+    padding-left: 16px;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+:global(body.dark-mode) .replies {
+    border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+.comment.reply {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+:global(body.dark-mode) .comment.reply {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.mention-link {
+    color: #0074d9;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.mention-link:hover {
+    color: #0056a8;
+    text-decoration: underline;
+}
+
+:global(body.dark-mode) .mention-link {
+    color: #4dabf7;
+}
+
+:global(body.dark-mode) .mention-link:hover {
+    color: #74c0fc;
+}
+
+.replying-to {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+:global(body.dark-mode) .replying-to {
+    background: rgba(74, 171, 247, 0.2);
+}
+
+.cancel-reply {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+    height: auto;
+    color: rgba(0, 0, 0, 0.6);
+    transition: color 0.2s ease;
+}
+
+:global(body.dark-mode) .cancel-reply {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.cancel-reply:hover {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+:global(body.dark-mode) .cancel-reply:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.reply-btn:hover {
+    background: rgba(0, 123, 255, 0.2);
 }
 </style>
