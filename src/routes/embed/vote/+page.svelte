@@ -188,6 +188,8 @@ async function loadComments() {
         const response = await fetch(`${API_URL}/api/v1/projects/comments?projectId=${projectId}&page=${commentPage}&pageSize=20`);
         const data = await response.json();
         
+        console.log("Comments data:", data.comments); // ADD THIS LINE TO DEBUG
+        
         if (commentPage === 0) {
             comments = data.comments;
         } else {
