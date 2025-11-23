@@ -401,9 +401,9 @@ function parseEmojis(text) {
 function parseMentions(text) {
     if (!text) return text;
     
-    // Match @username pattern (not at the start, since those are handled as replies)
-    return text.replace(/(?<!^)@(\w+)/g, (match, username) => {
-        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank" data-username="${username}">@${username}</a>`;
+    // Match @username pattern
+    return text.replace(/@(\w+)/g, (match, username) => {
+        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
     });
 }
 
@@ -1371,31 +1371,25 @@ function getEmojiList() {
     background: rgba(0, 123, 255, 0.2);
 }
 .mention-link {
-    color: #0074d9;
+    color: #4dabf7;
     text-decoration: none;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(0, 116, 217, 0.1);
-    transition: all 0.2s ease;
-    display: inline-block;
+    font-weight: bold;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline;
 }
 
 .mention-link:hover {
-    color: #0056a8;
-    background: rgba(0, 116, 217, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 116, 217, 0.2);
+    color: #4dabf7;
+    text-decoration: underline;
+    transform: scale(1.05);
 }
 
 :global(body.dark-mode) .mention-link {
     color: #4dabf7;
-    background: rgba(74, 171, 247, 0.15);
 }
 
 :global(body.dark-mode) .mention-link:hover {
     color: #74c0fc;
-    background: rgba(74, 171, 247, 0.25);
-    box-shadow: 0 2px 4px rgba(74, 171, 247, 0.3);
+    text-decoration: underline;
 }
 </style>
