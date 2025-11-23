@@ -1376,26 +1376,26 @@ function getEmojiList() {
 .reply-btn:hover {
     background: rgba(0, 123, 255, 0.2);
 }
-.mention-link {
-    color: #4dabf7;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.2s ease, transform 0.2s ease;
-    display: inline;
+:global(.mention-link) {
+    color: #4dabf7 !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+    display: inline !important;
 }
 
-.mention-link:hover {
-    color: #4dabf7;
-    text-decoration: underline;
-    transform: scale(1.05);
+:global(.mention-link:hover) {
+    color: #4dabf7 !important;
+    text-decoration: underline !important;
+    transform: scale(1.05) !important;
 }
 
-:global(body.dark-mode) .mention-link {
-    color: #4dabf7;
+:global(body.dark-mode) :global(.mention-link) {
+    color: #4dabf7 !important;
 }
 
-:global(body.dark-mode) .mention-link:hover {
-    color: #74c0fc;
-    text-decoration: underline;
+:global(body.dark-mode) :global(.mention-link:hover) {
+    color: #74c0fc !important;
+    text-decoration: underline !important;
 }
 </style>
