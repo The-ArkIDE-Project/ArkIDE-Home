@@ -401,10 +401,16 @@ function parseEmojis(text) {
 function parseMentions(text) {
     if (!text) return text;
     
+    console.log("Before parsing mentions:", text);
+    
     // Match @username pattern
-    return text.replace(/@(\w+)/g, (match, username) => {
+    const result = text.replace(/@(\w+)/g, (match, username) => {
+        console.log("Found mention:", match, username);
         return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
     });
+    
+    console.log("After parsing mentions:", result);
+    return result;
 }
 
 function parseContent(text) {
