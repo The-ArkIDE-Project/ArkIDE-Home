@@ -54,8 +54,8 @@
     <meta name="title" content="ArkIDE Desktop - Download" />
     <meta property="og:title" content="ArkIDE Desktop - Download" />
     <meta property="twitter:title" content="ArkIDE Desktop - Download">
-    <meta name="description" content="Download ArkIDE Desktop for Windows and Linux. Available for x86 and ARM64 architectures.">
-    <meta property="twitter:description" content="Download ArkIDE Desktop for Windows and Linux. Available for x86 and ARM64 architectures.">
+    <meta name="description" content="Download ArkIDE Desktop for Windows and Linux, and MacOS. Available for x86 and ARM64 architectures.">
+    <meta property="twitter:description" content="Download ArkIDE Desktop for Windows and Linux, and MacOS. Available for x86 and ARM64 architectures.">
     <meta property="og:url" content="https://penguinmod.com/arkide-desktop">
     <meta property="twitter:url" content="https://penguinmod.com/arkide-desktop">
 </svelte:head>
