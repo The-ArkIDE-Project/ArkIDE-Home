@@ -20,23 +20,33 @@
     // Download links - replace these with your actual download URLs
     const downloads = {
         windows: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.12.1/Ark.IDE.Setup.1.12.1.exe",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE.Setup.1.13.0.exe",
             // arm64: "https://example.com/arkide-windows-arm64.exe"
         },
         linux: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.12.1/Ark.IDE-1.12.1-x86.AppImage",
-            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.12.1/Ark.IDE-1.12.1-arm64.AppImage"
-        }
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-x86.AppImage",
+            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-arm64.AppImage"
+        },
+        MacOS: {
+        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0.dmg",
+        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-arm64.dmg"
+    }
     };
 
     let selectedOS = "windows";
-    let version = "1.12.1";
+    let version = "1.13.0";
     let selectedArch = "x86";
 
     function handleDownload(os, arch) {
         const url = downloads[os][arch];
         window.location.href = url;
     }
+    function getFileName(os, arch) {
+    const url = downloads[os]?.[arch];
+    if (!url) return '';
+    // Extract filename from URL (everything after the last /)
+    return url.split('/').pop();
+}
 </script>
 
 <svelte:head>
@@ -89,36 +99,38 @@
                             Linux
                         </span>
                     </Button>
+                    <Button on:click={() => selectedOS = 'MacOS'}>
+                        <span class:selected-indicator={selectedOS === 'MacOS'}>
+                            MacOS
+                        </span>
+                    </Button>
                 </div>
             </div>
+            <div class="selector-group">
+                <div class="selector-label">Architecture:</div>
+                <div class="button-group">
+                    <Button on:click={() => selectedArch = 'x86'}>
+                        <span class:selected-indicator={selectedArch === 'x86'}>
+                            x86-64 (Intel/AMD)
+                        </span>
+                    </Button>
 
-<div class="selector-group">
-    <div class="selector-label">Architecture:</div>
-    <div class="button-group">
-        <Button on:click={() => selectedArch = 'x86'}>
-            <span class:selected-indicator={selectedArch === 'x86'}>
-                x86-64 (Intel/AMD)
-            </span>
-        </Button>
-
-        {#if downloads[selectedOS].arm64} <!-- ✅ Only show ARM64 if link exists -->
-            <Button on:click={() => selectedArch = 'arm64'}>
-                <span class:selected-indicator={selectedArch === 'arm64'}>
-                    ARM64
-                </span>
-            </Button>
-        {/if}
-    </div>
-</div>
-
-
+                    {#if downloads[selectedOS].arm64} <!-- ✅ Only show ARM64 if link exists -->
+                        <Button on:click={() => selectedArch = 'arm64'}>
+                            <span class:selected-indicator={selectedArch === 'arm64'}>
+                                ARM64
+                            </span>
+                        </Button>
+                    {/if}
+                </div>
+            </div>
             <div class="download-action">
                 <Button on:click={() => handleDownload(selectedOS, selectedArch)}>
-                    Download for {selectedOS === 'windows' ? 'Windows' : 'Linux'} ({selectedArch === 'x86' ? 'x86-64' : 'ARM64'})
+                     Download for {selectedOS === 'windows' ? 'Windows' : selectedOS === 'linux' ? 'Linux' : 'macOS'} ({selectedArch === 'x86' ? 'x86-64' : 'ARM64'})
                 </Button>
             </div>
 
-            <p class="version-text">Latest version: 1.12.1</p>
+            <p class="version-text">Latest version: 1.13.0</p>
         </div>
 
         <div class="content-section">
@@ -140,15 +152,23 @@
                 <p><strong>Step 3:</strong> Follow the setup wizard. We recommend keeping the default settings.</p>
                 <p><strong>Step 4:</strong> Launch ArkIDE Desktop from the Start Menu or desktop shortcut.</p>
                 <p class="note-text"><strong>Note:</strong> Windows 10 or later is required. For ARM64 systems, make sure you're running Windows 11 or later.</p>
-            {:else}
+            {:else if selectedOS === 'linux'}
                 <h3>Linux Installation</h3>
                 <p><strong>Step 1:</strong> Download the AppImage file by clicking the download button above.</p>
                 <p><strong>Step 2:</strong> Make the file executable. Open a terminal in your downloads folder and run:</p>
-                <p class="code-block">chmod +x ./Ark.IDE-{version}-{selectedArch}.AppImage</p>
+                <p class="code-block">chmod +x ./{getFileName(selectedOS, selectedArch)}</p>
                 <p><strong>Step 3:</strong> Run the AppImage by double-clicking it or running from terminal:</p>
-                <p class="code-block">./Ark.IDE-{version}-{selectedArch}.AppImage</p>
+                <p class="code-block">./{getFileName(selectedOS, selectedArch)}</p>
                 <p><strong>Step 4 (Optional):</strong> Move the AppImage to <code>~/Applications</code> or <code>/opt</code> and create a desktop entry for easier access.</p>
                 <p class="note-text"><strong>Note:</strong> Most modern Linux distributions are supported. FUSE is required to run AppImages - it's pre-installed on most systems.</p>
+            {:else if selectedOS === 'MacOS'}
+                <h3>macOS Installation</h3>
+                <p><strong>Step 1:</strong> Download the DMG file by clicking the download button above.</p>
+                <p><strong>Step 2:</strong> Open the downloaded <code>{getFileName(selectedOS, selectedArch)}</code> file.</p>
+                <p><strong>Step 3:</strong> Drag the ArkIDE icon to your Applications folder.</p>
+                <p><strong>Step 4:</strong> Launch ArkIDE from your Applications folder. On first launch, you may need to right-click the app and select "Open" to bypass Gatekeeper security.</p>
+                <p><strong>Alternative:</strong> If you see "ArkIDE cannot be opened because it is from an unidentified developer", go to System Preferences → Security & Privacy → General, and click "Open Anyway".</p>
+                <p class="note-text"><strong>Note:</strong> macOS 10.13 (High Sierra) or later is required. For Apple Silicon Macs (M1/M2/M3), select ARM64. For Intel Macs, select x86-64.</p>
             {/if}
         </div>
 
