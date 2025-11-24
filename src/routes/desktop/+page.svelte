@@ -20,21 +20,21 @@
     // Download links - replace these with your actual download URLs
     const downloads = {
         windows: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE.Setup.1.13.0.exe",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.0.0/Ark.IDE.Setup.2.0.0.exe",
             // arm64: "https://example.com/arkide-windows-arm64.exe"
         },
         linux: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-x86.AppImage",
-            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-arm64.AppImage"
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.0.0/Ark.IDE-2.0.0.AppImage",
+            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.0.0/Ark.IDE-2.0.0-arm64.dmg"
         },
         MacOS: {
-        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0.dmg",
-        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v1.13.0/Ark.IDE-1.13.0-arm64.dmg"
+        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.0.0/Ark.IDE-2.0.0.dmg",
+        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.0.0/Ark.IDE-2.0.0-arm64.dmg"
     }
     };
 
     let selectedOS = "windows";
-    let version = "1.13.0";
+    let version = "2.0.0";
     let selectedArch = "x86";
 
     function handleDownload(os, arch) {
@@ -130,7 +130,7 @@
                 </Button>
             </div>
 
-            <p class="version-text">Latest version: 1.13.0</p>
+            <p class="version-text">Latest version: 2.0.0</p>
         </div>
 
         <div class="content-section">
