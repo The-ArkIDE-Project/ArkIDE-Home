@@ -115,7 +115,18 @@
                         </span>
                     </Button>
 
-                    {#if downloads[selectedOS].arm64} <!-- ✅ Only show ARM64 if link exists -->
+                    {#if selectedOS === 'linux'}
+                        <Button on:click={() => selectedArch = 'arm64'}>
+                            <span class:selected-indicator={selectedArch === 'arm64'}>
+                                ARM64
+                            </span>
+                        </Button>
+                        <Button on:click={() => window.open('https://the-arkide-project.github.io/ArkIDE-Desktop/', '_blank')}>
+                            <span>
+                                Flatpak
+                            </span>
+                        </Button>
+                    {:else if downloads[selectedOS].arm64}
                         <Button on:click={() => selectedArch = 'arm64'}>
                             <span class:selected-indicator={selectedArch === 'arm64'}>
                                 ARM64
