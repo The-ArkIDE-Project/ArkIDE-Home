@@ -123,7 +123,7 @@
                         </Button>
                         <Button on:click={() => window.open('https://the-arkide-project.github.io/ArkIDE-Desktop/', '_blank')}>
                             <span>
-                                Flatpak
+                                Flatpak (X86 & Arm64)
                             </span>
                         </Button>
                     {:else if downloads[selectedOS].arm64}
