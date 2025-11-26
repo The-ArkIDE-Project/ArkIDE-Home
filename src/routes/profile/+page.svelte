@@ -135,9 +135,10 @@ const fetchCommentsStatus = async () => {
     try {
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`);
         const data = await response.json();
-        commentsEnabled = data.enabled;
+        commentsEnabled = data.enabled !== false; // Default to true if undefined
     } catch (err) {
         console.error("Failed to load comments status:", err);
+        commentsEnabled = true; // Default to true on error
     }
 };
 
@@ -1806,9 +1807,11 @@ Promise.all([
 {#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
     <ContentCategory 
         header="Comments ({commentCount})" 
-        style="width:calc(90% - 10px); overflow-x: hidden;"
-        stylec="overflow-x: hidden;"
+        style="width:calc(90% - 10px); overflow: hidden;"
+        stylec="overflow: hidden;"
     >
+        <div style="width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;">
+            <div class="comments-section">
         <div class="comments-section">
             <!-- Comments Toggle (only for profile owner and admins) -->
             {#if canToggleComments}
@@ -1843,6 +1846,7 @@ Promise.all([
                         placeholder="Write a comment..."
                         maxLength="500"
                         class="comment-textarea"
+                        style="max-width: 100%; box-sizing: border-box;"
                     />
                     <button 
                         class="comment-submit-button" 
