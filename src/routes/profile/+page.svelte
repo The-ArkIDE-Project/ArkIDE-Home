@@ -66,7 +66,7 @@
     let editingCommentContent = '';
     let replyingToCommentId = null;
     let replyContent = '';
-    let commentsEnabled = true;
+    let commentsEnabled = false;
     let canToggleComments = false;
 
     $: {
@@ -133,19 +133,38 @@ const fetchProfileComments = async () => {
 
 // Fetch comments enabled status
 const fetchCommentsStatus = async () => {
-    if (!user) return; // 'user' must match the profile username exactly
     try {
-        const res = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${user}`);
-        if (!res.ok) {
-            console.error("Failed to fetch comments status:", res.status);
+        console.log("[Status] Fetching comments status for user:", user);
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${user}`);
+        console.log("[Status] GET /status response status:", response.status);
+
+        if (!response.ok) {
+            console.error("[Status] Failed to fetch comments status:", response.status);
+            const errorData = await response.json().catch(() => ({}));
+            console.log("[Status] Error response:", errorData);
+            
+            // fallback to false instead of leaving true
+            commentsEnabled = false;
             return;
         }
-        const data = await res.json();
-        commentsEnabled = data.enabled;
+
+        const data = await response.json();
+        console.log("[Status] Response data:", data);
+
+        if (typeof data.enabled === "boolean") {
+            commentsEnabled = data.enabled;
+        } else {
+            console.warn("[Status] Response missing 'enabled' field, defaulting to false");
+            commentsEnabled = false;
+        }
+
+        console.log("[Status] Final commentsEnabled after fetch:", commentsEnabled);
     } catch (err) {
-        console.error("Failed to fetch comments status:", err);
+        console.error("[Status] Network or unexpected error:", err);
+        commentsEnabled = false; // fallback
     }
 };
+
 
 
 // Post a new comment
