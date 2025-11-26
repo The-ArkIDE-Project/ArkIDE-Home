@@ -320,13 +320,19 @@ const replyToComment = (comment) => {
 let toggleInProgress = false;
 
 const toggleCommentsEnabled = async () => {
-    if (toggleInProgress) return; // Prevent double clicks
+    if (toggleInProgress) return; // prevent double-click
     toggleInProgress = true;
 
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // Optimistically flip UI
+    // Only allow owner/admin
+    if (!(loggedInAdmin || user.toLowerCase() === loggedInUser.toLowerCase())) {
+        toggleInProgress = false;
+        return;
+    }
+
+    // Optimistic flip
     const previousState = commentsEnabled;
     commentsEnabled = !commentsEnabled;
 
@@ -341,27 +347,23 @@ const toggleCommentsEnabled = async () => {
         });
 
         if (!response.ok) {
-            // If API fails, revert UI
+            // Revert if API fails
             commentsEnabled = previousState;
             const error = await response.json();
             console.error("Failed to toggle comments:", error);
             alert("Failed to toggle comments");
         } else {
             const data = await response.json();
-            // Make sure UI matches server confirmed value
-            commentsEnabled = data.enabled;
+            commentsEnabled = data.enabled; // ensure server-confirmed state
         }
     } catch (err) {
-        // Revert UI on network error
-        commentsEnabled = previousState;
+        commentsEnabled = previousState; // revert on network error
         console.error("Failed to toggle comments:", err);
         alert("Failed to toggle comments");
     } finally {
         toggleInProgress = false;
     }
 };
-
-
 
 // Check if user can delete/edit a comment
 const canModifyComment = (comment) => {
