@@ -1809,7 +1809,7 @@ Promise.all([
 <ContentCategory 
     header="Comments ({commentCount})" 
     style="width:calc(90% - 10px);"
-    stylec="padding: 0; overflow: hidden;"
+    stylec="padding: 0; overflow-x: hidden; overflow-y: auto; max-height: 600px;"
 >
     <div style="width: 100%; overflow: hidden; padding: 16px; box-sizing: border-box;">
         <div class="comments-section" style="width: 100%; overflow: hidden; box-sizing: border-box; padding: 0;">
@@ -3143,7 +3143,9 @@ Promise.all([
 .comments-section {
     width: 100%;
     padding: 16px;
-    overflow-x: hidden; /* Add this line */
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .comments-toggle {
@@ -3223,6 +3225,9 @@ Promise.all([
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: none; /* Allow it to grow */
 }
 
 .comment-item {
