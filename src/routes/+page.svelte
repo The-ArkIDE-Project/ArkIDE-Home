@@ -715,6 +715,7 @@
                                 <li>Fix some bugs related to adding comments onto profiles</li>
                                 <li>Edit the vote on ArkIDE Vote to remove the adding comments onto profiles option as i already added them</li>
                                 <li>API Backend changes to make profile comments work</li>
+                                <li>Add search recommendations to the search bar when searching</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 

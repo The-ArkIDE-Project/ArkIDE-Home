@@ -1,8 +1,11 @@
 <script>
     import { onMount } from "svelte";
+    import { createEventDispatcher } from "svelte";
+    const dispatch = createEventDispatcher();
 
     export let placeholder;
     export let text = "";
+    export { text as value }; // Allow bind:value from parent
 
     let searchBar;
 
@@ -27,6 +30,11 @@
         }
     }
 
+    function handleInput(event) {
+        text = event.target.value;
+        dispatch('input', event);
+    }
+
     onMount(() => {
         const params = new URLSearchParams(location.search);
         const searchQuery = params.get("q");
@@ -49,10 +57,11 @@
     <input
         bind:this={searchBar}
         class="search-bar"
-        value={text}
+        bind:value={text}
         {placeholder}
         name="search"
         on:keypress={enterCheck}
+        on:input={handleInput}
     />
 </div>
 

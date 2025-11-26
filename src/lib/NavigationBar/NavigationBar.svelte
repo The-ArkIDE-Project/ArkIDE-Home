@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from "svelte";
     import { page } from "$app/stores";
+	import { fade, slide } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	import { PUBLIC_API_URL, PUBLIC_STUDIO_URL } from "$env/static/public";
 
@@ -40,6 +42,11 @@
 	let accountUsername = "";
 	let messageCount = 0;
 	let canRankUp = false;
+	let searchQuery = "";
+	let searchRecommendations = [];
+	let showRecommendations = false;
+	let searchTimeout = null;
+	let searchBarElement = null;
 
 	const isAprilFirst = isAprilFools();
 	const randomColor = (() => {
@@ -206,6 +213,61 @@
 		localStorage.setItem("pm:language", lang);
 		Language.forceUpdate();
 	}
+	async function fetchSearchRecommendations(query) {
+		if (!query || query.trim().length === 0) {
+			searchRecommendations = [];
+			showRecommendations = false;
+			return;
+		}
+		
+		try {
+			const url = `${PUBLIC_API_URL}/api/v1/projects/searchprojects?query=${encodeURIComponent(query)}&page=0`;
+			const response = await fetch(url);
+			
+			if (response.ok) {
+				const data = await response.json();
+				// Filter to only projects that have the query in the title
+				const filtered = data.filter(project => 
+					project.title && project.title.toLowerCase().includes(query.toLowerCase())
+				);
+				searchRecommendations = filtered.slice(0, 3);
+				showRecommendations = searchRecommendations.length > 0;
+			}
+		} catch (error) {
+			console.error('Search recommendations error:', error);
+			searchRecommendations = [];
+			showRecommendations = false;
+		}
+	}
+
+	function handleSearchInput(event) {
+		searchQuery = event.detail.target.value;
+		
+		if (searchTimeout) {
+			clearTimeout(searchTimeout);
+		}
+		
+		if (!searchQuery || searchQuery.trim().length === 0) {
+			searchRecommendations = [];
+			showRecommendations = false;
+			return;
+		}
+		
+		searchTimeout = setTimeout(() => {
+			fetchSearchRecommendations(searchQuery);
+		}, 1000);
+	}
+
+	function openProject(projectId, projectTitle) {
+		const url = `${PUBLIC_STUDIO_URL}#${projectId}`;
+		window.open(url, '_blank');
+		showRecommendations = false;
+		searchQuery = "";
+	}
+
+	function closeRecommendations() {
+		showRecommendations = false;
+	}
 	// close menu if we didnt click in it
 	onMount(() => {
 		window.addEventListener("mousedown", (e) => {
@@ -218,6 +280,10 @@
 				if (!HTMLUtility.isDescendantOf(accountMenu, e.target) && !HTMLUtility.isDescendantOf(accountButton, e.target)) {
 					accountMenu.style.display = "none";
 				}
+			}
+			// ADD THIS SECTION:
+			if (searchBarElement && !HTMLUtility.isDescendantOf(searchBarElement, e.target)) {
+				closeRecommendations();
 			}
 		});
 	});
@@ -358,7 +424,13 @@
 			<img src="/create.png" alt="Create" />
 		</BarPage>
 	</div>
-	<BarSearch placeholder={Translations.textSafe("navigation.search", currentLang, "Search for projects...")} />
+	<div class="search-container" bind:this={searchBarElement}>
+			<BarSearch 
+				placeholder={Translations.textSafe("navigation.search", currentLang, "Search for projects...")}
+				on:input={handleSearchInput}
+				bind:value={searchQuery}
+			/>
+	</div>
 	<!-- <BarButton
 		highlighted="true"
 		link={LINK.discord}
@@ -458,6 +530,24 @@
 		lang={currentLang}
 	/>
 </div>
+	{#if showRecommendations}
+		<div class="search-recommendations" transition:fade={{ duration: 200 }}>
+				{#each searchRecommendations as project}
+					<button 
+						class="recommendation-item"
+						on:click={() => openProject(project.id, project.title)}
+					>
+						<img 
+							src={`https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${project.id}&requestType=thumbnail`}
+							alt={project.title}
+							class="recommendation-thumbnail"
+							on:error={(e) => e.target.src = '/navicon.png'}
+						/>
+						<span class="recommendation-name">{project.title}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
 
 <style>
 	:root {
@@ -740,4 +830,73 @@
     :global(body.dark-mode) .only-non-dark-mode {
         display: none;
     }
+	.search-container {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	}
+
+.search-recommendations {
+    background: rgba(98, 81, 255, 0.65) !important;
+    position: fixed;
+    top: 3rem; /* Position relative to viewport */
+    left: 52%; /* Center it or position where your search is */
+    transform: translateX(-50%); /* Center it */
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px;
+    z-index: 10001; /* Higher than nav bar */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    min-width: 300px;
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+:global(body.dark-mode) .search-recommendations {
+    background: rgba(98, 81, 255, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+	.recommendation-item {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 8px;
+		background: transparent;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background 0.2s ease;
+		text-align: left;
+		color: white;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	}
+
+	:global(html[dir="rtl"]) .recommendation-item {
+		text-align: right;
+	}
+
+	.recommendation-item:hover {
+		background: rgba(0, 0, 0, 0.3);
+	}
+
+	.recommendation-thumbnail {
+		width: 48px;
+		height: 36px;
+		border-radius: 4px;
+		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	.recommendation-name {
+		font-size: 0.9rem;
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		flex: 1;
+	}
 </style>
