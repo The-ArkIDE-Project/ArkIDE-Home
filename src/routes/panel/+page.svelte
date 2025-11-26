@@ -212,11 +212,31 @@
         if (type === "comment") {
             for (const report of projectsWithReports) {
                 try {
-                    const commentData = await ProjectClient.getComment(report.target);
-                    report.commentData = commentData;
+                    // Try to get it as a project comment first
+                    try {
+                        const commentData = await ProjectClient.getComment(report.target);
+                        report.commentData = commentData;
+                        report.commentType = "project";
+                    } catch (projErr) {
+                        // If that fails, try to get it as a profile comment
+                        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${report.target}`);
+                        if (response.ok) {
+                            const profileCommentData = await response.json();
+                            report.commentData = {
+                                username: profileCommentData.username,
+                                content: profileCommentData.content,
+                                projectId: null, // Profile comments don't have projectId
+                                profileUserId: profileCommentData.profileUserId
+                            };
+                            report.commentType = "profile";
+                        } else {
+                            throw new Error("Comment not found in either system");
+                        }
+                    }
                 } catch (err) {
                     console.error("Failed to load comment:", err);
                     report.commentData = { username: "Error", content: "Failed to load comment" };
+                    report.commentType = "unknown";
                 }
             }
         }
@@ -2150,7 +2170,12 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                         <p><strong>Comment ID:</strong> {content.target}</p>
                         {#if content.commentData}
                             <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
-                            <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
+                            {#if content.commentType === "project"}
+                                <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
+                            {:else if content.commentType === "profile"}
+                                <p><strong>Profile Comment</strong></p>
+                                <p><strong>Profile:</strong> <a href={`https://penguinmod.com/profile?id=${content.commentData.profileUserId}`} target="_blank">View Profile</a></p>
+                            {/if}
                             <p><strong>Comment Text:</strong></p>
                             <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px;">
                                 {content.commentData.content}
