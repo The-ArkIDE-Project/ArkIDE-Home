@@ -333,21 +333,16 @@ const replyToComment = (comment) => {
 let toggleInProgress = false;
 
 const toggleCommentsEnabled = async () => {
-    if (toggleInProgress) return; // prevent double-click
-    toggleInProgress = true;
-
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // Only allow owner/admin
-    if (!(loggedInAdmin || user.toLowerCase() === loggedInUser.toLowerCase())) {
-        toggleInProgress = false;
+    if (commentsEnabled === null) {
+        console.warn("Cannot toggle comments: current state unknown");
         return;
     }
 
-    // Optimistic flip
-    const previousState = commentsEnabled;
-    commentsEnabled = !commentsEnabled;
+    const newState = !commentsEnabled;
+    console.log("[Toggle] Attempting to set commentsEnabled to:", newState);
 
     try {
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/toggle`, {
@@ -356,27 +351,27 @@ const toggleCommentsEnabled = async () => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ enabled: commentsEnabled })
+            body: JSON.stringify({ enabled: newState })
         });
 
-        if (!response.ok) {
-            // Revert if API fails
-            commentsEnabled = previousState;
-            const error = await response.json();
-            console.error("Failed to toggle comments:", error);
-            alert("Failed to toggle comments");
+        console.log("[Toggle] POST response status:", response.status);
+        const data = await response.json().catch(() => ({}));
+        console.log("[Toggle] POST response data:", data);
+
+        if (response.ok) {
+            commentsEnabled = data.enabled;
+            console.log("[Toggle] Updated local commentsEnabled:", commentsEnabled);
         } else {
-            const data = await response.json();
-            commentsEnabled = data.enabled; // ensure server-confirmed state
+            console.error("[Toggle] Failed to toggle comments:", data);
+            alert("Failed to toggle comments");
         }
     } catch (err) {
-        commentsEnabled = previousState; // revert on network error
-        console.error("Failed to toggle comments:", err);
+        console.error("[Toggle] Network or unexpected error:", err);
         alert("Failed to toggle comments");
-    } finally {
-        toggleInProgress = false;
     }
 };
+
+
 
 // Check if user can delete/edit a comment
 const canModifyComment = (comment) => {
