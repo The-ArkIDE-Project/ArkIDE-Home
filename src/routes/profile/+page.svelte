@@ -291,34 +291,28 @@ const deleteComment = async (commentId) => {
 // Report a comment
 const reportComment = async (commentId) => {
     const reason = prompt("Why are you reporting this comment?");
-    if (!reason || !reason.trim()) return;
-
-    const token = localStorage.getItem("token");
-
+    if (!reason) return;
+    
     try {
-        console.log("Reporting comment:", commentId, "Reason:", reason); // Debug log
+        const headers = { "Content-Type": "application/json" };
+        const token = localStorage.getItem("token");
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
         
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}/report`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {})
-            },
+            headers,
             body: JSON.stringify({ reason: reason.trim() })
         });
-
-        console.log("Report response status:", response.status); // Debug log
-        const responseData = await response.json();
-        console.log("Report response data:", responseData); // Debug log
-
+        
         if (response.ok) {
-            alert("Comment reported successfully. Thank you for keeping our community safe!");
+            alert("Comment reported successfully");
         } else {
-            alert(`Failed to report comment: ${responseData.error || 'Unknown error'}`);
+            alert("Failed to report comment");
         }
     } catch (err) {
-        console.error("Failed to report comment:", err);
-        alert("Failed to report comment. Please try again.");
+        alert("Failed to report comment");
     }
 };
 
@@ -610,6 +604,15 @@ Promise.all([
             }
         }
         fetchProfile();
+        
+        // ADD THESE LINES HERE:
+        await fetchCommentsStatus();
+        await fetchProfileComments();
+        
+        // Check if user can toggle comments
+        if (loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)) {
+            canToggleComments = true;
+        }
     };
     
     function unixToDisplayDate(unix) {
@@ -656,7 +659,6 @@ Promise.all([
         user = query;
 
         if (idQuery) {
-            // set user to the result of fetching the username by id
             const username = await new Promise((resolve) => {
                 ProjectApi.getUsernameById(idQuery)
                     .then((username) => {
@@ -670,13 +672,12 @@ Promise.all([
                 user = username;
             }
         }
-    await fetchCommentsStatus();
-    await fetchProfileComments();
-    
-    // Check if user can toggle comments
-    if (loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)) {
-        canToggleComments = true;
-    }
+
+        // REMOVE THESE THREE LINES FROM HERE:
+        // await fetchCommentsStatus();
+        // await fetchProfileComments();
+        // canToggleComments check
+
         page.subscribe(v => {
             if (!v.url.searchParams.get("user") || !user) return;
             if (String(v.url.searchParams.get("user")).toLowerCase() === String(user).toLowerCase()) return;
