@@ -56,6 +56,17 @@
     let isAttemptingRankUp = false;
     let profileFeaturedProject = null;
     let backgroundImageUrl = '';
+    let profileComments = [];
+    let commentPage = 0;
+    let commentCount = 0;
+    let isLoadingComments = false;
+    let newCommentContent = '';
+    let editingCommentId = null;
+    let editingCommentContent = '';
+    let replyingToCommentId = null;
+    let replyContent = '';
+    let commentsEnabled = true;
+    let canToggleComments = false;
 
     $: {
         if (profileFeaturedProject && profileFeaturedProject !== 'none' && profileFeaturedProject.id) {
@@ -105,6 +116,209 @@
             profileEditingData.isBioEditLoading = false;
         });
     };
+    // Fetch profile comments
+const fetchProfileComments = async () => {
+    isLoadingComments = true;
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments?username=${encodeURIComponent(user)}&page=${commentPage}&pageSize=20`);
+        const data = await response.json();
+        profileComments = data.comments || [];
+        commentCount = data.count || 0;
+    } catch (err) {
+        console.error("Failed to load comments:", err);
+    }
+    isLoadingComments = false;
+};
+
+// Fetch comments enabled status
+const fetchCommentsStatus = async () => {
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`);
+        const data = await response.json();
+        commentsEnabled = data.enabled;
+    } catch (err) {
+        console.error("Failed to load comments status:", err);
+    }
+};
+
+// Post a new comment
+const postComment = async (content, parentId = null) => {
+    if (!content.trim()) return;
+    
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("You must be logged in to comment");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                username: user,
+                content,
+                parentId
+            })
+        });
+
+        if (response.ok) {
+            newCommentContent = '';
+            replyContent = '';
+            replyingToCommentId = null;
+            await fetchProfileComments();
+        } else {
+            const error = await response.json();
+            if (error.error === "CommentsDisabled") {
+                alert("Comments are disabled on this profile");
+            } else if (error.error === "IllegalWordsUsed") {
+                alert("Your comment contains inappropriate words");
+            } else {
+                alert("Failed to post comment");
+            }
+        }
+    } catch (err) {
+        console.error("Failed to post comment:", err);
+        alert("Failed to post comment");
+    }
+};
+
+// Update a comment
+const updateComment = async (commentId, content) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (response.ok) {
+            editingCommentId = null;
+            editingCommentContent = '';
+            await fetchProfileComments();
+        } else {
+            alert("Failed to update comment");
+        }
+    } catch (err) {
+        console.error("Failed to update comment:", err);
+        alert("Failed to update comment");
+    }
+};
+
+// Delete a comment
+const deleteComment = async (commentId) => {
+    if (!confirm("Are you sure you want to delete this comment?")) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            await fetchProfileComments();
+        } else {
+            alert("Failed to delete comment");
+        }
+    } catch (err) {
+        console.error("Failed to delete comment:", err);
+        alert("Failed to delete comment");
+    }
+};
+
+// Report a comment
+const reportComment = async (commentId) => {
+    const reason = prompt("Why are you reporting this comment?");
+    if (!reason) return;
+
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}/report`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({ reason })
+        });
+
+        if (response.ok) {
+            alert("Comment reported successfully");
+        } else {
+            alert("Failed to report comment");
+        }
+    } catch (err) {
+        console.error("Failed to report comment:", err);
+        alert("Failed to report comment");
+    }
+};
+
+// Toggle comments enabled/disabled
+const toggleCommentsEnabled = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/toggle`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ enabled: !commentsEnabled })
+        });
+
+        if (response.ok) {
+            commentsEnabled = !commentsEnabled;
+        } else {
+            alert("Failed to toggle comments");
+        }
+    } catch (err) {
+        console.error("Failed to toggle comments:", err);
+        alert("Failed to toggle comments");
+    }
+};
+
+// Check if user can delete/edit a comment
+const canModifyComment = (comment) => {
+    if (!loggedIn) return false;
+    if (loggedInAdmin) return true;
+    if (comment.username === loggedInUser) return true;
+    if (user.toLowerCase() === loggedInUser.toLowerCase()) return true;
+    return false;
+};
+
+// Format date
+function formatCommentDate(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    
+    return date.toLocaleDateString();
+}
     const updateProjectFeaturedTitle = (element) => {
         const projectTitle = Number(element.target.value);
         profileEditingData.projectTitle = projectTitle;
@@ -351,7 +565,13 @@ Promise.all([
                 user = username;
             }
         }
-
+    await fetchCommentsStatus();
+    await fetchProfileComments();
+    
+    // Check if user can toggle comments
+    if (loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)) {
+        canToggleComments = true;
+    }
         page.subscribe(v => {
             if (!v.url.searchParams.get("user") || !user) return;
             if (String(v.url.searchParams.get("user")).toLowerCase() === String(user).toLowerCase()) return;
@@ -1582,6 +1802,231 @@ Promise.all([
     </ContentCategory>
 {/if}
 
+<!-- Profile Comments Section -->
+{#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
+    <ContentCategory 
+        header="Comments ({commentCount})" 
+        style="width:calc(90% - 10px); overflow-x: hidden;"
+        stylec="overflow-x: hidden;"
+    >
+        <div class="comments-section">
+            <!-- Comments Toggle (only for profile owner and admins) -->
+            {#if canToggleComments}
+                <div class="comments-toggle">
+                    <button 
+                        class="comments-toggle-button" 
+                        on:click={toggleCommentsEnabled}
+                        title={commentsEnabled ? "Disable comments" : "Enable comments"}
+                    >
+                        {#if commentsEnabled}
+                            <LocalizedText
+                                text="Comments Enabled"
+                                key="profile.comments.enabled"
+                                lang={currentLang}
+                            />
+                        {:else}
+                            <LocalizedText
+                                text="Comments Disabled"
+                                key="profile.comments.disabled"
+                                lang={currentLang}
+                            />
+                        {/if}
+                    </button>
+                </div>
+            {/if}
+
+            <!-- New Comment Box -->
+            {#if loggedIn && commentsEnabled}
+                <div class="comment-input-box">
+                    <textarea
+                        bind:value={newCommentContent}
+                        placeholder="Write a comment..."
+                        maxLength="500"
+                        class="comment-textarea"
+                    />
+                    <button 
+                        class="comment-submit-button" 
+                        on:click={() => postComment(newCommentContent)}
+                        disabled={!newCommentContent.trim()}
+                    >
+                        <LocalizedText
+                            text="Post"
+                            key="profile.comments.post"
+                            lang={currentLang}
+                        />
+                    </button>
+                </div>
+            {:else if !loggedIn}
+                <p style="opacity:0.5;text-align:center;padding:20px;">
+                    <LocalizedText
+                        text="Log in to comment"
+                        key="profile.comments.logintocomment"
+                        lang={currentLang}
+                    />
+                </p>
+            {:else if !commentsEnabled}
+                <p style="opacity:0.5;text-align:center;padding:20px;">
+                    <LocalizedText
+                        text="Comments are disabled on this profile"
+                        key="profile.comments.disabled.message"
+                        lang={currentLang}
+                    />
+                </p>
+            {/if}
+
+            <!-- Comments List -->
+            <div class="comments-list">
+                {#if isLoadingComments}
+                    <LoadingSpinner />
+                {:else if profileComments.length === 0}
+                    <p style="opacity:0.5;text-align:center;padding:20px;">
+                        <LocalizedText
+                            text="No comments yet"
+                            key="profile.comments.none"
+                            lang={currentLang}
+                        />
+                    </p>
+                {:else}
+                    {#each profileComments as comment}
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <img
+                                    src="{PUBLIC_API_URL}/api/v1/users/getpfp?username={comment.username}"
+                                    alt={comment.username}
+                                    class="comment-avatar"
+                                />
+                                <div class="comment-info">
+                                    <a href="/profile?user={comment.username}" class="comment-username">
+                                        {comment.username}
+                                    </a>
+                                    <span class="comment-date">{formatCommentDate(comment.createdAt)}</span>
+                                    {#if comment.edited}
+                                        <span class="comment-edited">(edited)</span>
+                                    {/if}
+                                </div>
+                                <div class="comment-actions">
+                                    {#if canModifyComment(comment)}
+                                        <button 
+                                            class="comment-action-button" 
+                                            on:click={() => {
+                                                editingCommentId = comment.id;
+                                                editingCommentContent = comment.content;
+                                            }}
+                                            title="Edit"
+                                        >
+                                            <img src="/pencil.png" alt="Edit" style="height:16px;" />
+                                        </button>
+                                        <button 
+                                            class="comment-action-button" 
+                                            on:click={() => deleteComment(comment.id)}
+                                            title="Delete"
+                                        >
+                                            <img src="/notallowed.png" alt="Delete" style="height:16px;" />
+                                        </button>
+                                    {/if}
+                                    <button 
+                                        class="comment-action-button" 
+                                        on:click={() => reportComment(comment.id)}
+                                        title="Report"
+                                    >
+                                        <img src="/report_flag.png" alt="Report" style="height:16px;" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {#if editingCommentId === comment.id}
+                                <div class="comment-edit-box">
+                                    <textarea
+                                        bind:value={editingCommentContent}
+                                        maxLength="500"
+                                        class="comment-textarea"
+                                    />
+                                    <div class="comment-edit-actions">
+                                        <button 
+                                            class="comment-edit-save" 
+                                            on:click={() => updateComment(comment.id, editingCommentContent)}
+                                        >
+                                            Save
+                                        </button>
+                                        <button 
+                                            class="comment-edit-cancel" 
+                                            on:click={() => {
+                                                editingCommentId = null;
+                                                editingCommentContent = '';
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            {:else}
+                                <div class="comment-content">
+                                    {@html generateMarkdown(comment.content)}
+                                </div>
+                            {/if}
+
+                            {#if loggedIn && commentsEnabled && replyingToCommentId !== comment.id}
+                                <button 
+                                    class="comment-reply-button" 
+                                    on:click={() => {
+                                        replyingToCommentId = comment.id;
+                                    }}
+                                >
+                                    Reply
+                                </button>
+                            {/if}
+
+                            {#if replyingToCommentId === comment.id}
+                                <div class="comment-reply-box">
+                                    <textarea
+                                        bind:value={replyContent}
+                                        placeholder="Write a reply..."
+                                        maxLength="500"
+                                        class="comment-textarea"
+                                    />
+                                    <div class="comment-edit-actions">
+                                        <button 
+                                            class="comment-edit-save" 
+                                            on:click={() => postComment(replyContent, comment.id)}
+                                        >
+                                            Reply
+                                        </button>
+                                        <button 
+                                            class="comment-edit-cancel" 
+                                            on:click={() => {
+                                                replyingToCommentId = null;
+                                                replyContent = '';
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
+                    {/each}
+                {/if}
+            </div>
+
+            {#if commentCount > profileComments.length}
+                <button 
+                    class="load-more-comments" 
+                    on:click={async () => {
+                        commentPage++;
+                        await fetchProfileComments();
+                    }}
+                >
+                    <LocalizedText
+                        text="Load More"
+                        key="profile.comments.loadmore"
+                        lang={currentLang}
+                    />
+                </button>
+            {/if}
+        </div>
+    </ContentCategory>
+{/if}
+
             </div>
             <div class="section-serious-actions">
                 {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
@@ -2691,5 +3136,248 @@ Promise.all([
     -webkit-backdrop-filter: blur(12px) saturate(140%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
+.comments-section {
+    width: 100%;
+    padding: 16px;
+    overflow-x: hidden; /* Add this line */
+}
+
+.comments-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.comments-toggle-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+:global(body.dark-mode) .comments-toggle-button {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.comments-toggle-button:hover {
+    transform: scale(1.05);
+}
+
+.comment-input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+
+.comment-textarea {
+    width: calc(100% - 24px); /* Change from 100% to account for padding */
+    min-height: 80px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box; /* Add this line */
+}
+
+:global(body.dark-mode) .comment-textarea {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.comment-submit-button {
+    align-self: flex-end;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, rgba(89, 0, 255, 0.8), rgba(150, 60, 255, 0.9));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.comment-submit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.comment-submit-button:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comment-item {
+    padding: 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-x: hidden; /* Add this line */
+    max-width: 100%; /* Add this line */
+}
+
+:global(body.dark-mode) .comment-item {
+    background: rgba(30, 30, 30, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.comment-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.comment-username {
+    font-weight: bold;
+    color: #4d97ff;
+    text-decoration: none;
+}
+
+.comment-date {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.comment-edited {
+    font-size: 12px;
+    opacity: 0.5;
+    font-style: italic;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-action-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.comment-action-button:hover {
+    opacity: 1;
+}
+
+.comment-content {
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word; 
+    max-width: 100%; 
+}
+
+
+.comment-reply-button {
+    background: transparent;
+    border: none;
+    color: #4d97ff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 0;
+}
+
+.comment-reply-button:hover {
+    text-decoration: underline;
+}
+
+.comment-edit-box,
+.comment-reply-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.comment-edit-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-edit-save {
+    padding: 8px 16px;
+    background: #4d97ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.comment-edit-save:hover {
+    background: #3a7fe6;
+}
+
+.comment-edit-cancel {
+    padding: 8px 16px;
+    background: rgba(128, 128, 128, 0.3);
+    color: inherit;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.comment-edit-cancel:hover {
+    background: rgba(128, 128, 128, 0.5);
+}
+
+.load-more-comments {
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+:global(body.dark-mode) .load-more-comments {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.load-more-comments:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+:global(body.dark-mode) .load-more-comments:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
 
 </style>
