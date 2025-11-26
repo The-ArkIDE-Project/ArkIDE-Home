@@ -2910,7 +2910,8 @@ Promise.all([
     }
     .profile-project-authordiv {
         display: flex;
-        align-items: center;
+        align-items: center; /* vertically centers the children */
+        gap: 8px; /* optional spacing between PFP and text */
     }
     .profile-project-author {
         width: 2.4em;
@@ -2921,7 +2922,7 @@ Promise.all([
     .profile-project-authorinfo {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: center; /* vertical centering inside this column */
     }
     .profile-project-authorinfo p {
         margin-block: 0;
@@ -2929,6 +2930,9 @@ Promise.all([
     .profile-project-link {
         color: #4d97ff;
         text-decoration: none;
+        display: inline-flex;
+        align-items: center; /* vertically centers if parent height is set */
+        height: 100%; /* make sure it takes full height of container */
     }
     .profile-project-date {
         color: #575e75;
@@ -3413,10 +3417,17 @@ Promise.all([
     margin-bottom: 12px;
 }
 
+.comment-author-info {
+    display: flex;          
+    align-items: center;     
+    gap: 8px;                
+}
+
 .comment-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 4px;
+    object-fit: cover;
 }
 
 .comment-info {
@@ -3428,9 +3439,12 @@ Promise.all([
 }
 
 .comment-username {
-    font-weight: bold;
     color: #4d97ff;
     text-decoration: none;
+    font-weight: bold;     
+    font-size: 1rem;       
+    line-height: normal;    
+    margin: 0;              
 }
 
 .comment-date {
