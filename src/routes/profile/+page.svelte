@@ -133,15 +133,20 @@ const fetchProfileComments = async () => {
 
 // Fetch comments enabled status
 const fetchCommentsStatus = async () => {
+    if (!user) return; // 'user' must match the profile username exactly
     try {
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`);
-        const data = await response.json();
-        commentsEnabled = data.enabled !== false; // Default to true if undefined
+        const res = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${user}`);
+        if (!res.ok) {
+            console.error("Failed to fetch comments status:", res.status);
+            return;
+        }
+        const data = await res.json();
+        commentsEnabled = data.enabled;
     } catch (err) {
-        console.error("Failed to load comments status:", err);
-        commentsEnabled = true; // Default to true on error
+        console.error("Failed to fetch comments status:", err);
     }
 };
+
 
 // Post a new comment
 const postComment = async () => {
