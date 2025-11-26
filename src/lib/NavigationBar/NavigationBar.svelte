@@ -271,6 +271,9 @@
 	// close menu if we didnt click in it
 	onMount(() => {
 		window.addEventListener("mousedown", (e) => {
+			// Only handle left clicks (button 0)
+			if (e.button !== 0) return;
+			
 			if (languageMenu) {
 				if (!HTMLUtility.isDescendantOf(languageMenu, e.target)) {
 					languageMenu.style.display = "none";
@@ -281,10 +284,7 @@
 					accountMenu.style.display = "none";
 				}
 			}
-			// ADD THIS SECTION:
-			if (searchBarElement && !HTMLUtility.isDescendantOf(searchBarElement, e.target)) {
-				closeRecommendations();
-			}
+			// Removed the searchBarElement click-away detection
 		});
 	});
 </script>
@@ -530,24 +530,27 @@
 		lang={currentLang}
 	/>
 </div>
-	{#if showRecommendations}
-		<div class="search-recommendations" transition:fade={{ duration: 200 }}>
-				{#each searchRecommendations as project}
-					<button 
-						class="recommendation-item"
-						on:click={() => openProject(project.id, project.title)}
-					>
-						<img 
-							src={`https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${project.id}&requestType=thumbnail`}
-							alt={project.title}
-							class="recommendation-thumbnail"
-							on:error={(e) => e.target.src = '/navicon.png'}
-						/>
-						<span class="recommendation-name">{project.title}</span>
-					</button>
-				{/each}
-			</div>
-		{/if}
+	{#if showRecommendations && searchBarElement}
+	<div 
+		class="search-recommendations" 
+		style="left: {searchBarElement.getBoundingClientRect().left}px; width: {searchBarElement.getBoundingClientRect().width}px;"
+	>
+		{#each searchRecommendations as project}
+		<button 
+			class="recommendation-item"
+			on:click={() => openProject(project.id, project.title)}
+		>
+			<img 
+			src={`https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${project.id}&requestType=thumbnail`}
+			alt={project.title}
+			class="recommendation-thumbnail"
+			on:error={(e) => e.target.src = '/navicon.png'}
+			/>
+			<span class="recommendation-name">{project.title}</span>
+		</button>
+		{/each}
+	</div>
+	{/if}
 
 <style>
 	:root {
@@ -839,15 +842,13 @@
 .search-recommendations {
     background: rgba(98, 81, 255, 0.65) !important;
     position: fixed;
-    top: 3rem; /* Position relative to viewport */
-    left: 52%; /* Center it or position where your search is */
-    transform: translateX(-50%); /* Center it */
+    top: calc(3rem + 4px);
+    /* left and width set via inline style */
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 8px;
-    z-index: 10001; /* Higher than nav bar */
+    z-index: 999;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    min-width: 300px;
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
