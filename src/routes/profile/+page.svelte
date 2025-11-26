@@ -318,6 +318,7 @@ const toggleCommentsEnabled = async () => {
     if (!token) return;
 
     try {
+        // Send the opposite of the current state to the server
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/toggle`, {
             method: "POST",
             headers: {
@@ -326,13 +327,15 @@ const toggleCommentsEnabled = async () => {
             },
             body: JSON.stringify({ 
                 enabled: !commentsEnabled,
-                username: user  // Add this if your API needs it
+                username: user
             })
         });
 
         if (response.ok) {
-            commentsEnabled = !commentsEnabled;
-            await fetchCommentsStatus(); // Re-fetch to confirm
+            // Instead of flipping immediately, get the confirmed value from the server
+            const data = await response.json();
+            // Assume your API returns { enabled: true/false }
+            commentsEnabled = data.enabled;
         } else {
             const error = await response.json();
             console.error("Failed to toggle comments:", error);
@@ -343,6 +346,7 @@ const toggleCommentsEnabled = async () => {
         alert("Failed to toggle comments");
     }
 };
+
 
 // Check if user can delete/edit a comment
 const canModifyComment = (comment) => {
