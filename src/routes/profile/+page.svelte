@@ -66,7 +66,7 @@
     let editingCommentContent = '';
     let replyingToCommentId = null;
     let replyContent = '';
-    let commentsEnabled = false;
+    let commentsEnabled = null;
     let canToggleComments = false;
 
     $: {
@@ -139,12 +139,8 @@ const fetchCommentsStatus = async () => {
         console.log("[Status] GET /status response status:", response.status);
 
         if (!response.ok) {
-            console.error("[Status] Failed to fetch comments status:", response.status);
-            const errorData = await response.json().catch(() => ({}));
-            console.log("[Status] Error response:", errorData);
-            
-            // fallback to false instead of leaving true
-            commentsEnabled = false;
+            console.warn("[Status] Failed to fetch comments status, defaulting to true");
+            commentsEnabled = true; // fallback
             return;
         }
 
@@ -154,18 +150,16 @@ const fetchCommentsStatus = async () => {
         if (typeof data.enabled === "boolean") {
             commentsEnabled = data.enabled;
         } else {
-            console.warn("[Status] Response missing 'enabled' field, defaulting to false");
-            commentsEnabled = false;
+            console.warn("[Status] Response missing 'enabled', defaulting to true");
+            commentsEnabled = true;
         }
 
         console.log("[Status] Final commentsEnabled after fetch:", commentsEnabled);
     } catch (err) {
         console.error("[Status] Network or unexpected error:", err);
-        commentsEnabled = false; // fallback
+        commentsEnabled = true; // fallback
     }
 };
-
-
 
 // Post a new comment
 const postComment = async () => {
@@ -3140,9 +3134,8 @@ Promise.all([
     .subuser-section {
         width: 100%;
         display: flex;
-        justify-content: center; /* Changed from space-between */
+        justify-content: space-between; /* Changed from space-between */
         align-items: center;
-        gap: 40px; /* Add spacing between elements */
     }
     .user-username {
         display: flex;
