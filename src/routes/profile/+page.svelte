@@ -135,11 +135,27 @@ const fetchProfileComments = async () => {
 const fetchCommentsStatus = async () => {
     try {
         console.log("[Status] Fetching comments status for user:", user);
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`);
+        
+        const token = localStorage.getItem("token");
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`, {
+            headers
+        });
+        
         console.log("[Status] GET /status response status:", response.status);
 
-        if (response.status === 404 || !response.ok) {
-            console.warn("[Status] Status not found or failed, defaulting to true");
+        if (response.status === 404 || response.status === 401) {
+            console.warn("[Status] Status not found or unauthorized, defaulting to true");
+            commentsEnabled = true;
+            return;
+        }
+
+        if (!response.ok) {
+            console.warn("[Status] Failed to fetch, defaulting to true");
             commentsEnabled = true;
             return;
         }
@@ -147,7 +163,7 @@ const fetchCommentsStatus = async () => {
         const data = await response.json();
         console.log("[Status] Response data:", data);
 
-        commentsEnabled = data.enabled !== false; // Default to true if undefined
+        commentsEnabled = data.enabled !== false;
         console.log("[Status] Final commentsEnabled after fetch:", commentsEnabled);
     } catch (err) {
         console.error("[Status] Network or unexpected error:", err);
@@ -287,12 +303,19 @@ const reportComment = async (commentId) => {
     const reason = prompt("Why are you reporting this comment?");
     if (!reason) return;
     
+    console.log("[Report] Starting report for commentId:", commentId);
+    console.log("[Report] Reason:", reason);
+    
     try {
         const headers = { "Content-Type": "application/json" };
         const token = localStorage.getItem("token");
+        console.log("[Report] Token exists:", !!token);
+        
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
+        
+        console.log("[Report] Sending request to:", `${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}/report`);
         
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}/report`, {
             method: "POST",
@@ -300,12 +323,17 @@ const reportComment = async (commentId) => {
             body: JSON.stringify({ reason: reason.trim() })
         });
         
+        console.log("[Report] Response status:", response.status);
+        const responseText = await response.text();
+        console.log("[Report] Response body:", responseText);
+        
         if (response.ok) {
             alert("Comment reported successfully");
         } else {
             alert("Failed to report comment");
         }
     } catch (err) {
+        console.error("[Report] Error:", err);
         alert("Failed to report comment");
     }
 };
