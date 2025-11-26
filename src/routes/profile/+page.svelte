@@ -312,40 +312,50 @@ const replyToComment = (comment) => {
     newCommentContent = `@${comment.username} `;
 };
 
-// Toggle comments enabled/disabled
+let toggleInProgress = false;
+
 const toggleCommentsEnabled = async () => {
+    if (toggleInProgress) return; // Prevent double clicks
+    toggleInProgress = true;
+
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    // Optimistically flip UI
+    const previousState = commentsEnabled;
+    commentsEnabled = !commentsEnabled;
+
     try {
-        // Send the opposite of the current state to the server
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/toggle`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ 
-                enabled: !commentsEnabled,
-                username: user
-            })
+            body: JSON.stringify({ enabled: commentsEnabled })
         });
 
-        if (response.ok) {
-            // Instead of flipping immediately, get the confirmed value from the server
-            const data = await response.json();
-            // Assume your API returns { enabled: true/false }
-            commentsEnabled = data.enabled;
-        } else {
+        if (!response.ok) {
+            // If API fails, revert UI
+            commentsEnabled = previousState;
             const error = await response.json();
             console.error("Failed to toggle comments:", error);
             alert("Failed to toggle comments");
+        } else {
+            const data = await response.json();
+            // Make sure UI matches server confirmed value
+            commentsEnabled = data.enabled;
         }
     } catch (err) {
+        // Revert UI on network error
+        commentsEnabled = previousState;
         console.error("Failed to toggle comments:", err);
         alert("Failed to toggle comments");
+    } finally {
+        toggleInProgress = false;
     }
 };
+
 
 
 // Check if user can delete/edit a comment
