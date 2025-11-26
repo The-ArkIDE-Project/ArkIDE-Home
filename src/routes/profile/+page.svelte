@@ -135,29 +135,23 @@ const fetchProfileComments = async () => {
 const fetchCommentsStatus = async () => {
     try {
         console.log("[Status] Fetching comments status for user:", user);
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${user}`);
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/status?username=${encodeURIComponent(user)}`);
         console.log("[Status] GET /status response status:", response.status);
 
-        if (!response.ok) {
-            console.warn("[Status] Failed to fetch comments status, defaulting to true");
-            commentsEnabled = true; // fallback
+        if (response.status === 404 || !response.ok) {
+            console.warn("[Status] Status not found or failed, defaulting to true");
+            commentsEnabled = true;
             return;
         }
 
         const data = await response.json();
         console.log("[Status] Response data:", data);
 
-        if (typeof data.enabled === "boolean") {
-            commentsEnabled = data.enabled;
-        } else {
-            console.warn("[Status] Response missing 'enabled', defaulting to true");
-            commentsEnabled = true;
-        }
-
+        commentsEnabled = data.enabled !== false; // Default to true if undefined
         console.log("[Status] Final commentsEnabled after fetch:", commentsEnabled);
     } catch (err) {
         console.error("[Status] Network or unexpected error:", err);
-        commentsEnabled = true; // fallback
+        commentsEnabled = true;
     }
 };
 
@@ -349,14 +343,20 @@ const toggleCommentsEnabled = async () => {
         });
 
         console.log("[Toggle] POST response status:", response.status);
-        const data = await response.json().catch(() => ({}));
-        console.log("[Toggle] POST response data:", data);
 
         if (response.ok) {
+            const data = await response.json();
+            console.log("[Toggle] POST response data:", data);
+            
+            // CRITICAL: Reassign to trigger Svelte reactivity
             commentsEnabled = data.enabled;
+            
+            // Force a re-render by reassigning to itself
+            commentsEnabled = commentsEnabled;
+            
             console.log("[Toggle] Updated local commentsEnabled:", commentsEnabled);
         } else {
-            console.error("[Toggle] Failed to toggle comments:", data);
+            console.error("[Toggle] Failed to toggle comments");
             alert("Failed to toggle comments");
         }
     } catch (err) {
@@ -364,8 +364,6 @@ const toggleCommentsEnabled = async () => {
         alert("Failed to toggle comments");
     }
 };
-
-
 
 // Check if user can delete/edit a comment
 const canModifyComment = (comment) => {
