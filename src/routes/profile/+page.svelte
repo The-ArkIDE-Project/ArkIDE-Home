@@ -244,7 +244,7 @@ const deleteComment = async (commentId) => {
 // Report a comment
 const reportComment = async (commentId) => {
     const reason = prompt("Why are you reporting this comment?");
-    if (!reason) return;
+    if (!reason || !reason.trim()) return;
 
     const token = localStorage.getItem("token");
 
@@ -255,17 +255,18 @@ const reportComment = async (commentId) => {
                 "Content-Type": "application/json",
                 ...(token ? { "Authorization": `Bearer ${token}` } : {})
             },
-            body: JSON.stringify({ reason })
+            body: JSON.stringify({ reason: reason.trim() })
         });
 
         if (response.ok) {
-            alert("Comment reported successfully");
+            alert("Comment reported successfully. Thank you for keeping our community safe!");
         } else {
-            alert("Failed to report comment");
+            const error = await response.json();
+            alert(`Failed to report comment: ${error.error || 'Unknown error'}`);
         }
     } catch (err) {
         console.error("Failed to report comment:", err);
-        alert("Failed to report comment");
+        alert("Failed to report comment. Please try again.");
     }
 };
 
@@ -1805,14 +1806,13 @@ Promise.all([
 
 <!-- Profile Comments Section -->
 {#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
-    <ContentCategory 
-        header="Comments ({commentCount})" 
-        style="width:calc(90% - 10px); overflow: hidden;"
-        stylec="overflow: hidden;"
-    >
-        <div style="width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;">
-            <div class="comments-section">
-        <div class="comments-section">
+<ContentCategory 
+    header="Comments ({commentCount})" 
+    style="width:calc(90% - 10px);"
+    stylec="padding: 0; overflow: hidden;"
+>
+    <div style="width: 100%; overflow: hidden; padding: 16px; box-sizing: border-box;">
+        <div class="comments-section" style="width: 100%; overflow: hidden; box-sizing: border-box; padding: 0;">
             <!-- Comments Toggle (only for profile owner and admins) -->
             {#if canToggleComments}
                 <div class="comments-toggle">
@@ -3298,10 +3298,12 @@ Promise.all([
 .comment-content {
     margin-bottom: 12px;
     word-wrap: break-word;
-    overflow-wrap: break-word; 
-    max-width: 100%; 
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: pre-wrap;
 }
-
 
 .comment-reply-button {
     background: transparent;
