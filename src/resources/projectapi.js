@@ -62,6 +62,14 @@ async getAllUsers() {
     }
     return await response.json();
 }
+
+async getProfileComment(commentId) {
+    const response = await fetch(`${this.OriginApiUrl}/api/v1/profiles/comments/${commentId}`);
+    if (!response.ok) {
+        throw await response.text();
+    }
+    return await response.json();
+}
     static getUsernameById(id) {
         return new Promise((resolve, reject) => {
             const url = `${OriginApiUrl}/api/v1/users/getusername?ID=${id}`;

@@ -278,6 +278,8 @@ const reportComment = async (commentId) => {
     const token = localStorage.getItem("token");
 
     try {
+        console.log("Reporting comment:", commentId, "Reason:", reason); // Debug log
+        
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/profiles/comments/${commentId}/report`, {
             method: "POST",
             headers: {
@@ -287,11 +289,14 @@ const reportComment = async (commentId) => {
             body: JSON.stringify({ reason: reason.trim() })
         });
 
+        console.log("Report response status:", response.status); // Debug log
+        const responseData = await response.json();
+        console.log("Report response data:", responseData); // Debug log
+
         if (response.ok) {
             alert("Comment reported successfully. Thank you for keeping our community safe!");
         } else {
-            const error = await response.json();
-            alert(`Failed to report comment: ${error.error || 'Unknown error'}`);
+            alert(`Failed to report comment: ${responseData.error || 'Unknown error'}`);
         }
     } catch (err) {
         console.error("Failed to report comment:", err);
@@ -319,12 +324,18 @@ const toggleCommentsEnabled = async () => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ enabled: !commentsEnabled })
+            body: JSON.stringify({ 
+                enabled: !commentsEnabled,
+                username: user  // Add this if your API needs it
+            })
         });
 
         if (response.ok) {
             commentsEnabled = !commentsEnabled;
+            await fetchCommentsStatus(); // Re-fetch to confirm
         } else {
+            const error = await response.json();
+            console.error("Failed to toggle comments:", error);
             alert("Failed to toggle comments");
         }
     } catch (err) {
@@ -3089,8 +3100,9 @@ Promise.all([
     .subuser-section {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: center; /* Changed from space-between */
         align-items: center;
+        gap: 40px; /* Add spacing between elements */
     }
     .user-username {
         display: flex;
@@ -3111,8 +3123,8 @@ Promise.all([
         font-weight: bolder;
         margin-block: 0.2rem;
         margin-left: 20px;
+        margin-right: 20px;
     }
-
     .user-badge-container {
         margin: 0px;
         margin-top: 4px;
