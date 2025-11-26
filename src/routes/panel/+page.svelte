@@ -200,27 +200,20 @@
         unapprovedProjects = [];
         contentWithReports = [];
         
-        // Map comment types to their API numbers
+        // Map "comment" to type 2 for the API
         let apiType = type;
         if (type === "comment") {
-            apiType = 2; // Project comments use type 2
-        } else if (type === "profileComment") {
-            apiType = 3; // Profile comments use type 3
+            apiType = 2; // Comments use type 2
         }
         
         const projectsWithReports = await ProjectClient.getTypeWithReports(apiType, 0);
         
         // Auto-load comment data for comment reports
-        if (type === "comment" || type === "profileComment") {
+        if (type === "comment") {
             for (const report of projectsWithReports) {
                 try {
-                    if (type === "comment") {
-                        const commentData = await ProjectClient.getComment(report.target);
-                        report.commentData = commentData;
-                    } else if (type === "profileComment") {
-                        const commentData = await ProjectClient.getProfileComment(report.target);
-                        report.commentData = commentData;
-                    }
+                    const commentData = await ProjectClient.getComment(report.target);
+                    report.commentData = commentData;
                 } catch (err) {
                     console.error("Failed to load comment:", err);
                     report.commentData = { username: "Error", content: "Failed to load comment" };
@@ -1988,8 +1981,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                     <option value="" disabled />
                     <option value="user">User Reports</option>
                     <option value="project">Project Reports</option>
-                    <option value="comment">Project Comment Reports</option>
-                    <option value="profileComment">Profile Comment Reports</option>
+                    <option value="comment">Comment Reports</option>
                     <option value="" disabled />
                     <optgroup label="Moderation">
                         <option value="removed">Removed Projects</option>
@@ -2116,101 +2108,93 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                     {/if}
                 </div>
             {/if}
-{:else if dropdownSelectMenu.value === "comment" || dropdownSelectMenu.value === "profileComment"}
-    <button
-        class="reports-user-button"
-        on:click={async () => {
-            // Comment data should already be loaded
-            if (!content.commentData) {
-                try {
-                    if (dropdownSelectMenu.value === "comment") {
-                        const commentData = await ProjectClient.getComment(content.target);
-                        content.commentData = commentData;
-                    } else {
-                        const commentData = await ProjectClient.getProfileComment(content.target);
-                        content.commentData = commentData;
+        {:else if dropdownSelectMenu.value === "comment"}
+            <button
+                class="reports-user-button"
+                on:click={async () => {
+                    // Load comment details
+                    if (!content.commentData) {
+                        try {
+                            const commentData = await ProjectClient.getComment(content.target);
+                            content.commentData = commentData;
+                        } catch (err) {
+                            console.error("Failed to load comment:", err);
+                        }
                     }
-                } catch (err) {
-                    console.error("Failed to load comment:", err);
-                }
-            }
-            
-            loadReportDetails(content.target);
-            if (selectedReportDetailed === idx) {
-                selectedReportDetailed = -1;
-                return;
-            }
-            selectedReportDetailed = idx;
-        }}
-    >
-        <div class="reports-user-content">
-            <p style="font-weight: bold;">
-                {dropdownSelectMenu.value === "profileComment" ? "Profile" : "Project"} Comment by {content.commentData?.username || 'Loading...'}
-            </p>
-            <p style="font-size: 0.85em; opacity: 0.8;">
-                {content.commentData?.content ? 
-                    (content.commentData.content.substring(0, 50) + (content.commentData.content.length > 50 ? '...' : '')) 
-                    : 'Loading comment...'}
-            </p>
-        </div>
-    </button>
-    {#if selectedReportDetailed === idx}
-        <div class="reports-generic-details">
-            {#if !reportDetails[content.target]}
-                <LoadingSpinner />
-            {:else}
-                <h5>Reported by: <a href={`https://penguinmod.com/profile?user=${content.reporter}`}>{content.reporter}</a></h5>
-                <p><strong>Comment ID:</strong> {content.target}</p>
-                {#if content.commentData}
-                    <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
-                    {#if dropdownSelectMenu.value === "comment"}
-                        <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
-                    {:else}
-                        <p><strong>Profile:</strong> <a href={`/profile?user=${content.commentData.profileUserId}`} target="_blank">View Profile</a></p>
-                    {/if}
-                    <p><strong>Comment Text:</strong></p>
-                    <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px;">
-                        {content.commentData.content}
+                    
+                    loadReportDetails(content.target);
+                    if (selectedReportDetailed === idx) {
+                        selectedReportDetailed = -1;
+                        return;
+                    }
+                    selectedReportDetailed = idx;
+                }}
+            >
+                <div class="reports-user-content">
+                    <p style="font-weight: bold;">
+                        Comment by {content.commentData?.username || 'Loading...'}
                     </p>
-                {:else}
-                    <p>Loading comment details...</p>
-                {/if}
-                <p><strong>Report Reason:</strong></p>
-                <p style="white-space:pre-wrap">
-                    {content.report}
-                </p>
-                <Button
-                    on:click={() =>
-                        closeUserReport(
-                            content.id
-                        )}
-                    color="red"
-                >
-                    Close Report
-                </Button>
-                <h3>All reports on this comment</h3>
-                {#each reportDetails[content.target] as report}
-                    <details>
-                        <summary>
-                            {report.reporter}
-                        </summary>
+                    <p style="font-size: 0.85em; opacity: 0.8;">
+                        {content.commentData?.content ? 
+                            (content.commentData.content.substring(0, 50) + (content.commentData.content.length > 50 ? '...' : '')) 
+                            : 'Loading comment...'}
+                    </p>
+                </div>
+            </button>
+            {#if selectedReportDetailed === idx}
+                <div class="reports-generic-details">
+                    {#if !reportDetails[content.target]}
+                        <LoadingSpinner />
+                    {:else}
+                        <h5>Reported by: <a href={`https://penguinmod.com/profile?user=${content.reporter}`}>{content.reporter}</a></h5>
+                        <p><strong>Comment ID:</strong> {content.target}</p>
+                        {#if content.commentData}
+                            <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
+                            <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
+                            <p><strong>Comment Text:</strong></p>
+                            <p style="white-space:pre-wrap; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px;">
+                                {content.commentData.content}
+                            </p>
+                        {:else}
+                            <p>Loading comment details...</p>
+                        {/if}
+                        <p><strong>Report Reason:</strong></p>
+                        <p style="white-space:pre-wrap">
+                            {content.report}
+                        </p>
                         <Button
                             on:click={() =>
                                 closeUserReport(
-                                    report.id
+                                    content.id
                                 )}
                             color="red"
                         >
                             Close Report
                         </Button>
-                        <p style="white-space:pre-wrap">
-                            {report.report}
-                        </p>
-                    </details>
-                {/each}
+                        <h3>All reports on this comment</h3>
+                        {#each reportDetails[content.target] as report}
+                            <details>
+                                <summary>
+                                    {report.reporter}
+                                </summary>
+                                <Button
+                                    on:click={() =>
+                                        closeUserReport(
+                                            report.id
+                                        )}
+                                    color="red"
+                                >
+                                    Close Report
+                                </Button>
+                                <p style="white-space:pre-wrap">
+                                    {report.report}
+                                </p>
+                            </details>
+                        {/each}
+                    {/if}
+                </div>
             {/if}
-        </div>
-    {/if}
+        {:else}
                             <button
                                 class="reports-user-button reports-project-button"
                                 on:click={() => {
