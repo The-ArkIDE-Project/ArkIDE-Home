@@ -710,11 +710,11 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add working Google Authentication</li>
-                                <li>Fix email verification (VERIFY YOUR EMAILS!!!)</li>
-                                <li>Add replies feature to the comment section (you can now reply to other comments)</li>
-                                <li>You can now @ users by doing "@(ARKIDE USERNAME)" Replacing (ARKIDE USERNAME) With the name of the user you wanna @</li>
-                                <li>API Backend changes to make the replying feature work</li>
+                                <li>Add comments onto profiles</li>
+                                <li>Fix the comment reporting system</li>
+                                <li>Fix some bugs related to adding comments onto profiles</li>
+                                <li>Edit the vote on ArkIDE Vote to remove the adding comments onto profiles option as i already added them</li>
+                                <li>API Backend changes to make profile comments work</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
