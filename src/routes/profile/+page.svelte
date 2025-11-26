@@ -38,6 +38,7 @@
     let loggedInUser = "";
     let loggedInUserId = "";
     let loggedInAdmin = false;
+    let replyingTo = null;
 
     let user;
     const projects = {
@@ -143,8 +144,36 @@ const fetchCommentsStatus = async () => {
 };
 
 // Post a new comment
-const postComment = async (content, parentId = null) => {
-    if (!content.trim()) return;
+const postComment = async () => {
+    if (!newCommentContent.trim()) return;
+    
+    // Check if we're replying to a specific comment
+    let parentId = null;
+    let content = newCommentContent.trim();
+    
+    if (replyingTo && replyingTo.commentId) {
+        // Using the reply button - we know exactly which comment to reply to
+        parentId = replyingTo.commentId;
+        // Remove the @mention from the content
+        const mentionMatch = content.match(/^@\w+\s+(.+)/);
+        if (mentionMatch) {
+            content = mentionMatch[1];
+        }
+    } else {
+        // Manual @mention - find the most recent top-level comment by that user
+        const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
+        if (mentionMatch) {
+            const mentionedUser = mentionMatch[1];
+            const restOfComment = mentionMatch[2];
+            
+            const userComments = profileComments.filter(c => c.username === mentionedUser && !c.parentId);
+            const parentComment = userComments[0];
+            if (parentComment) {
+                parentId = parentComment.id;
+                content = restOfComment;
+            }
+        }
+    }
     
     const token = localStorage.getItem("token");
     if (!token) {
@@ -161,15 +190,15 @@ const postComment = async (content, parentId = null) => {
             },
             body: JSON.stringify({
                 username: user,
-                content,
-                parentId
+                content: content,
+                parentId: parentId
             })
         });
 
         if (response.ok) {
             newCommentContent = '';
-            replyContent = '';
-            replyingToCommentId = null;
+            replyingTo = null;
+            commentPage = 0;
             await fetchProfileComments();
         } else {
             const error = await response.json();
@@ -270,6 +299,14 @@ const reportComment = async (commentId) => {
     }
 };
 
+const replyToComment = (comment) => {
+    replyingTo = {
+        commentId: comment.id,
+        username: comment.username
+    };
+    newCommentContent = `@${comment.username} `;
+};
+
 // Toggle comments enabled/disabled
 const toggleCommentsEnabled = async () => {
     const token = localStorage.getItem("token");
@@ -320,6 +357,32 @@ function formatCommentDate(timestamp) {
     if (diffDays < 7) return `${diffDays}d ago`;
     
     return date.toLocaleDateString();
+}
+
+// Add these functions after formatCommentDate
+function parseEmojis(text) {
+    if (!text) return text;
+    
+    // Match :emojiname: pattern
+    return text.replace(/:([a-zA-Z0-9_-]+):/g, (match, emojiName) => {
+        return `<img src="https://library.arkide.site/files/emojis/${emojiName}.png" alt="${emojiName}" class="emoji-inline" title=":${emojiName}:" />`;
+    });
+}
+
+function parseMentions(text) {
+    if (!text) return text;
+    
+    // Match @username pattern
+    return text.replace(/@(\w+)/g, (match, username) => {
+        return `<a href="/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
+    });
+}
+
+function parseContent(text) {
+    // First parse emojis, then mentions
+    let parsed = parseEmojis(text);
+    parsed = parseMentions(parsed);
+    return parsed;
 }
     const updateProjectFeaturedTitle = (element) => {
         const projectTitle = Number(element.target.value);
@@ -1167,7 +1230,7 @@ Promise.all([
             {#if user}
                 <div class="section-user">
                     <div class="section-user-header">
-<div class="subuser-section">
+                        <div class="subuser-section">
                             <div class="user-username">
                                 <div class="profile-picture-container">
                                     <img
@@ -1841,16 +1904,29 @@ Promise.all([
             <!-- New Comment Box -->
             {#if loggedIn && commentsEnabled}
                 <div class="comment-input-box">
+                    {#if replyingTo}
+                        <div class="replying-to">
+                            <span>Replying to @{replyingTo.username}</span>
+                            <button 
+                                class="cancel-reply" 
+                                on:click={() => { 
+                                    replyingTo = null; 
+                                    newCommentContent = ""; 
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                    {/if}
                     <textarea
                         bind:value={newCommentContent}
                         placeholder="Write a comment..."
                         maxLength="500"
                         class="comment-textarea"
-                        style="max-width: 100%; box-sizing: border-box;"
                     />
                     <button 
                         class="comment-submit-button" 
-                        on:click={() => postComment(newCommentContent)}
+                        on:click={() => postComment()}
                         disabled={!newCommentContent.trim()}
                     >
                         <LocalizedText
@@ -1878,160 +1954,203 @@ Promise.all([
                 </p>
             {/if}
 
-            <!-- Comments List -->
-            <div class="comments-list">
-                {#if isLoadingComments}
-                    <LoadingSpinner />
-                {:else if profileComments.length === 0}
-                    <p style="opacity:0.5;text-align:center;padding:20px;">
-                        <LocalizedText
-                            text="No comments yet"
-                            key="profile.comments.none"
-                            lang={currentLang}
+<!-- Comments List -->
+<div class="comments-list">
+    {#if isLoadingComments}
+        <LoadingSpinner />
+    {:else if profileComments.length === 0}
+        <p style="opacity:0.5;text-align:center;padding:20px;">
+            <LocalizedText
+                text="No comments yet"
+                key="profile.comments.none"
+                lang={currentLang}
+            />
+        </p>
+        {:else}
+            {#each profileComments.filter(c => !c.parentId) as comment}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author-info">
+                        <img
+                            src="{PUBLIC_API_URL}/api/v1/users/getpfp?username={comment.username}"
+                            alt={comment.username}
+                            class="comment-avatar"
                         />
-                    </p>
-                {:else}
-                    {#each profileComments as comment}
-                        <div class="comment-item">
-                            <div class="comment-header">
-                                <img
-                                    src="{PUBLIC_API_URL}/api/v1/users/getpfp?username={comment.username}"
-                                    alt={comment.username}
-                                    class="comment-avatar"
-                                />
-                                <div class="comment-info">
-                                    <a href="/profile?user={comment.username}" class="comment-username">
-                                        {comment.username}
-                                    </a>
-                                    <span class="comment-date">{formatCommentDate(comment.createdAt)}</span>
-                                    {#if comment.edited}
-                                        <span class="comment-edited">(edited)</span>
-                                    {/if}
-                                </div>
-                                <div class="comment-actions">
-                                    {#if canModifyComment(comment)}
-                                        <button 
-                                            class="comment-action-button" 
-                                            on:click={() => {
-                                                editingCommentId = comment.id;
-                                                editingCommentContent = comment.content;
-                                            }}
-                                            title="Edit"
-                                        >
-                                            <img src="/pencil.png" alt="Edit" style="height:16px;" />
-                                        </button>
-                                        <button 
-                                            class="comment-action-button" 
-                                            on:click={() => deleteComment(comment.id)}
-                                            title="Delete"
-                                        >
-                                            <img src="/notallowed.png" alt="Delete" style="height:16px;" />
-                                        </button>
-                                    {/if}
-                                    <button 
-                                        class="comment-action-button" 
-                                        on:click={() => reportComment(comment.id)}
-                                        title="Report"
-                                    >
-                                        <img src="/report_flag.png" alt="Report" style="height:16px;" />
-                                    </button>
-                                </div>
-                            </div>
+                        <a href="/profile?user={comment.username}" class="comment-username">
+                            {comment.username}
+                        </a>
+                    </div>
+                    <div class="comment-meta">
+                        <span class="comment-date">{formatCommentDate(comment.createdAt)}</span>
+                        {#if comment.edited}
+                            <span class="comment-edited">(edited)</span>
+                        {/if}
+                    </div>
+                </div>
 
-                            {#if editingCommentId === comment.id}
-                                <div class="comment-edit-box">
-                                    <textarea
-                                        bind:value={editingCommentContent}
-                                        maxLength="500"
-                                        class="comment-textarea"
-                                    />
-                                    <div class="comment-edit-actions">
-                                        <button 
-                                            class="comment-edit-save" 
-                                            on:click={() => updateComment(comment.id, editingCommentContent)}
-                                        >
-                                            Save
-                                        </button>
-                                        <button 
-                                            class="comment-edit-cancel" 
-                                            on:click={() => {
-                                                editingCommentId = null;
-                                                editingCommentContent = '';
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            {:else}
-                                <div class="comment-content">
-                                    {@html generateMarkdown(comment.content)}
-                                </div>
-                            {/if}
-
-                            {#if loggedIn && commentsEnabled && replyingToCommentId !== comment.id}
-                                <button 
-                                    class="comment-reply-button" 
-                                    on:click={() => {
-                                        replyingToCommentId = comment.id;
-                                    }}
-                                >
-                                    Reply
-                                </button>
-                            {/if}
-
-                            {#if replyingToCommentId === comment.id}
-                                <div class="comment-reply-box">
-                                    <textarea
-                                        bind:value={replyContent}
-                                        placeholder="Write a reply..."
-                                        maxLength="500"
-                                        class="comment-textarea"
-                                    />
-                                    <div class="comment-edit-actions">
-                                        <button 
-                                            class="comment-edit-save" 
-                                            on:click={() => postComment(replyContent, comment.id)}
-                                        >
-                                            Reply
-                                        </button>
-                                        <button 
-                                            class="comment-edit-cancel" 
-                                            on:click={() => {
-                                                replyingToCommentId = null;
-                                                replyContent = '';
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            {/if}
+                {#if editingCommentId === comment.id}
+                    <div class="comment-edit-box">
+                        <textarea
+                            bind:value={editingCommentContent}
+                            maxLength="500"
+                            class="comment-textarea"
+                        />
+                        <div class="comment-edit-actions">
+                            <button 
+                                class="comment-edit-save" 
+                                on:click={() => updateComment(comment.id, editingCommentContent)}
+                            >
+                                Save
+                            </button>
+                            <button 
+                                class="comment-edit-cancel" 
+                                on:click={() => {
+                                    editingCommentId = null;
+                                    editingCommentContent = '';
+                                }}
+                            >
+                                Cancel
+                            </button>
                         </div>
-                    {/each}
+                    </div>
+                {:else}
+                    <div class="comment-content">
+                        {@html parseContent(comment.content)}
+                    </div>
+                    
+                    <div class="comment-actions">
+                        {#if loggedIn && commentsEnabled}
+                            <button 
+                                class="comment-action-button reply-btn" 
+                                on:click={() => replyToComment(comment)}
+                                title="Reply"
+                            >
+                                Reply
+                            </button>
+                        {/if}
+                        {#if canModifyComment(comment)}
+                            <button 
+                                class="comment-action-button" 
+                                on:click={() => {
+                                    editingCommentId = comment.id;
+                                    editingCommentContent = comment.content;
+                                }}
+                                title="Edit"
+                            >
+                                <img src="/pencil.png" alt="Edit" style="height:16px;" />
+                            </button>
+                            <button 
+                                class="comment-action-button" 
+                                on:click={() => deleteComment(comment.id)}
+                                title="Delete"
+                            >
+                                <img src="/notallowed.png" alt="Delete" style="height:16px;" />
+                            </button>
+                        {/if}
+                        <button 
+                            class="comment-action-button" 
+                            on:click={() => reportComment(comment.id)}
+                            title="Report"
+                        >
+                            <img src="/report_flag.png" alt="Report" style="height:16px;" />
+                        </button>
+                    </div>
+                {/if}
+
+                <!-- Show replies -->
+                {#if profileComments.filter(c => c.parentId === comment.id).length > 0}
+                    <div class="replies">
+                        {#each profileComments.filter(c => c.parentId === comment.id) as reply}
+                            <div class="comment-item reply">
+                                <div class="comment-header">
+                                    <div class="comment-author-info">
+                                        <img
+                                            src="{PUBLIC_API_URL}/api/v1/users/getpfp?username={reply.username}"
+                                            alt={reply.username}
+                                            class="comment-avatar"
+                                        />
+                                        <a href="/profile?user={reply.username}" class="comment-username">
+                                            {reply.username}
+                                        </a>
+                                    </div>
+                                    <div class="comment-meta">
+                                        <span class="comment-date">{formatCommentDate(reply.createdAt)}</span>
+                                        {#if reply.edited}
+                                            <span class="comment-edited">(edited)</span>
+                                        {/if}
+                                    </div>
+                                </div>
+
+                                {#if editingCommentId === reply.id}
+                                    <div class="comment-edit-box">
+                                        <textarea
+                                            bind:value={editingCommentContent}
+                                            maxLength="500"
+                                            class="comment-textarea"
+                                        />
+                                        <div class="comment-edit-actions">
+                                            <button 
+                                                class="comment-edit-save" 
+                                                on:click={() => updateComment(reply.id, editingCommentContent)}
+                                            >
+                                                Save
+                                            </button>
+                                            <button 
+                                                class="comment-edit-cancel" 
+                                                on:click={() => {
+                                                    editingCommentId = null;
+                                                    editingCommentContent = '';
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                {:else}
+                                    <div class="comment-content">
+                                        {@html parseContent(reply.content)}
+                                    </div>
+                                    
+                                    <div class="comment-actions">
+                                        {#if canModifyComment(reply)}
+                                            <button 
+                                                class="comment-action-button" 
+                                                on:click={() => {
+                                                    editingCommentId = reply.id;
+                                                    editingCommentContent = reply.content;
+                                                }}
+                                                title="Edit"
+                                            >
+                                                <img src="/pencil.png" alt="Edit" style="height:16px;" />
+                                            </button>
+                                            <button 
+                                                class="comment-action-button" 
+                                                on:click={() => deleteComment(reply.id)}
+                                                title="Delete"
+                                            >
+                                                <img src="/notallowed.png" alt="Delete" style="height:16px;" />
+                                            </button>
+                                        {/if}
+                                        <button 
+                                            class="comment-action-button" 
+                                            on:click={() => reportComment(reply.id)}
+                                                    title="Report"
+                                                >
+                                                    <img src="/report_flag.png" alt="Report" style="height:16px;" />
+                                            </button>
+                            </div>
+                        {/if}
+                    </div>
+                        {/each}
+                    </div>
                 {/if}
             </div>
-
-            {#if commentCount > profileComments.length}
-                <button 
-                    class="load-more-comments" 
-                    on:click={async () => {
-                        commentPage++;
-                        await fetchProfileComments();
-                    }}
-                >
-                    <LocalizedText
-                        text="Load More"
-                        key="profile.comments.loadmore"
-                        lang={currentLang}
-                    />
-                </button>
-            {/if}
-        </div>
-    </ContentCategory>
+        {/each}
+    {/if}
+</div> <!-- end comments-list -->
+</div> <!-- end comments-section -->
+</ContentCategory>
 {/if}
-
-            </div>
             <div class="section-serious-actions">
                 {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
                     <div class="report-action">
@@ -2075,11 +2194,12 @@ Promise.all([
                         </a>
                     </div>
                 {/if}
-            </div>
-            {/if}
-            {/if}
-        </div>
-        {:else}
+            </div> <!-- closes section-serious-actions -->
+        </div> <!-- closes section-projects -->
+        {/if} <!-- closes isProfilePrivate check -->
+        {/if} <!-- closes isBlocked check -->
+    </div> <!-- closes background div -->
+{:else}
             <div style="height:32px;" />
             <div style="display:flex;flex-direction:column;align-items:center;">
                 <PenguinConfusedSVG height="10rem" />
@@ -3389,6 +3509,91 @@ Promise.all([
 :global(body.dark-mode) .load-more-comments:hover {
     background: rgba(255, 255, 255, 0.1);
 }
+.replies {
+    margin-left: 40px;
+    margin-top: 12px;
+    padding-left: 16px;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
 
+:global(body.dark-mode) .replies {
+    border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+.comment-item.reply {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+:global(body.dark-mode) .comment-item.reply {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+:global(.mention-link) {
+    color: #4dabf7 !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    transition: color 0.2s ease !important;
+}
+
+:global(.mention-link:hover) {
+    color: #4dabf7 !important;
+    text-decoration: underline !important;
+}
+
+:global(body.dark-mode) :global(.mention-link) {
+    color: #4dabf7 !important;
+}
+
+:global(body.dark-mode) :global(.mention-link:hover) {
+    color: #74c0fc !important;
+}
+
+:global(.emoji-inline) {
+    width: 20px !important;
+    height: 20px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+    object-fit: contain;
+}
+
+.reply-btn {
+    color: #4d97ff;
+    background: transparent;
+}
+
+.reply-btn:hover {
+    background: rgba(77, 151, 255, 0.1);
+}
+.replying-to {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(77, 151, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+:global(body.dark-mode) .replying-to {
+    background: rgba(74, 171, 247, 0.2);
+}
+
+.cancel-reply {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+    height: auto;
+    opacity: 0.6;
+}
+
+.cancel-reply:hover {
+    opacity: 1;
+}
 
 </style>
