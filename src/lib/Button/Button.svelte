@@ -65,7 +65,7 @@
         outline-color: rgba(0, 4, 255, 0.35);
         color: white;
         background-color: #0011ff;
-        cursor: pointer;
+        cursor: url('link.png'), pointer;
         display: flex;
         flex-direction: row;
         align-items: center;

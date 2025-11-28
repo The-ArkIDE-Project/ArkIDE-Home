@@ -68,7 +68,7 @@
         outline: 0px;
         color: white;
         background-color: transparent;
-        cursor: pointer;
+        cursor: url('link.png'), pointer;
         display: flex;
         align-items: center;
         justify-content: center;
