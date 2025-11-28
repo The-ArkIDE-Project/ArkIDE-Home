@@ -581,7 +581,16 @@
     font-weight: bold;
     min-width: 1000px;
     z-index: 1000;
+	cursor: url('cur.png'), auto;
 }
+
+    .bar :global(a) {
+        cursor: url('link.png'), pointer;
+    }
+
+    .bar :global(button) {
+        cursor: url('link.png'), pointer;
+    }
 	:global(body.launcher-mode) .bar {
 		width: 5rem;
 		height: 100%;

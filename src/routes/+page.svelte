@@ -711,11 +711,10 @@
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
                                 <li>Add comments onto profiles</li>
-                                <li>Fix the comment reporting system</li>
                                 <li>Fix some bugs related to adding comments onto profiles</li>
-                                <li>Edit the vote on ArkIDE Vote to remove the adding comments onto profiles option as i already added them</li>
                                 <li>API Backend changes to make profile comments work</li>
                                 <li>Add search recommendations to the search bar when searching</li>
+                                <li>Add a custom Homepage wide custom cursor (TEMPORARY UNTILL MY ARTIST MAKES A NEW ONE)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
@@ -1243,9 +1242,18 @@
         top: 0px;
         width: 100%;
         min-width: 1000px;
+        cursor: url('cur.png'), auto;
     }
     :global(body.dark-mode) .main {
         color: white;
+    }
+
+    .main :global(a) {
+        cursor: url('link.png'), pointer;
+    }
+
+    .main :global(button) {
+        cursor: url('link.png'), pointer;
     }
 
     .cat-button {
