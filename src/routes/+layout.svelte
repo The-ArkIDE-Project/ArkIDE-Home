@@ -33,6 +33,6 @@
     :global(input[type="search"]),
     :global(textarea),
     :global(.search-bar) {
-        cursor: text !important;
+        cursor: url('/txt.png'), text !important;
     }
 </style>

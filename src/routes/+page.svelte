@@ -714,7 +714,7 @@
                                 <li>Fix some bugs related to adding comments onto profiles</li>
                                 <li>API Backend changes to make profile comments work</li>
                                 <li>Add search recommendations to the search bar when searching</li>
-                                <li>Add a custom Homepage wide custom cursor (TEMPORARY UNTILL MY ARTIST MAKES A NEW ONE)</li>
+                                <li>Add a custom Homepage wide custom cursor</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
