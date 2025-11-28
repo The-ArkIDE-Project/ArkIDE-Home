@@ -8,7 +8,7 @@
 <style>
     /* Global cursor styles */
     :global(*) {
-        cursor: url('cur.png'), auto !important;
+        cursor: url('/cur.png'), auto !important;
     }
 
     :global(a),
@@ -23,7 +23,7 @@
     :global(.project-author-wrapper),
     :global(.comment-action-button),
     :global([onclick]) {
-        cursor: url('link.png'), pointer !important;
+        cursor: url('/link.png'), pointer !important;
     }
 
     /* Default text cursor for text inputs */
