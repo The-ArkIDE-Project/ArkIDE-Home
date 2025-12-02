@@ -112,6 +112,11 @@
         // If all methods fail, assume online (due to CORS restrictions)
         return { status: 'online', method: 'assumed', note: 'CORS restricted' };
     }
+function preprocessDiscordMessage(message) {
+    if (!message) return "";
+    const result = message.split("|").join("<br>");
+    return result;
+}
 
     // Check all services
     async function checkAllServices() {
@@ -330,7 +335,7 @@
                                 </div>
                             </div>
                             <div class="news-content">
-                                {item.cleanContent}
+                                {@html preprocessDiscordMessage(item.cleanContent || "")}
                             </div>
                             {#if item.image}
                                 <img src={item.image} alt="Update attachment" class="news-image" />
