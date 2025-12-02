@@ -528,6 +528,7 @@
     "account.settings.standing.unbanned": "Your account has been reinstated.",
     "account.settings.standing.unbanned.subtitle": "Click \"Continue\" to use the account again.",
     "home.footer.sections.info.contact": "Contact Us",
+    "home.footer.sections.info.status": "Status Page",
     "generic.typehere": "Type here...",
     "generic.inappropriate": "Words or phrases were used that are not allowed in ArkIDE.",
     "account.fields.username.taken": "Username is taken",

@@ -45,7 +45,7 @@
     let langDecided = false;
     let currentLang = "en";
 
-    let ghcommits = [];
+    let ghcommits = null;
     let myFeed = [];
     let updates = [];
     let feedIsEmpty = false;
@@ -58,7 +58,7 @@
     async function fetchLatestCommit() {
         try {
             const repo = 'The-ArkIDE-Project/ArkIDE-Home';
-            const response = await fetch(`https://api.github.com/repos/${repo}/commits/main`);
+            const response = await fetch(`https://api.github.com/repos/The-ArkIDE-Project/ArkIDE-Home/commits/main`);
             if (!response.ok) throw new Error('GitHub API error');
 
             const data = await response.json();
@@ -584,40 +584,22 @@
                 seemore={LINK.github}
             >
                 <div class="category-content">
-                    {#if ghcommits.length > 0}
+                    {#if ghcommits && ghcommits.length > 0}
                         {#each ghcommits as commit}
                             {#if commit}
                                 <UserDisplay
                                     link={commit.html_url}
-                                    userLink={commit.author
-                                        ? commit.author.html_url
-                                        : ""}
+                                    userLink={commit.author ? commit.author.html_url : ""}
                                     text={censor(commit.commit.message)}
-                                    author={commit.author
-                                        ? commit.author.login
-                                        : ""}
-                                    image={commit.author
-                                        ? commit.author.avatar_url
-                                        : ""}
+                                    author={commit.author ? commit.author.login : ""}
+                                    image={commit.author ? commit.author.avatar_url : ""}
                                 />
                             {/if}
                         {/each}
                     {:else if ghcommitsFailed}
-                        <p>
-                            <LocalizedText
-                                text="Failed to load commits."
-                                key="home.sections.githubcommits.failed.generic"
-                                lang={currentLang}
-                            />
-                        </p>
-                    {:else if ghcommitsLoaded}
-                        <p style="text-align: center;">
-                            <LocalizedText
-                                text="GitHub failed to provide commits. Please try again later."
-                                key="home.sections.githubcommits.failed.provide"
-                                lang={currentLang}
-                            />
-                        </p>
+                        <p>Failed to load commits...</p>
+                    {:else if ghcommitsLoaded && (!ghcommits || ghcommits.length === 0)}
+                        <p>No commits found</p>
                     {:else}
                         <LoadingSpinner />
                     {/if}
@@ -1142,6 +1124,13 @@
                     <LocalizedText
                         text="Contact Us"
                         key="home.footer.sections.info.contact"
+                        lang={currentLang}
+                    />
+                </a>
+                <a target="_blank" href="/status">
+                    <LocalizedText
+                        text="Status Page"
+                        key="home.footer.sections.info.status"
                         lang={currentLang}
                     />
                 </a>
