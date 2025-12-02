@@ -40,6 +40,7 @@
             private: false,
             privateToNonFollowers: false,
             showCubesOnProfile: false,
+            customCursor: true,
         },
     };
 
@@ -90,6 +91,9 @@
     onMount(async () => {
         const username = localStorage.getItem("username");
         token = localStorage.getItem("token");
+        // Load custom cursor setting from localStorage
+const cursorSetting = localStorage.getItem('customCursorEnabled');
+accountInformation.settings.customCursor = cursorSetting === null ? true : cursorSetting === 'true';
         if (!token || !username) {
             loggedIn = false;
             return;
@@ -184,6 +188,19 @@
         const privateToNonFollowers = accountInformation.settings.privateToNonFollowers || false;
 
         ProjectClient.updatePrivateProfile(privateProfile, privateToNonFollowers);
+    }
+    function updateCustomCursor() {
+        const enabled = accountInformation.settings.customCursor || false;
+        localStorage.setItem('customCursorEnabled', enabled.toString());
+        
+        // Apply immediately
+        if (enabled) {
+            document.body.classList.add('custom-cursor-enabled');
+            document.body.classList.remove('custom-cursor-disabled');
+        } else {
+            document.body.classList.remove('custom-cursor-enabled');
+            document.body.classList.add('custom-cursor-disabled');
+        }
     }
 
     function setPFP() {
@@ -656,6 +673,20 @@
                                 <LocalizedText
                                     text="Allow people I follow to view my profile"
                                     key="account.settings.account.toggles.privatenonfollowers"
+                                    lang={currentLang}
+                                />
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    bind:checked={accountInformation.settings.customCursor}
+                                    on:change={updateCustomCursor}
+                                >
+                                <LocalizedText
+                                    text="Use custom cursor"
+                                    key="account.settings.account.toggles.customcursor"
                                     lang={currentLang}
                                 />
                             </label>

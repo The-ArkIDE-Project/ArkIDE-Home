@@ -1231,18 +1231,9 @@
         top: 0px;
         width: 100%;
         min-width: 1000px;
-        cursor: url('cur.png'), auto;
     }
     :global(body.dark-mode) .main {
         color: white;
-    }
-
-    .main :global(a) {
-        cursor: url('link.png'), pointer;
-    }
-
-    .main :global(button) {
-        cursor: url('link.png'), pointer;
     }
 
     .cat-button {
