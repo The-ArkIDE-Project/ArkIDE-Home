@@ -35,82 +35,73 @@
 
     // Check service status with multiple fallback methods
     async function checkService(service) {
-        const methods = [
-            // Method 1: Direct fetch with no-cors (will succeed but we can't read response)
-            async () => {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
-                    
-                    await fetch(service.url, { 
-                        mode: 'no-cors',
-                        signal: controller.signal,
-                        cache: 'no-cache'
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    return { status: 'online', method: 'no-cors' };
-                } catch (error) {
-                    if (error.name === 'AbortError') {
-                        return { status: 'timeout', method: 'no-cors' };
-                    }
-                    return { status: 'offline', method: 'no-cors', error: error.message };
-                }
-            },
-            
-            // Method 2: Try via proxy API if available
-            async () => {
-                try {
-                    const response = await fetch(`https://arkidebasicapi.arkide.site/check-status?url=${encodeURIComponent(service.url)}`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        return { status: data.online ? 'online' : 'offline', method: 'proxy', details: data };
-                    }
-                    return { status: 'unknown', method: 'proxy' };
-                } catch (error) {
-                    return null; // Try next method
-                }
-            },
-            
-            // Method 3: Image loading trick (for some sites)
-            async () => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    const timeout = setTimeout(() => {
-                        img.src = '';
-                        resolve({ status: 'timeout', method: 'image' });
-                    }, 5000);
-                    
-                    img.onload = () => {
-                        clearTimeout(timeout);
-                        resolve({ status: 'online', method: 'image' });
-                    };
-                    
-                    img.onerror = () => {
-                        clearTimeout(timeout);
-                        // Error might mean CORS, but site is up
-                        resolve({ status: 'online', method: 'image' });
-                    };
-                    
-                    img.src = service.url + '?_=' + Date.now();
-                });
-            }
-        ];
-
-        // Try each method in sequence
-        for (const method of methods) {
-            const result = await method();
-            if (result && result.status !== 'unknown') {
-                return result;
-            }
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
+        let response;
+        let fetchError = null;
+        
+        try {
+            response = await fetch(service.url, {
+                method: 'HEAD',
+                mode: 'cors',
+                cache: 'no-cache',
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+        } catch (error) {
+            clearTimeout(timeoutId);
+            fetchError = error;
         }
-
-        // If all methods fail, assume online (due to CORS restrictions)
-        return { status: 'online', method: 'assumed', note: 'CORS restricted' };
+        
+        // If we got a response, check the status
+        if (response) {
+            const statusCode = response.status;
+            
+            if (statusCode === 502) {
+                return { status: 'cloudflare-error', cloudflareError: 'Bad Gateway' };
+            }
+            if (statusCode === 503) {
+                return { status: 'cloudflare-error', cloudflareError: 'Service Unavailable' };
+            }
+            if (statusCode >= 520 && statusCode <= 530) {
+                const errors = {
+                    520: "Unknown Error", 521: "Web Server Is Down",
+                    522: "Connection Timed Out", 523: "Origin Is Unreachable",
+                    524: "A Timeout Occurred", 525: "SSL Handshake Failed",
+                    526: "Invalid SSL Certificate", 527: "Railgun Error",
+                    530: "Origin DNS Error"
+                };
+                return { status: 'cloudflare-error', cloudflareError: errors[statusCode] };
+            }
+            if (statusCode >= 500) {
+                return { status: 'offline', cloudflareError: `Server Error: ${statusCode}` };
+            }
+            if (statusCode === 200 || response.ok || statusCode === 403 || statusCode === 405) {
+                return { status: 'online' };
+            }
+            
+            return { status: 'degraded', cloudflareError: `HTTP ${statusCode}` };
+        }
+        
+        // No response but got an error - likely network issue or CORS blocked a bad status
+        if (fetchError) {
+            // If it's a TypeError with "NetworkError", it might be CORS blocking a 502/503
+            if (fetchError.message && fetchError.message.includes('NetworkError')) {
+                // Try no-cors to see if site is completely down
+                try {
+                    await fetch(service.url, { mode: 'no-cors' });
+                    // Got SOMETHING back - likely a 502/503 behind CORS
+                    return { status: 'cloudflare-error', cloudflareError: 'Bad Gateway (CORS blocked)' };
+                } catch {
+                    return { status: 'offline', cloudflareError: 'Completely unreachable' };
+                }
+            }
+            
+            return { status: 'offline', cloudflareError: fetchError.name === 'AbortError' ? 'Timeout' : 'Network Error' };
+        }
+        
+        return { status: 'offline', cloudflareError: 'Unknown error' };
     }
 function preprocessDiscordMessage(message) {
     if (!message) return "";
@@ -123,36 +114,16 @@ function preprocessDiscordMessage(message) {
         lastChecked = new Date();
         
         const results = await Promise.all(
-            serviceStatuses.map(async (service, index) => {
+            serviceStatuses.map(async (service) => {
                 const result = await checkService(service);
-                
-                // Detect Cloudflare errors
-                let status = result.status;
-                let cloudflareError = null;
-                
-                if (result.details) {
-                    const statusCode = result.details.statusCode;
-                    if (statusCode === 520) cloudflareError = "Web server returned unknown error";
-                    if (statusCode === 521) cloudflareError = "Web server is down";
-                    if (statusCode === 522) cloudflareError = "Connection timed out";
-                    if (statusCode === 523) cloudflareError = "Origin is unreachable";
-                    if (statusCode === 524) cloudflareError = "A timeout occurred";
-                    if (statusCode === 525) cloudflareError = "SSL handshake failed";
-                    if (statusCode === 526) cloudflareError = "Invalid SSL certificate";
-                    if (statusCode === 527) cloudflareError = "Railgun error";
-                    if (statusCode === 530) cloudflareError = "Origin DNS error";
-                    
-                    if (cloudflareError) {
-                        status = 'cloudflare-error';
-                    }
-                }
                 
                 return {
                     ...service,
-                    status,
-                    cloudflareError,
+                    status: result.status,
+                    cloudflareError: result.cloudflareError,
                     lastCheck: new Date(),
-                    responseTime: result.responseTime
+                    responseTime: result.details?.responseTime,
+                    note: result.note
                 };
             })
         );
@@ -161,14 +132,30 @@ function preprocessDiscordMessage(message) {
     }
 
     // Load news from Discord via API
+// Load news from Discord via API
     async function loadNews() {
         try {
             newsLoading = true;
-            const response = await fetch(`https://arkidebasicapi.arkide.site/discord-news`);
+            const response = await fetch(`https://arkidebasicapi.arkide.site/discord-news`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
+            });
+            
+            // Check status code BEFORE trying to read response
+            if (response.status === 502 || response.status === 503) {
+                console.error(`Basic API returned ${response.status}`);
+                newsItems = [];
+                newsLoading = false;
+                return;
+            }
             
             if (response.ok) {
                 const data = await response.json();
                 newsItems = data.messages || [];
+            } else {
+                console.error("News API returned:", response.status);
+                newsItems = [];
             }
         } catch (error) {
             console.error("Failed to load news:", error);
