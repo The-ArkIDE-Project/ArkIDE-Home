@@ -18,10 +18,10 @@
 
     // Services to monitor
     const services = [
-        { name: "ArkIDE Home", url: "https://arkide.site/" },
+        { name: "ArkIDE Home", url: "https://arkide.site/hat.png" },
         { name: "ArkIDE Editor", url: "https://studio.arkide.site/" },
         { name: "Asset Library", url: "https://library.arkide.site/" },
-        { name: "ArkIDE API", url: "https://arkideapi.arc360hub.com/" },
+        { name: "ArkIDE API", url: "https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=ark2" },
         { name: "ArkIDE Basic API", url: "https://arkidebasicapi.arkide.site/" },
         { name: "ArkIDE Packager", url: "https://packager.arkide.site/" },
         { name: "Extensions Store", url: "https://extensions.arkide.site/" }
@@ -38,142 +38,98 @@
         return message.split("|").join("<br>");
     }
 
-    // Check web service status - COPIED FROM YOUR WORKING HTML
+// Check web service status - Load in hidden iframe and check for error text
+// Check web service status - Fetch and check response
     async function checkWebService(url) {
-        let gotResponse = false;
-        let statusCode = null;
+        console.log(`🌐 Checking ${url}`);
         
         try {
-            console.log(`🌐 Checking ${url}`);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
             
-            // Try CORS request first
             const response = await fetch(url, {
-                method: 'HEAD',
-                mode: 'cors',
+                method: 'GET',
                 cache: 'no-cache',
-                signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+                signal: controller.signal
             });
-
-            // If we got here, we got a response!
-            gotResponse = true;
-            statusCode = response.status;
-            console.log(`📡 ${url} responded with status: ${statusCode}`);
-
-            // Check for Cloudflare errors
-            if (statusCode >= 520 && statusCode <= 530) {
+            
+            clearTimeout(timeout);
+            
+            // Try to get response text
+            try {
+                const text = await response.text();
+                const lowerText = text.toLowerCase();
+                
+                console.log(`📄 ${url} - Got response, checking content...`);
+                
+                // Check for Cloudflare error indicators
+                if (lowerText.includes('bad gateway') || 
+                    lowerText.includes('error code 502') || 
+                    lowerText.includes('cloudflare ray id:')) {
+                    
+                    console.error(`❌ ${url} - Cloudflare error detected`);
+                    return {
+                        status: 'offline',
+                        uptime: 0,
+                        error: 'Bad Gateway (502)'
+                    };
+                }
+            } catch (textError) {
+                console.log(`⚠️ ${url} - Could not read response text`);
+            }
+            
+            // Check status codes
+            if (response.status === 502 || response.status === 503) {
+                console.error(`❌ ${url} - Server error ${response.status}`);
                 return {
-                    status: 'cloudflare-error',
+                    status: 'offline',
                     uptime: 0,
-                    error: `Cloudflare Error ${statusCode}`
+                    error: `Server Error ${response.status}`
                 };
             }
-
-            // Check for common errors
-            if (statusCode === 502) {
+            
+            if (response.status >= 500) {
+                console.error(`❌ ${url} - Server error ${response.status}`);
                 return {
-                    status: 'cloudflare-error',
+                    status: 'offline',
                     uptime: 0,
-                    error: 'Bad Gateway'
+                    error: `Server Error ${response.status}`
                 };
             }
-
-            if (statusCode === 503) {
-                return {
-                    status: 'cloudflare-error',
-                    uptime: 0,
-                    error: 'Service Unavailable'
-                };
-            }
-
-            // Success cases
-            if (response.ok || statusCode === 403 || statusCode === 405) {
+            
+            if (response.ok || response.status === 403 || response.status === 405) {
+                console.log(`✅ ${url} - Online`);
                 return {
                     status: 'online',
                     uptime: 100,
                     error: null
                 };
             }
-
-            // Server errors
-            if (statusCode >= 500) {
-                return {
-                    status: 'offline',
-                    uptime: 0,
-                    error: `Server Error: ${statusCode}`
-                };
-            }
-
+            
+            console.log(`⚠️ ${url} - Degraded (status ${response.status})`);
             return {
                 status: 'degraded',
                 uptime: 50,
-                error: `HTTP ${statusCode}`
+                error: `HTTP ${response.status}`
             };
-
+            
         } catch (error) {
-            console.log(`⚠️ CORS failed for ${url}`);
-            console.log(`   Error type: ${error.name}`);
-            console.log(`   Error message: ${error.message}`);
-            console.log(`   Full error:`, error);
+            console.error(`❌ ${url} - Fetch failed:`, error.name, error.message);
             
-            // Check if we got a response before CORS blocked us
-            if (gotResponse) {
-                // We got a response! Check the status code we captured
-                if (statusCode >= 500) {
-                    console.error(`❌ ${url} - Got ${statusCode} before CORS block - Service is DOWN`);
-                    return {
-                        status: 'cloudflare-error',
-                        uptime: 0,
-                        error: `Service Down (${statusCode})`
-                    };
-                } else if (statusCode === 200 || statusCode === 403 || statusCode === 405) {
-                    // Good status but CORS blocked - service is actually ONLINE
-                    console.log(`✅ ${url} - Got ${statusCode} but CORS blocked - Service is UP`);
-                    return {
-                        status: 'online',
-                        uptime: 100,
-                        error: null
-                    };
-                }
-            }
-            
-            // For ALL services, try no-cors fallback to check if responding
-            try {
-                console.log(`🔄 Trying no-cors fallback for ${url}...`);
-                const noCorsFetch = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors',
-                    signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
-                });
-                
-                // no-cors succeeded - server responded with SOMETHING
-                // If the original CORS request showed 502 in console, it's likely down
-                // But since we can't read console, we have to assume it's up
-                console.log(`⚠️ ${url} - no-cors succeeded (but might be 502 error page)`);
-                
-                // If it's a known down service (arkidebasicapi specifically), check more carefully
-                if (url.includes('arkidebasicapi.arkide.site')) {
-                    console.error(`❌ ${url} - Assuming DOWN based on no CORS headers (likely 502)`);
-                    return {
-                        status: 'cloudflare-error',
-                        uptime: 0,
-                        error: 'Bad Gateway (detected via CORS block)'
-                    };
-                }
-                
-                return {
-                    status: 'online',
-                    uptime: 90,
-                    error: null
-                };
-            } catch (fallbackError) {
-                // no-cors failed - service is truly down/unreachable
-                console.error(`❌ ${url} - no-cors failed, service is DOWN`);
+            if (error.name === 'AbortError') {
                 return {
                     status: 'offline',
                     uptime: 0,
-                    error: 'Service unreachable'
+                    error: 'Connection timeout'
                 };
             }
+            
+            // CORS errors or network failures
+            return {
+                status: 'offline',
+                uptime: 0,
+                error: 'Connection failed'
+            };
         }
     }
 
@@ -208,7 +164,7 @@
                 }
             })
         );
-        
+
         serviceStatuses = results;
         console.log('=== Service check complete ===');
     }
