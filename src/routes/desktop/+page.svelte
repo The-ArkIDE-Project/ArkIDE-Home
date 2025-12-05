@@ -20,17 +20,17 @@
     // Download links - replace these with your actual download URLs
     const downloads = {
         windows: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.2.0/Ark.IDE.Setup.2.2.0.exe",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE.Setup.2.4.0.exe",
             // arm64: "https://example.com/arkide-windows-arm64.exe"
         },
         linux: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.2.0/Ark.IDE-2.2.0.AppImage",
-            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.2.0/Ark.IDE-2.2.0-arm64.AppImage",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0.AppImage",
+            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0-arm64.AppImage",
             flatpak: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop"
         },
         MacOS: {
-        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.2.0/Ark.IDE-2.2.0.dmg",
-        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.2.0/Ark.IDE-2.2.0-arm64.dmg"
+        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0.dmg",
+        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0-arm64.dmg"
     }
     };
 
@@ -164,7 +164,7 @@ $: fileName = getFileName(selectedOS, selectedArch);
         <p><strong>Step 2:</strong> Run the downloaded <code>{fileName}</code> file. Windows may show a security warning - click "More info" and then "Run anyway" to proceed.</p>
         <p><strong>Step 3:</strong> Follow the setup wizard. We recommend keeping the default settings.</p>
         <p><strong>Step 4:</strong> Launch ArkIDE Desktop from the Start Menu or desktop shortcut.</p>
-        <p class="note-text"><strong>Note:</strong> Windows 10 or later is required.</p>
+        <p class="note-text"><strong>Note:</strong> Windows 7 or later is required. (Dont worry we wont end support for win7 and 10 untill electron COMPLETLY depreciates them.)</p>
 
     {:else if selectedOS === 'linux' && !showFlatpak}
         <h3>Linux AppImage Installation</h3>
