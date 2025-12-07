@@ -20,22 +20,22 @@
     // Download links - replace these with your actual download URLs
     const downloads = {
         windows: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE.Setup.2.4.0.exe",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE.Setup.2.5.0.exe",
             // arm64: "https://example.com/arkide-windows-arm64.exe"
         },
         linux: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0.AppImage",
-            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0-arm64.AppImage",
+            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0.AppImage",
+            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0-arm64.AppImage",
             flatpak: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop"
         },
         MacOS: {
-        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0.dmg",
-        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.4.0/Ark.IDE-2.4.0-arm64.dmg"
+        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0.dmg",
+        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0-arm64.dmg"
     }
     };
 
     let selectedOS = "windows";
-    let version = "2.2.0";
+    let version = "2.5.0";
     let selectedArch = "x86";
     let showFlatpak = false;
 
@@ -207,6 +207,8 @@ $: fileName = getFileName(selectedOS, selectedArch);
                 <li>Native performance and faster load times</li>
                 <li>Work offline without an internet connection</li>
                 <li>Quick launch from your desktop</li>
+                <li>Discord RPC Compatibility, so people can see that your coding on ArkIDE</li>
+                <li>Verson checker to see when your desktop app is out-of-date</li>
             </ul>
         </div>
 
@@ -215,14 +217,14 @@ $: fileName = getFileName(selectedOS, selectedArch);
             <div class="requirements-grid">
                 <div class="requirement-box">
                     <h3>Minimum</h3>
-                    <p><strong>OS:</strong> Windows 10 / Any linux distro that supports Appimages</p>
+                    <p><strong>OS:</strong> Windows 7 / Any linux distro that supports Appimages / MacOS 10.15 or later</p>
                     <p><strong>RAM:</strong> 4 GB</p>
                     <p><strong>Storage:</strong> 100 MB free space</p>
                     <p><strong>Display:</strong> 1280x720 resolution</p>
                 </div>
                 <div class="requirement-box">
                     <h3>Recommended</h3>
-                    <p><strong>OS:</strong> Windows 11 / Any linux distro that supports Appimages</p>
+                    <p><strong>OS:</strong> Windows 11 / Any linux distro that supports Appimages / MacOS 11 or later</p>
                     <p><strong>RAM:</strong> 4 GB or more</p>
                     <p><strong>Storage:</strong> 500 MB free space</p>
                     <p><strong>Display:</strong> 1920x1080 resolution or higher</p>
@@ -232,6 +234,9 @@ $: fileName = getFileName(selectedOS, selectedArch);
 
         <div class="content-section">
             <h2>Frequently Asked Questions</h2>
+
+            <p><strong>Why in some parts of the app do I see "Icarus Desktop"</strong></p>
+            <p>You see Icarus Desktop because that is the codename for ArkIDE Desktop. And I put that in some places becuase Icarus Desktop sounds considerably cooler that ArkIDE Desktop.</p>
             
             <p><strong>Is ArkIDE Desktop free?</strong></p>
             <p>Yes! ArkIDE Desktop is completely free to download and use.</p>

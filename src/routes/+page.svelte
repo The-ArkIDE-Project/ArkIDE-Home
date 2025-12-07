@@ -692,11 +692,10 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add comments onto profiles</li>
-                                <li>Fix some bugs related to adding comments onto profiles</li>
-                                <li>API Backend changes to make profile comments work</li>
-                                <li>Add search recommendations to the search bar when searching</li>
-                                <li>Add a custom Homepage wide custom cursor</li>
+                                <li>Migrate to ArkIDE-VM from penguinmod-vm on the editor</li>
+                                <li>Update the desktop app to be just better in so many ways</li>
+                                <li>Fix the API a bit more so its less buggy</li>
+                                <li>Fix the status page so it actualy detects outages</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
