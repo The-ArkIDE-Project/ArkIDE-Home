@@ -298,7 +298,7 @@
                         message = TranslationHandler.textSafe(
                             "uploading.error.toomanyrequests",
                             currentLang,
-                            "You can only upload projects every 8 minutes."
+                            "You can only upload projects every 2 minutes."
                         );
                         break;
                     case "Uploading is disabled":
