@@ -696,6 +696,7 @@
                                 <li>Update the desktop app to be just better in so many ways</li>
                                 <li>Fix the API a bit more so its less buggy</li>
                                 <li>Fix the status page so it actualy detects outages</li>
+                                <li>Add github authentication (you can now create accounts with github)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 

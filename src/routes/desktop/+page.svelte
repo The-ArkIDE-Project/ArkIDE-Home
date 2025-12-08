@@ -17,25 +17,25 @@
         currentLang = lang;
     });
 
-    // Download links - replace these with your actual download URLs
-    const downloads = {
-        windows: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE.Setup.2.5.0.exe",
-            // arm64: "https://example.com/arkide-windows-arm64.exe"
-        },
-        linux: {
-            x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0.AppImage",
-            arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0-arm64.AppImage",
-            flatpak: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop"
-        },
-        MacOS: {
-        x86: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0.dmg",
-        arm64: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v2.5.0/Ark.IDE-2.5.0-arm64.dmg"
+let version = "2.5.0";
+// Download links - replace these with your actual download URLs
+const downloads = {
+    windows: {
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE.Setup.${version}.exe`,
+        // arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/arkide-windows-arm64.exe`
+    },
+    linux: {
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}.AppImage`,
+        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}-arm64.AppImage`,
+        flatpak: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop"
+    },
+    MacOS: {
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}.dmg`,
+        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}-arm64.dmg`
     }
-    };
+};
 
     let selectedOS = "windows";
-    let version = "2.5.0";
     let selectedArch = "x86";
     let showFlatpak = false;
 
