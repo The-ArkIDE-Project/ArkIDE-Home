@@ -246,7 +246,7 @@
                 {@html generateMarkdown(`${TranslationHandler.textSafe(
                     "login.linkto.oldaccounts2025.line1",
                     currentLang,
-                    "Email verification does not work yet, you will have to stay with an unverified email for now. This will be fixed soon."
+                    "Scratch authentication does not work yet, will be fixed soon."
                 )}
                 ${TranslationHandler.textSafe(
                     "login.linkto.oldaccounts2025.line2",

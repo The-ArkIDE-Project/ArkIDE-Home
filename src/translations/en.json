@@ -899,7 +899,7 @@
     "account.fields.username.ratelimit.day": "Please wait one day before changing your username again.",
     "account.fields.username.ratelimit.days": "Please wait {{DAYS}} days before changing your username again.",
     "login.linkto.forgot": "Forgot your password? Reset it here.",
-    "login.linkto.oldaccounts2025.line1": "Email verification does not work yet, you will have to stay with an unverified email for now. This will be fixed soon.",
+    "login.linkto.oldaccounts2025.line1": "Scratch authentication does not work yet, will be fixed soon.",
     "login.linkto.oldaccounts2025.line2": " ",
     "event.status.upcoming": "This is an upcoming event. Please wait until the event date to participate.",
     "event.status.active": "This event is active now!",
