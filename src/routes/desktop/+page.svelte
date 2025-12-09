@@ -17,7 +17,7 @@
         currentLang = lang;
     });
 
-let version = "2.7.0";
+let version = "2.7.1";
 // Download links - replace these with your actual download URLs
 const downloads = {
     windows: {
@@ -153,6 +153,7 @@ $: fileName = getFileName(selectedOS, selectedArch);
                     {selectedArch === 'x86' ? ' (x86-64)' : selectedArch === 'arm64' ? ' (ARM64)' : showFlatpak ? ' (Flatpak)' : ''}
                 </Button>
             </div>
+            <p>Version: {version}</p>
         </div> <!-- closes <div class="main"> -->
 
 <div class="content-section">
