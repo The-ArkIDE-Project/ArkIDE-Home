@@ -692,7 +692,7 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add a new extension to the editor (ArkIDE Console)</li>
+                                <li>Introduce the ArkIDE Forum</li>
                                 <li>Re-add a feature the pm devs were making and finished it (The files tab, you can now search through and see all of the assets in your project)</li>
                                 <li>Fix other wierd bugs with the ArkIDE Desktop app</li>
                                 <li>Add github authentication (you can now create accounts with github)</li>

@@ -74,7 +74,7 @@ export default {
     /**
      * PenguinMod's unofficial wiki
      */
-    wiki: "https://wiki.penguinmod.com/wiki/Main_Page",
+    wiki: "https://forums.arkide.site/",
 
     /**
      * PenguinMod's Discord invite
