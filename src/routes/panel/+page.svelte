@@ -74,6 +74,7 @@
                 ProjectClient.setUsername(username);
                 ProjectClient.setToken(token);
                 loggedIn = true;
+                loadVerifiedUsernames();
             })
             .catch(() => {
                 loggedIn = false;
@@ -186,7 +187,101 @@
                 alert(err);
             });
     };
+// Verified usernames management
+let verifiedUsernames = [];
+let verifiedUsernameInput = "";
+let showAllUsersForVerified = false;
+let allUsersListForVerified = [];
+let allUsersLoadingForVerified = false;
 
+const loadVerifiedUsernames = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/misc/getVerifiedUsernames?token=${token}`);
+        if (response.ok) {
+            const data = await response.json();
+            verifiedUsernames = data.verifiedUsernames || [];
+        } else {
+            alert("Failed to load verified usernames");
+        }
+    } catch (err) {
+        console.error("Error loading verified usernames:", err);
+        alert("Error loading verified usernames");
+    }
+};
+
+const saveVerifiedUsernames = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/misc/setVerifiedUsernames`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: token,
+                usernames: verifiedUsernames
+            })
+        });
+        
+        if (response.ok) {
+            alert("Verified usernames saved successfully!");
+        } else {
+            alert("Failed to save verified usernames");
+        }
+    } catch (err) {
+        console.error("Error saving verified usernames:", err);
+        alert("Error saving verified usernames");
+    }
+};
+
+const addVerifiedUser = () => {
+    const username = verifiedUsernameInput.trim().toLowerCase();
+    if (!username) {
+        alert("Please enter a username");
+        return;
+    }
+    if (verifiedUsernames.includes(username)) {
+        alert("User is already verified");
+        return;
+    }
+    verifiedUsernames = [...verifiedUsernames, username];
+    verifiedUsernameInput = "";
+};
+
+const addVerifiedUserByName = (username) => {
+    const lowerUsername = username.toLowerCase();
+    if (verifiedUsernames.includes(lowerUsername)) {
+        alert("User is already verified");
+        return;
+    }
+    verifiedUsernames = [...verifiedUsernames, lowerUsername];
+};
+
+const removeVerifiedUser = (username) => {
+    if (!confirm(`Remove ${username} from verified list?`)) return;
+    verifiedUsernames = verifiedUsernames.filter(u => u !== username);
+};
+
+const loadAllUsersForVerified = () => {
+    allUsersLoadingForVerified = true;
+    showAllUsersForVerified = !showAllUsersForVerified;
+    
+    if (showAllUsersForVerified && allUsersListForVerified.length === 0) {
+        ProjectClient.getAllUsers()
+            .then(users => {
+                allUsersListForVerified = users;
+                allUsersLoadingForVerified = false;
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(`Failed to get all users; ${err}`);
+                allUsersLoadingForVerified = false;
+            });
+    } else {
+        allUsersLoadingForVerified = false;
+    }
+};
     let unapprovedPage = 1;
     function openProjectsMenu(type) {
         // type is assumed to be unapproved because we have nothing else right now
@@ -1988,6 +2083,89 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
 
             <br />
             <br />
+            <br/>
+            <div class="card">
+                <h2>Verified Usernames</h2>
+                <p>Manage the list of verified users who will get a verified badge next to their name.</p>
+                
+                <h3>Current Verified Users</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+                    {#if verifiedUsernames.length === 0}
+                        <p style="opacity: 0.7;">No verified users yet</p>
+                    {:else}
+                        {#each verifiedUsernames as username}
+                            <div style="background: #7e5eff; color: white; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                                <span>{username}</span>
+                                <button 
+                                    on:click={() => removeVerifiedUser(username)}
+                                    style="background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; border-radius: 4px; padding: 2px 6px;"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        {/each}
+                    {/if}
+                </div>
+
+                <h3>Add Verified User</h3>
+                <p>Type username to add:</p>
+                <input
+                    type="text"
+                    size="50"
+                    placeholder="Enter username..."
+                    bind:value={verifiedUsernameInput}
+                    style="margin-bottom: 8px;"
+                />
+                <div class="user-action-row" style="margin-bottom: 16px;">
+                    <Button color="remix" on:click={addVerifiedUser}>
+                        Add User
+                    </Button>
+                    <Button on:click={loadAllUsersForVerified}>
+                        {showAllUsersForVerified ? 'Hide' : 'Show'} All Users
+                    </Button>
+                </div>
+
+                {#if allUsersLoadingForVerified}
+                    <LoadingSpinner />
+                {:else if showAllUsersForVerified}
+                    <div class="all-users-list">
+                        {#each allUsersListForVerified as user}
+                            <div class="user-list-item">
+                                <img
+                                    src={`https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=${user.username}`}
+                                    alt={user.username}
+                                    class="user-list-pfp"
+                                />
+                                <div class="user-list-info">
+                                    <a href={`/profile?user=${user.username}`} target="_blank">
+                                        {user.username}
+                                    </a>
+                                    {#if verifiedUsernames.includes(user.username)}
+                                        <span style="color: #7e5eff;">✓ Already verified</span>
+                                    {/if}
+                                </div>
+                                {#if !verifiedUsernames.includes(user.username)}
+                                    <Button 
+                                        on:click={() => addVerifiedUserByName(user.username)}
+                                        color="remix"
+                                        label="Verify"
+                                    />
+                                {/if}
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+
+                <br />
+                <div class="user-action-row">
+                    <Button color="remix" on:click={saveVerifiedUsernames}>
+                        Save Changes
+                    </Button>
+                    <Button on:click={loadVerifiedUsernames}>
+                        Reload List
+                    </Button>
+                </div>
+            </div>
         </div>
         <div class="project-sidebar">
             <div class="project-sidebar-actions">
