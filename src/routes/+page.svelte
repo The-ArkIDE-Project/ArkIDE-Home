@@ -612,7 +612,7 @@
                     <img style="max-width: 100%; height: auto; border-radius: 1rem;" src="keithmas.png" alt="Keithmas Event 2025">
 
                     <h2 style="text-align:center; margin-bottom: 0;">
-                        Keithmas Event 2025!
+                        Keithmas Event 2025! (Dec 10th to the 25th)
                     </h2>
                     <p style="text-align:center;">
                         Join us for the Keithmas Event 2025! Participate in fun activities and earn exclusive badges!
@@ -636,6 +636,12 @@
                     <h2>How to Participate</h2>
                     <ul>
                         <li>Simply post a project with the #keithmas tag and all of the other requirements shown above.</li>
+                    </ul>
+                    <h2>Dates</h2>
+                    <ul>
+                        <li>Event Start: December 10th, 2025</li>
+                        <li>Submission Deadline: December 25th, 2025</li>
+                        <li>Winners Announcement: December 26th, 2025</li>
                     </ul>
 
                 </div>
