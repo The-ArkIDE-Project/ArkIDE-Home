@@ -52,6 +52,11 @@ export default {
     totalynotafurry: "totalynotafurry",
     mainantagonist: "mainantagonist",
 
+    // arkide keithmas 2025 badges
+    participatedinkeithmas2025: "participatedinkeithmas2025",
+    keithmas2025nominee: "keithmas2025nominee",
+    keithmas2025winner: "keithmas2025winner",
+
     // auto but a bunch of stuff
     // studio50: "studio50",
     // likes100: "likes100",

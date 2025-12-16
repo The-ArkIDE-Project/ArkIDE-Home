@@ -606,36 +606,37 @@
                 </div>
             </ContentCategory>
                 {:else if loggedIn && selectedFrontTabSelected === "vote"}
-            <ContentCategory header="Vote on whats added next">
+            <ContentCategory header="Keithmas 2025 event">
                 <div class="category-content" style="display:flex; flex-direction:column; gap:1rem;">
 
+                    <img src="keithmas.png" alt="Keithmas Event 2025">
+
                     <h2 style="text-align:center; margin-bottom: 0;">
-                        Vote on what gets added next to ArkIDE!
+                        Keithmas Event 2025!
                     </h2>
-
-                    <div style="
-                        width: 100%;
-                        aspect-ratio: 1 / 1.3;
-                        max-height: 700px;
-                        overflow: hidden;
-                        border-radius: 12px;
-                        border: 2px solid var(--border-color, #ccc);
-                    ">
-                    <iframe
-                        src="https://docs.google.com/forms/d/e/1FAIpQLSdHLbWahy0p2NKQ7YX4IMUf0TTx8ViuPuc29F7efGQflJMRTA/viewform?usp=publish-editor"
-                        style="width:100%; height:100%; border:none;"
-                        loading="lazy"
-                        title="Google Form: Vote on what gets added next to ArkIDE"
-                    />
-                    </div>
-
                     <p style="text-align:center;">
-                        To give us more ideas on what to add to this forum next,
-                        join our server and give us ideas!
-                        <a href="https://discord.gg/mYdcjn6YMV" target="_blank">
-                            https://discord.gg/mYdcjn6YMV
-                        </a>
+                        Join us for the Keithmas Event 2025! Participate in fun activities and earn exclusive badges!
                     </p>
+                    <h2>Event Details</h2>
+                    <ul>
+                        <li>Submitted projects must have the #keithmas tag somewhere in the project so we can find them easier</li>
+                        <li>@Insomnia64 must be tagged in the notes/credits/instructions</li>
+                        <li>must clarify in the project or in the notes/instructions that its a keithmas submission</li>
+                        <li>must be a christmas-related project, christmas themed. </li>
+                        <li>Can be any type of project like animation, art, game, etc. </li>
+                        <li>You will be blacklisted from the year's keithmas for commenting hateful messages on contestants comment sections. </li>
+                        <li>@keith_official will post the results on dec. 26th </li>
+                    </ul>
+                    <h2>Badges</h2>
+                    <ul>
+                        <li><strong>Participated in Keithmas 2025</strong>: Awarded to all participants who submit a project.</li>
+                        <li><strong>Keithmas 2025 Nominee</strong>: Given to the top (Insomnia wont give me a number) projects selected by the ArkIDE team.</li>
+                        <li><strong>Keithmas 2025 Winner</strong>: Awarded to one project that is voted on by the ArkIDE team.</li>
+                    </ul>
+                    <h2>How to Participate</h2>
+                    <ul>
+                        <li>Simply post a project with the #keithmas tag and all of the other requirements shown above.</li>
+                    </ul>
 
                 </div>
             </ContentCategory>
@@ -792,7 +793,7 @@
                         selectedFrontTabSelected = "vote";
                     }}
                 >
-                    ArkIDE Vote!
+                    Keithmas Event!
                 </button>
 
             </div>
