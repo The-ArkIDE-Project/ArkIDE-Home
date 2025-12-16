@@ -1067,14 +1067,14 @@ Promise.all([
                 if (/^\d{6,}$/.test(id)) {
                     return `<a href="${PUBLIC_STUDIO_URL}/#${id}" target="_blank">#${id}</a>`;
                 }
-                return `<a href="https://penguinmod.com/search?q=%23${id}">#${id}</a>`;
+                return `<a href="https://arkide.site/search?q=%23${id}">#${id}</a>`;
             });
             textChanged = true;
         }
         if (newText.match(regexRules.user)) {
             newText = newText.replace(regexRules.user, function(name) {
                 name = name.replace('@', '');
-                return `<a href="https://penguinmod.com/profile?user=${name}">@${name}</a>`;
+                return `<a href="https://arkide.site/profile?user=${name}">@${name}</a>`;
             });
             textChanged = true;
         }
@@ -1157,10 +1157,10 @@ Promise.all([
     <meta name="title"                   content="ArkIDE - {user ? user : "User Profile"}" />
     <meta property="og:title"            content="ArkIDE - {user ? user : "User Profile"}" />
     <meta property="twitter:title"       content="ArkIDE - {user ? user : "User Profile"}">
-    <meta name="description"             content="View {user ? user : "this user"}'s profile on PenguinMod.">
-    <meta property="twitter:description" content="View {user ? user : "this user"}'s profile on PenguinMod.">
-    <meta property="og:url"              content="https://penguinmod.com/profile">
-    <meta property="twitter:url"         content="https://penguinmod.com/profile">
+    <meta name="description"             content="View {user ? user : "this user"}'s profile on ArkIDE.">
+    <meta property="twitter:description" content="View {user ? user : "this user"}'s profile on ArkIDE.">
+    <meta property="og:url"              content="https://arkide.site/profile">
+    <meta property="twitter:url"         content="https://arkide.site/profile">
 </svelte:head>
 
 <NavigationBar />
