@@ -609,7 +609,7 @@
             <ContentCategory header="Keithmas 2025 event">
                 <div class="category-content" style="display:flex; flex-direction:column; gap:1rem;">
 
-                    <img style="max-width: 60%; height: auto;" src="keithmas.png" alt="Keithmas Event 2025">
+                    <img style="max-width: 100%; height: auto; border-radius: 1rem;" src="keithmas.png" alt="Keithmas Event 2025">
 
                     <h2 style="text-align:center; margin-bottom: 0;">
                         Keithmas Event 2025!
