@@ -198,7 +198,7 @@
         switch (type) {
             case "upload":
             case "remix":
-                return `${PUBLIC_STUDIO_URL}/#${content.id}`;
+                return `/viewer#${content.id}`;
             case "posted":
                 return `/profile?user=${author}&post=${content.id}`;
             default:
@@ -232,7 +232,7 @@
 
         const projectId = Number(location.hash.replace("#", ""));
         if (!isNaN(projectId) && projectId != 0) {
-            location.href = `${PUBLIC_STUDIO_URL}/#${projectId}`;
+            location.href = `/viewer#${projectId}`;
             return;
         }
 
