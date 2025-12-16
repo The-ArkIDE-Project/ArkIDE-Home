@@ -8,6 +8,7 @@
     import Button from "$lib/Button/Button.svelte";
     import LocalizedText from "$lib/LocalizedText/Node.svelte";
     import Language from "../../resources/language.js";
+    import VoteEmbed from "../embed/vote/+page.svelte"; // Adjust path as needed
 
     let currentLang = "en";
     onMount(() => {
@@ -91,8 +92,15 @@
         <div class="content-wrapper">
             <div class="title-container">
                 <h1 class="project-title">{projectData.title}</h1>
-                <Button on:click={() => window.open(`https://studio.arkide.site/editor.html#${projectId}`, '_blank')}>
-                    See Inside
+                <Button on:click={() => window.location.href = `https://studio.arkide.site/editor.html#${projectId}`}>
+                    <span class="see-inside-content">
+                        <img 
+                            src="https://scratch.mit.edu/svgs/project/see-inside-white.svg" 
+                            alt="See Inside"
+                            class="see-inside-icon"
+                        />
+                        See Inside
+                    </span>
                 </Button>
             </div>
             
@@ -141,11 +149,7 @@
             </div>
 
             <div class="vote-container">
-                <iframe
-                    src="https://arkide.site/embed/vote?id={projectId}#dark={isDarkMode}"
-                    class="vote-embed"
-                    frameborder="0"
-                ></iframe>
+                <VoteEmbed projectId={projectId} />
             </div>
         </div>
     {/if}
@@ -314,8 +318,9 @@
 
     .vote-embed {
         width: 100%;
-        height: 900px;
-        border: 1px solid rgba(0, 0, 0, 0.15);
+        min-height: 1000px;
+        height: auto;
+        border: 0px solid rgba(0, 0, 0, 0.15);
         border-radius: 8px;
     }
 
@@ -354,5 +359,15 @@
         font-size: 2.5rem;
         margin: 0;
         color: #001affad;
+    }
+    .see-inside-content {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .see-inside-icon {
+        width: 20px;
+        height: 20px;
     }
 </style>

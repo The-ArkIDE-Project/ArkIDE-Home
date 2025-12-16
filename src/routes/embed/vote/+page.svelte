@@ -34,7 +34,9 @@
     let showEmojiPicker = false;
     let commentTextarea;
 
-    let projectId = 0;
+    export let projectId = "";
+
+    console.log("TOP OF SCRIPT - projectId prop:", projectId);
 
     function vote() {
         if (loggedIn === false) {
@@ -103,14 +105,21 @@
             });
     }
     onMount(() => {
-        const params = new URLSearchParams(location.search);
-        const projId = String(params.get("id"));
-        projectId = projId;
+        console.log("ONMOUNT - Vote embed received projectId prop:", projectId);
+        
+        // Only read from URL if projectId prop wasn't provided
+        if (!projectId) {
+            const params = new URLSearchParams(location.search);
+            projectId = String(params.get("id"));
+            console.log("ONMOUNT - Read projectId from URL:", projectId);
+        }
+        
+        console.log("ONMOUNT - Final projectId being used:", projectId);
         
         // Load emojis
         loadEmojis();
-        
-        ProjectApi.getProjectMeta(projId)
+
+        ProjectApi.getProjectMeta(projectId)
             .then((meta) => {
                 likes = numberCast(meta.loves);
                 votes = numberCast(meta.votes);
@@ -153,6 +162,7 @@
                 userLiked = false;
                 userVoted = false;
                 loaded = true;
+                loadComments();
             });
     });
 
