@@ -259,7 +259,7 @@
 	}
 
 	function openProject(projectId, projectTitle) {
-		const url = `${PUBLIC_STUDIO_URL}#${projectId}`;
+		const url = `/viewer#${projectId}`;
 		window.open(url, '_blank');
 		showRecommendations = false;
 		searchQuery = "";
