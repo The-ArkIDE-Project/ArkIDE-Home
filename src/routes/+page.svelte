@@ -609,7 +609,7 @@
             <ContentCategory header="Keithmas 2025 event">
                 <div class="category-content" style="display:flex; flex-direction:column; gap:1rem;">
 
-                    <img src="keithmas.png" alt="Keithmas Event 2025">
+                    <img style="max-width: 60%; height: auto;" src="keithmas.png" alt="Keithmas Event 2025">
 
                     <h2 style="text-align:center; margin-bottom: 0;">
                         Keithmas Event 2025!
@@ -630,7 +630,7 @@
                     <h2>Badges</h2>
                     <ul>
                         <li><strong>Participated in Keithmas 2025</strong>: Awarded to all participants who submit a project.</li>
-                        <li><strong>Keithmas 2025 Nominee</strong>: Given to the top (Insomnia wont give me a number) projects selected by the ArkIDE team.</li>
+                        <li><strong>Keithmas 2025 Nominee</strong>: Given to the top 3-4 projects selected by the ArkIDE team.</li>
                         <li><strong>Keithmas 2025 Winner</strong>: Awarded to one project that is voted on by the ArkIDE team.</li>
                     </ul>
                     <h2>How to Participate</h2>
