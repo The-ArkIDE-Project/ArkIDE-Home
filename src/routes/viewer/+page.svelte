@@ -52,6 +52,7 @@
                 throw new Error('Failed to fetch project data');
             }
             projectData = await response.json();
+            await fetchRemixData(); // Add this line
             loading = false;
         } catch (err) {
             error = err.message;
@@ -63,6 +64,21 @@
         if (!text) return '';
         // Replace \r\n and \n with <br> tags
         return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+    }
+
+    let remixData = null;
+
+    async function fetchRemixData() {
+        if (projectData && projectData.remix && projectData.remix !== "0") {
+            try {
+                const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectData.remix}&requestType=metadata`);
+                if (response.ok) {
+                    remixData = await response.json();
+                }
+            } catch (err) {
+                console.error("Failed to fetch remix data:", err);
+            }
+        }
     }
 </script>
 
@@ -127,6 +143,27 @@
                             {projectData.author.username}
                         </a>
                     </div>
+
+                    {#if remixData}
+                        <div class="remix-section">
+                            <p>
+                            <img 
+                            src="https://arkideapi.arc360hub.com/api/v1/users/getpfp?username={remixData.author.username}"
+                            alt="{remixData.author.username}'s profile picture"
+                            class="remix-pfp"
+                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect fill=%22%23cccccc%22 width=%2264%22 height=%2264%22/%3E%3C/svg%3E'"
+                            />
+                                Thanks to 
+                                <a href="/profile?user={remixData.author.username}" class="remix-link">
+                                    {remixData.author.username}
+                                </a>
+                                for the original project 
+                                <a href="/viewer#{remixData.id}" class="remix-link">
+                                    {remixData.title}
+                                </a>
+                            </p>
+                        </div>
+                    {/if}
 
                     {#if projectData.instructions}
                         <div class="info-box">
@@ -316,14 +353,6 @@
         margin-top: 32px;
     }
 
-    .vote-embed {
-        width: 100%;
-        min-height: 1000px;
-        height: auto;
-        border: 0px solid rgba(0, 0, 0, 0.15);
-        border-radius: 8px;
-    }
-
     :global(body.dark-mode) .vote-embed {
         border-color: rgba(255, 255, 255, 0.15);
     }
@@ -369,5 +398,46 @@
     .see-inside-icon {
         width: 20px;
         height: 20px;
+    }
+    .remix-section {
+        padding: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.35);
+        border-radius: 4px;
+        background: rgba(255, 200, 100, 0.1);
+        font-size: 0.95rem;
+    }
+
+    :global(body.dark-mode) .remix-section {
+        border-color: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 200, 100, 0.15);
+    }
+
+    .remix-section p {
+        margin: 0;
+        line-height: 1.5;
+        display: flex;
+        align-items: center; 
+        gap: 8px;           
+    }
+
+    .remix-link {
+        color: #001affad;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .remix-link:hover {
+        text-decoration: underline;
+    }
+
+    :global(body.dark-mode) .remix-link {
+        color: #4d6bff;
+    }
+
+    .remix-pfp {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 </style>

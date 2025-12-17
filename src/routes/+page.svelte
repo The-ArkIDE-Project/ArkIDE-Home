@@ -1023,7 +1023,7 @@
     <div class="footer">
         <p>
             <LocalizedText
-                text="ArkIDE is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
+                text="ArkIDE is not affiliated with Penguinmod, Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
                 key="home.footer.notaffiliated"
                 lang={currentLang}
             />
@@ -1154,6 +1154,7 @@
                 <a target="_blank" href={LINK.donate.scratch}>Scratch</a>
             </div>
         </div>
+        <p class="footer-note">A project by Ark360 Studios, &copy; 2020-2025. All rights reserved.</p>
     </div>
 </div>
 
@@ -1161,6 +1162,12 @@
     * {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
+
+.footer-note {
+    font-size: 0.8em;
+    margin-top: 24px;
+    color: gray;
+}
 
     /* Chrismas stuff :D */
 .profile-picture-container {
