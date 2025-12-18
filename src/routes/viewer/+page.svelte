@@ -25,17 +25,20 @@
     let isDarkMode = false;
 
     onMount(async () => {
-        // Get project ID from URL hash - try multiple times if needed
+        // Get project ID from URL hash
         const hash = window.location.hash;
-        console.log("Hash:", hash); // Debug log
+        console.log("Hash:", hash);
         
         if (hash && hash.length > 1) {
-            projectId = hash.substring(1); // Remove the # symbol
-            console.log("Project ID:", projectId); // Debug log
+            projectId = hash.substring(1);
+            console.log("Project ID:", projectId);
         }
 
         // Check if dark mode is enabled
         isDarkMode = document.body.classList.contains('dark-mode');
+
+        // Load emojis in parallel (don't await)
+        loadEmojis().catch(err => console.error("Emoji load error:", err));
 
         if (projectId && projectId.trim() !== "") {
             await fetchProjectData();
@@ -45,6 +48,64 @@
         }
     });
 
+let emojiMap = {};
+let emojisLoaded = false;
+
+async function loadEmojis() {
+    try {
+        // Import the emoji list directly
+        const { mockRequest } = await import("../../resources/emojis-compat.js");
+        const emojis = mockRequest();
+        
+        emojis.forEach(emojiName => {
+            if (typeof emojiName === 'string') {
+                emojiMap[emojiName] = true;
+            }
+        });
+        emojisLoaded = true;
+        console.log("Loaded emojis:", Object.keys(emojiMap).length);
+    } catch (err) {
+        console.error("Failed to load emojis:", err);
+    }
+}
+
+function parseEmojis(text) {
+    if (!emojisLoaded || !text) return text;
+    
+    return text.replace(/:([a-zA-Z0-9_-]+):/g, (match, emojiName) => {
+        if (emojiMap[emojiName]) {
+            return `<img src="https://library.arkide.site/files/emojis/${emojiName}.png" alt="${emojiName}" class="emoji-inline" title=":${emojiName}:" />`;
+        }
+        return match;
+    });
+}
+
+function parseMentions(text) {
+    if (!text) return text;
+    
+    return text.replace(/@(\w+)/g, (match, username) => {
+        return `<a href="/profile?user=${username}" class="mention-link">${match}</a>`;
+    });
+}
+
+function parseHashtags(text) {
+    if (!text) return text;
+    
+    return text.replace(/#(\w+)/g, (match, hashtag) => {
+        return `<a href="/search?q=%23${hashtag}" class="hashtag-link">${match}</a>`;
+    });
+}
+
+function parseContent(text) {
+    if (!text) return text;
+    
+    // Parse in order: emojis -> mentions -> hashtags
+    let parsed = parseEmojis(text);
+    parsed = parseMentions(parsed);
+    parsed = parseHashtags(parsed);
+    return parsed;
+}
+
     async function fetchProjectData() {
         try {
             const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=metadata`);
@@ -52,7 +113,7 @@
                 throw new Error('Failed to fetch project data');
             }
             projectData = await response.json();
-            await fetchRemixData(); // Add this line
+            await fetchRemixData();
             loading = false;
         } catch (err) {
             error = err.message;
@@ -60,10 +121,20 @@
         }
     }
 
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    }
+
     function formatText(text) {
         if (!text) return '';
-        // Replace \r\n and \n with <br> tags
-        return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+        // Replace \r\n and \n with <br> tags, then parse content
+        let formatted = text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+        return parseContent(formatted);
     }
 
     let remixData = null;
@@ -121,18 +192,28 @@
             </div>
             
             <div class="main-content">
+                <div class="left-column">
                 <div class="embed-container">
                     <iframe 
                         src="https://studio.arkide.site/embed.html#{projectId}"
                         class="project-embed"
+                        title="{projectData.title}"
                         frameborder="0"
                         allowfullscreen
                         style="color-scheme: auto"
                     ></iframe>
                 </div>
 
-                <div class="sidebar">
-                    <div class="author-section">
+                <div class="project-dates">
+                    <span class="upload-date">Uploaded: {formatDate(projectData.date)}</span>
+                    {#if projectData.lastUpdate && projectData.lastUpdate !== projectData.date}
+                        <span class="update-date">(Updated: {formatDate(projectData.lastUpdate)})</span>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="author-section">
                         <img 
                             src="https://arkideapi.arc360hub.com/api/v1/users/getpfp?username={projectData.author.username}"
                             alt="{projectData.author.username}'s profile picture"
@@ -250,6 +331,12 @@
         margin-bottom: 32px;
     }
 
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
     .embed-container {
         width: 100%;
         position: relative;
@@ -342,6 +429,9 @@
         line-height: 1.6;
         color: #333;
         word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     :global(body.dark-mode) .info-content {
@@ -440,4 +530,108 @@
         border-radius: 50%;
         object-fit: cover;
     }
+    .project-dates {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        color: #333;
+    }
+
+    :global(body.dark-mode) .project-dates {
+        color: #ddd;
+    }
+
+    .update-date {
+        margin-left: 8px;
+        font-style: italic;
+    }
+
+.emoji-inline {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+    object-fit: contain;
+}
+
+:global(.emoji-inline) {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 2px;
+    user-select: none;
+    object-fit: contain;
+}
+
+.mention-link {
+    color: #0074d9;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.mention-link:hover {
+    color: #0056a8;
+    text-decoration: underline;
+}
+
+:global(body.dark-mode) .mention-link {
+    color: #4dabf7;
+}
+
+:global(body.dark-mode) .mention-link:hover {
+    color: #74c0fc;
+}
+
+.hashtag-link {
+    color: #0074d9;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.hashtag-link:hover {
+    color: #0056a8;
+    text-decoration: underline;
+}
+
+:global(body.dark-mode) .hashtag-link {
+    color: #4dabf7;
+}
+
+:global(body.dark-mode) .hashtag-link:hover {
+    color: #74c0fc;
+}
+
+:global(.mention-link),
+:global(.hashtag-link) {
+    color: #0074d9 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: color 0.2s ease !important;
+    display: inline !important;
+}
+
+:global(.mention-link:hover),
+:global(.hashtag-link:hover) {
+    color: #0056a8 !important;
+    text-decoration: underline !important;
+}
+
+:global(body.dark-mode) :global(.mention-link),
+:global(body.dark-mode) :global(.hashtag-link) {
+    color: #4dabf7 !important;
+}
+
+:global(body.dark-mode) :global(.mention-link:hover),
+:global(body.dark-mode) :global(.hashtag-link:hover) {
+    color: #74c0fc !important;
+}
 </style>
