@@ -178,7 +178,20 @@ function parseContent(text) {
     {:else if projectData}
         <div class="content-wrapper">
             <div class="title-container">
-                <h1 class="project-title">{projectData.title}</h1>
+                <div class="title-author-section">
+                    <img 
+                        src="https://arkideapi.arc360hub.com/api/v1/users/getpfp?username={projectData.author.username}"
+                        alt="{projectData.author.username}'s profile picture"
+                        class="title-author-pfp"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect fill=%22%23cccccc%22 width=%2264%22 height=%2264%22/%3E%3C/svg%3E'"
+                    />
+                    <div class="title-text-section">
+                        <h1 class="project-title">{projectData.title}</h1>
+                        <a href="/profile?user={projectData.author.username}" class="title-author-link">
+                            by {projectData.author.username}
+                        </a>
+                    </div>
+                </div>
                 <Button on:click={() => window.location.href = `https://studio.arkide.site/editor.html#${projectId}`}>
                     <span class="see-inside-content">
                         <img 
@@ -213,17 +226,6 @@ function parseContent(text) {
             </div>
 
             <div class="sidebar">
-                <div class="author-section">
-                        <img 
-                            src="https://arkideapi.arc360hub.com/api/v1/users/getpfp?username={projectData.author.username}"
-                            alt="{projectData.author.username}'s profile picture"
-                            class="author-pfp"
-                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect fill=%22%23cccccc%22 width=%2264%22 height=%2264%22/%3E%3C/svg%3E'"
-                        />
-                        <a href="/profile?user={projectData.author.username}" class="author-link">
-                            {projectData.author.username}
-                        </a>
-                    </div>
 
                     {#if remixData}
                         <div class="remix-section">
@@ -245,24 +247,27 @@ function parseContent(text) {
                             </p>
                         </div>
                     {/if}
-
-                    {#if projectData.instructions}
-                        <div class="info-box">
-                            <h3>Instructions</h3>
-                            <div class="info-content">
+                    <div class="info-box">
+                        <h3>Instructions</h3>
+                        <div class="info-content {!projectData.instructions ? 'empty-content' : ''}">
+                            {#if projectData.instructions}
                                 {@html formatText(projectData.instructions)}
-                            </div>
+                            {:else}
+                                No instructions provided
+                            {/if}
                         </div>
-                    {/if}
+                    </div>
 
-                    {#if projectData.notes}
-                        <div class="info-box">
-                            <h3>Notes and Credits</h3>
-                            <div class="info-content">
+                    <div class="info-box">
+                        <h3>Notes and Credits</h3>
+                        <div class="info-content {!projectData.notes ? 'empty-content' : ''}">
+                            {#if projectData.notes}
                                 {@html formatText(projectData.notes)}
-                            </div>
+                            {:else}
+                                No notes provided
+                            {/if}
                         </div>
-                    {/if}
+                    </div>
                 </div>
             </div>
 
@@ -363,43 +368,6 @@ function parseContent(text) {
         gap: 16px;
     }
 
-    .author-section {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.35);
-        border-radius: 4px;
-        background: white;
-    }
-
-    :global(body.dark-mode) .author-section {
-        border-color: rgba(255, 255, 255, 0.35);
-        background: #1a1a1a;
-    }
-
-    .author-pfp {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .author-link {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #001affad;
-        text-decoration: none;
-    }
-
-    .author-link:hover {
-        text-decoration: underline;
-    }
-
-    :global(body.dark-mode) .author-link {
-        color: #4d6bff;
-    }
-
     .info-box {
         padding: 16px;
         border: 1px solid rgba(0, 0, 0, 0.35);
@@ -474,10 +442,49 @@ function parseContent(text) {
         margin-bottom: 24px;
     }
 
+    .title-author-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .title-author-pfp {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .title-text-section {
+        display: flex;
+        flex-direction: column;
+    }
+
     .project-title {
-        font-size: 2.5rem;
+        font-size: 2.4rem;
         margin: 0;
         color: #001affad;
+    }
+
+    .title-author-link {
+        font-size: 1rem;
+        color: #666;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .title-author-link:hover {
+        color: #001affad;
+        text-decoration: underline;
+    }
+
+    :global(body.dark-mode) .title-author-link {
+        color: #999;
+    }
+
+    :global(body.dark-mode) .title-author-link:hover {
+        color: #4d6bff;
     }
     .see-inside-content {
         display: flex;
@@ -633,5 +640,13 @@ function parseContent(text) {
 :global(body.dark-mode) :global(.mention-link:hover),
 :global(body.dark-mode) :global(.hashtag-link:hover) {
     color: #74c0fc !important;
+}
+.empty-content {
+    color: #999;
+    font-style: italic;
+}
+
+:global(body.dark-mode) .empty-content {
+    color: #666;
 }
 </style>

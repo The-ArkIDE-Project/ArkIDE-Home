@@ -1238,6 +1238,16 @@
         /* border-top-right-radius: 20%; */
     }
 
+    a {
+        text-decoration: none;
+        color: rgb(114, 54, 255);
+        font-weight: bold;
+    }
+    a:hover {
+        text-decoration: underline;
+        color: rgb(145, 98, 255);
+    }
+
     .main {
         position: absolute;
         left: 0px;

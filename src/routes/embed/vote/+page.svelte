@@ -416,7 +416,7 @@ function parseMentions(text) {
     // Match @username pattern
     const result = text.replace(/@(\w+)/g, (match, username) => {
         console.log("Found mention:", match, username);
-        return `<a href="https://arkide.site/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
+        return `<a href="/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
     });
     
     console.log("After parsing mentions:", result);
@@ -609,7 +609,7 @@ function getEmojiList() {
                                 class="comment-pfp"
                             />
                             <a 
-                                href={`https://arkide.site/profile?user=${comment.username}`}
+                                href={`/profile?user=${comment.username}`}
                                 class="comment-author"
                                 target="_blank"
                             >
@@ -1160,6 +1160,7 @@ function getEmojiList() {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 2px;
 }
 
 :global(body.dark-mode) .emoji-picker-btn {

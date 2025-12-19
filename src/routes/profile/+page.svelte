@@ -1717,7 +1717,7 @@ Promise.all([
                                 />
                             </p>
                         {:else if profileFeaturedProject.author.id === fullProfile.id}
-                            <a href={`${LINK.base}#${profileFeaturedProject.id}`} style="text-decoration: none">
+                            <a href={`/viewer#${profileFeaturedProject.id}`} style="text-decoration: none">
                                 <img
                                     src={`${ProjectApi.OriginApiUrl}/api/v1/projects/getproject?projectID=${profileFeaturedProject.id}&requestType=thumbnail`}
                                     alt="Project Thumbnail"
