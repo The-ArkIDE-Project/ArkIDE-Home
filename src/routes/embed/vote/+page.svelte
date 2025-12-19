@@ -1160,7 +1160,7 @@ function getEmojiList() {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 :global(body.dark-mode) .emoji-picker-btn {
