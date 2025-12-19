@@ -699,10 +699,10 @@
 
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Introduce the ArkIDE Forum</li>
-                                <li>Migrate the project viewer to the homepage with the new /viewer endpoint on ArkIDE Home</li>
-                                <li>Introduce the Keithmas Event</li>
-                                <li>Re-Add expandable blocks to the editor</li>
+                                <li>Add a new most popular projects page</li>
+                                <li>Fix a bunch of issues with the project viewer</li>
+                                <li>Introduce the Keithmas Event (PARTICIPATE!!! ITS EASY!)</li>
+                                <li>Fix some other CSS isues with the homepage</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 

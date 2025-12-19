@@ -412,6 +412,15 @@
 			/>
 		</BarPage>
 	</div>
+	<div class="only-non-launcher">
+		<BarPage link={LINK.popular}>
+			<LocalizedText
+				text="Popular"
+				key="navigation.popular"
+				lang={currentLang}
+			/>
+		</BarPage>
+	</div>
 	<BarPage link=/upload>
 			<LocalizedText
 				text="Upload"

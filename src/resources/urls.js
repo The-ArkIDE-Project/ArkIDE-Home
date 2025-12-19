@@ -109,5 +109,11 @@ export default {
     /**
      * The link to the Desktop App
      */
-    desktop: "/desktop"
+    desktop: "/desktop",
+
+    /**
+     * The link to the Popular Projects page
+     */
+
+    popular: "/popular"
 }
