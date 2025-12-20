@@ -451,7 +451,7 @@ function parseContent(text) {
     .title-author-pfp {
         width: 72px;
         height: 72px;
-        border-radius: 50%;
+        border-radius: 10%;
         object-fit: cover;
         flex-shrink: 0;
     }
