@@ -696,13 +696,10 @@
                                 Note: If you want to use Sharkpool Extensions but they're blocked, use this website:
                                 <a href="https://arkfs.arc360hub.com/folder/sharkpool-extensions/">ArkFS sharkpool-extensions Folder</a>
                             </p>
-
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add a new most popular projects page</li>
-                                <li>Fix a bunch of issues with the project viewer</li>
+                                <li>I am probably going to take a break on updates for the holidays, Remember, Participate in Keithmas!</li>
                                 <li>Introduce the Keithmas Event (PARTICIPATE!!! ITS EASY!)</li>
-                                <li>Fix some other CSS isues with the homepage</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
