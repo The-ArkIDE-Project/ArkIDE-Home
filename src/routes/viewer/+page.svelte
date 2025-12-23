@@ -213,6 +213,7 @@ function parseContent(text) {
                         title="{projectData.title}"
                         frameborder="0"
                         allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-storage-access-by-user-activation"
                         style="color-scheme: auto"
                     ></iframe>
                 </div>
