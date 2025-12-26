@@ -25,7 +25,8 @@
     let switchCaptchaKey = 0; // Separate key for switch dialog
     let switchingAccount = null; // Account being switched to
     let showSwitchCaptcha = false;
-    let captchaUsedOnce = false; // NEW: Track if captcha was used
+    let addFormCaptchaShownCount = 0; // NEW: Track how many times add form captcha shown
+    let switchCaptchaShownCount = 0; // NEW: Track how many times switch captcha shown
     
     // Load accounts from localStorage
     function loadAccounts() {
@@ -160,6 +161,7 @@
         newUsername = accounts[index].username;
         newPassword = accounts[index].password;
         showPassword = true;
+        addFormCaptchaShownCount++; // NEW: Increment when showing edit form
     }
     
     // Save edited account
@@ -250,9 +252,10 @@
     // Switch to account - show captcha dialog first
     function initiateSwitchAccount(account) {
         captchaToken = null;
-        switchCaptchaKey++; // Instead of captchaKey++
+        switchCaptchaKey++;
         switchingAccount = account;
         showSwitchCaptcha = true;
+        switchCaptchaShownCount++; // NEW: Increment when showing
         errorMessage = "";
     }
 
@@ -354,7 +357,11 @@
                 <div class="accounts-list">
                     <div class="accounts-header">
                         <h3>Saved Accounts</h3>
-                        <button class="add-account-btn" on:click={() => { showAddForm = true; editingIndex = -1; }} disabled={saving}>
+                        <button class="add-account-btn" on:click={() => { 
+                            showAddForm = true; 
+                            editingIndex = -1; 
+                            addFormCaptchaShownCount++; // Increment when showing
+                        }} disabled={saving}>
                             + Add Account
                         </button>
                     </div>
@@ -452,9 +459,9 @@
                             </div>
                         </div>
                         
-                        {#if captchaUsedOnce}
+                        {#if addFormCaptchaShownCount > 1}
                             <div class="captcha-warning">
-                                ⚠️ Captcha may not work properly after first use. If it fails, please refresh the page.
+                                ⚠️ Captcha may not work after being shown multiple times. Please refresh the page if it doesn't load.
                             </div>
                         {/if}
                         
@@ -490,9 +497,9 @@
                         <h3>Switch to {switchingAccount.username}</h3>
                         <p style="margin: 8px 0; color: #666;">Complete the captcha to switch accounts</p>
                         
-                        {#if captchaUsedOnce}
+                        {#if switchCaptchaShownCount > 1}
                             <div class="captcha-warning">
-                                ⚠️ Captcha may not work properly after first use. If it fails, please refresh the page.
+                                ⚠️ Captcha may not work after being shown multiple times. Please refresh the page if it doesn't load.
                             </div>
                         {/if}
                         
