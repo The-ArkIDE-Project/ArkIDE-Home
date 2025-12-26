@@ -476,9 +476,11 @@
                         <h3>Switch to {switchingAccount.username}</h3>
                         <p style="margin: 8px 0; color: #666;">Complete the captcha to switch accounts</p>
                         
-                        <Captcha key={captchaKey} on:update={(event) => {
-                            captchaToken = event.detail;
-                        }} />
+                        {#key captchaKey}
+                            <Captcha on:update={(event) => {
+                                captchaToken = event.detail;
+                            }} />
+                        {/key}
                         
                         <div class="form-actions">
                             <button class="form-btn save-btn" on:click={performSwitch} disabled={saving || !captchaToken}>
