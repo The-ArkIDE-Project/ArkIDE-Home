@@ -244,10 +244,10 @@
     
     // Switch to account - show captcha dialog first
     function initiateSwitchAccount(account) {
+        captchaToken = null;
+        captchaKey++; // Increment FIRST
         switchingAccount = account;
         showSwitchCaptcha = true;
-        captchaToken = null;
-        captchaKey++;
         errorMessage = "";
     }
     
