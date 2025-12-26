@@ -32,13 +32,6 @@
             if (stored) {
                 accounts = JSON.parse(stored);
             }
-            
-            // Add current logged-in account if not already in the list
-            if (currentUsername && !accounts.some(acc => acc.username === currentUsername)) {
-                // We don't have the password for the current user, so we'll mark it specially
-                // This account can't be used for switching, but shows in the list
-                accounts = [{ username: currentUsername, password: null, isCurrent: true }, ...accounts];
-            }
         } catch (e) {
             console.error("Failed to load accounts:", e);
             accounts = [];
@@ -233,28 +226,14 @@
     function deleteAccount(index) {
         const account = accounts[index];
         
-        // Don't allow deleting the current-only account marker
-        if (account.isCurrent) {
-            errorMessage = "This is your current session - you can't delete it from here.";
-            return;
-        }
-        
         if (confirm(`Remove ${account.username} from saved accounts?`)) {
             accounts = accounts.filter((_, i) => i !== index);
-            // Save only the accounts with passwords (not the current marker)
-            const accountsToSave = accounts.filter(acc => !acc.isCurrent);
-            localStorage.setItem("pm:saved_accounts", JSON.stringify(accountsToSave));
+            saveAccounts();
         }
     }
     
     // Switch to account - show captcha dialog first
     function initiateSwitchAccount(account) {
-        // Can't switch to current-only accounts (ones without saved password)
-        if (account.isCurrent || !account.password) {
-            errorMessage = "Cannot switch to this account - password not saved. Please add it properly first.";
-            return;
-        }
-        
         switchingAccount = account;
         showSwitchCaptcha = true;
         captchaToken = null;
@@ -382,21 +361,15 @@
                                 </div>
                                 <div class="account-actions">
                                     {#if account.username !== currentUsername}
-                                        {#if !account.isCurrent}
-                                            <button class="action-btn switch-btn" on:click={() => initiateSwitchAccount(account)} disabled={saving}>
-                                                Switch
-                                            </button>
-                                        {/if}
-                                        {#if !account.isCurrent}
-                                            <button class="action-btn edit-btn" on:click={() => startEdit(index)} disabled={saving}>
-                                                Edit
-                                            </button>
-                                        {/if}
-                                        {#if !account.isCurrent}
-                                            <button class="action-btn delete-btn" on:click={() => deleteAccount(index)} disabled={saving}>
-                                                Delete
-                                            </button>
-                                        {/if}
+                                        <button class="action-btn switch-btn" on:click={() => initiateSwitchAccount(account)} disabled={saving}>
+                                            Switch
+                                        </button>
+                                        <button class="action-btn edit-btn" on:click={() => startEdit(index)} disabled={saving}>
+                                            Edit
+                                        </button>
+                                        <button class="action-btn delete-btn" on:click={() => deleteAccount(index)} disabled={saving}>
+                                            Delete
+                                        </button>
                                     {:else}
                                         <span class="current-session-label">Active Session</span>
                                     {/if}
