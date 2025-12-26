@@ -622,7 +622,7 @@
                     </ul>
                     <h2>Winners</h2>
                     <ul>
-                        <li>1st Place: 'Keithmas Submition' by hooman_bean</li>
+                        <li>'Keithmas Submition' by hooman_bean</li>
                     </ul>
                     <h3>Thats it, only 1 winner and 2 nominees.</h3>
                 </div>
