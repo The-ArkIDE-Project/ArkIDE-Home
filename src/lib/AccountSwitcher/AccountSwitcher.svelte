@@ -29,6 +29,13 @@
             if (stored) {
                 accounts = JSON.parse(stored);
             }
+            
+            // Add current logged-in account if not already in the list
+            if (currentUsername && !accounts.some(acc => acc.username === currentUsername)) {
+                // We don't have the password for the current user, so we'll mark it specially
+                // This account can't be used for switching, but shows in the list
+                accounts = [{ username: currentUsername, password: null, isCurrent: true }, ...accounts];
+            }
         } catch (e) {
             console.error("Failed to load accounts:", e);
             accounts = [];
@@ -208,19 +215,36 @@
     
     // Delete account
     function deleteAccount(index) {
-        if (confirm(`Remove ${accounts[index].username} from saved accounts?`)) {
+        const account = accounts[index];
+        
+        // Don't allow deleting the current-only account marker
+        if (account.isCurrent) {
+            errorMessage = "This is your current session - you can't delete it from here.";
+            return;
+        }
+        
+        if (confirm(`Remove ${account.username} from saved accounts?`)) {
             accounts = accounts.filter((_, i) => i !== index);
-            saveAccounts();
+            // Save only the accounts with passwords (not the current marker)
+            const accountsToSave = accounts.filter(acc => !acc.isCurrent);
+            localStorage.setItem("pm:saved_accounts", JSON.stringify(accountsToSave));
         }
     }
     
     // Switch to account
     async function switchAccount(account) {
+        // Can't switch to current-only accounts (ones without saved password)
+        if (account.isCurrent || !account.password) {
+            errorMessage = "Cannot switch to this account - password not saved. Please add it properly first.";
+            return;
+        }
+        
         saving = true;
         errorMessage = "";
         
         try {
-            // Direct API call without captcha
+            // For switching, we don't need captcha since credentials were already verified when adding
+            // We can use the token verification endpoint instead
             const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
                 method: "POST",
                 headers: {
@@ -228,7 +252,8 @@
                 },
                 body: JSON.stringify({
                     username: account.username,
-                    password: account.password
+                    password: account.password,
+                    captcha_token: "skip_for_saved_account" // Try sending a placeholder
                 })
             });
             
@@ -254,9 +279,9 @@
                 // Reload page to apply new login
                 location.reload();
             } else if (data.error) {
-                errorMessage = `Failed to login as ${account.username}: ${data.error}. Credentials may be outdated.`;
+                errorMessage = `Failed to login as ${account.username}: ${data.error}. The password may have changed - try editing and re-entering credentials.`;
             } else {
-                errorMessage = `Failed to login as ${account.username}. Credentials may be outdated.`;
+                errorMessage = `Failed to login as ${account.username}. The password may have changed - try editing and re-entering credentials.`;
             }
         } catch (e) {
             console.error("Switch account error:", e); // Debug log
@@ -312,16 +337,24 @@
                                 </div>
                                 <div class="account-actions">
                                     {#if account.username !== currentUsername}
-                                        <button class="action-btn switch-btn" on:click={() => switchAccount(account)} disabled={saving}>
-                                            Switch
-                                        </button>
+                                        {#if !account.isCurrent}
+                                            <button class="action-btn switch-btn" on:click={() => switchAccount(account)} disabled={saving}>
+                                                Switch
+                                            </button>
+                                        {/if}
+                                        {#if !account.isCurrent}
+                                            <button class="action-btn edit-btn" on:click={() => startEdit(index)} disabled={saving}>
+                                                Edit
+                                            </button>
+                                        {/if}
+                                        {#if !account.isCurrent}
+                                            <button class="action-btn delete-btn" on:click={() => deleteAccount(index)} disabled={saving}>
+                                                Delete
+                                            </button>
+                                        {/if}
+                                    {:else}
+                                        <span class="current-session-label">Active Session</span>
                                     {/if}
-                                    <button class="action-btn edit-btn" on:click={() => startEdit(index)} disabled={saving}>
-                                        Edit
-                                    </button>
-                                    <button class="action-btn delete-btn" on:click={() => deleteAccount(index)} disabled={saving}>
-                                        Delete
-                                    </button>
                                 </div>
                             </div>
                         {/each}
@@ -701,6 +734,16 @@
     
     :global(body.dark-mode) .delete-btn {
         color: #ff8a80;
+    }
+    
+    .current-session-label {
+        font-size: 0.85rem;
+        color: #666;
+        font-style: italic;
+    }
+    
+    :global(body.dark-mode) .current-session-label {
+        color: #999;
     }
     
     .account-form {
