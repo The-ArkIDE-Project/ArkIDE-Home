@@ -18,6 +18,7 @@
 	import Authentication from "../../resources/authentication.js";
 	import ProjectApi from "../../resources/projectapi.js";
 	import HTMLUtility from "../../resources/html.js";
+	import AccountSwitcher from "$lib/AccountSwitcher/AccountSwitcher.svelte";
 
 	const ProjectClient = new ProjectApi();
 
@@ -47,6 +48,7 @@
 	let showRecommendations = false;
 	let searchTimeout = null;
 	let searchBarElement = null;
+	let accountSwitcherModal;
 
 	const isAprilFirst = isAprilFools();
 	const randomColor = (() => {
@@ -202,6 +204,13 @@
 		}px`;
 		accountMenu.style.top = `3rem`;
 		accountMenuIsOpen = true;
+	}
+	function openAccountSwitcher() {
+		accountMenu.style.display = "none";
+		accountMenuIsOpen = false;
+		if (accountSwitcherModal) {
+			accountSwitcherModal.open();
+		}
 	}
 	function chooseLang(lang) {
 		languageMenu.style.display = "none";
@@ -380,6 +389,9 @@
 			/>
 		</button>
 	</a>
+	<button on:click={openAccountSwitcher}>
+		Account Switcher
+	</button>
 	<div class="seperated-navopt" />
 	<button on:click={logout}>
 		<LocalizedText
@@ -560,6 +572,11 @@
 		{/each}
 	</div>
 	{/if}
+	<AccountSwitcher 
+	bind:this={accountSwitcherModal}
+	currentUsername={accountUsername}
+		{currentLang}
+	/>
 
 <style>
 	:root {
