@@ -13,6 +13,7 @@
     let showModal = false;
     let accounts = [];
     let editingIndex = -1;
+    let showAddForm = false;
     let newUsername = "";
     let newPassword = "";
     let showPassword = false;
@@ -46,6 +47,7 @@
     export function open() {
         loadAccounts();
         showModal = true;
+        showAddForm = false;
         errorMessage = "";
     }
     
@@ -53,6 +55,7 @@
     function close() {
         showModal = false;
         editingIndex = -1;
+        showAddForm = false;
         newUsername = "";
         newPassword = "";
         showPassword = false;
@@ -90,17 +93,23 @@
             
             const data = await response.json();
             
+            console.log("Add account response:", data); // Debug log
+            
             if (data.token) {
                 accounts = [...accounts, { username: newUsername, password: newPassword }];
                 saveAccounts();
                 newUsername = "";
                 newPassword = "";
                 showPassword = false;
+                showAddForm = false;
                 errorMessage = "";
+            } else if (data.error) {
+                errorMessage = `Login failed: ${data.error}`;
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
             }
         } catch (e) {
+            console.error("Add account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
         } finally {
             saving = false;
@@ -110,6 +119,7 @@
     // Start editing an account
     function startEdit(index) {
         editingIndex = index;
+        showAddForm = false;
         newUsername = accounts[index].username;
         newPassword = accounts[index].password;
         showPassword = true;
@@ -140,6 +150,8 @@
             
             const data = await response.json();
             
+            console.log("Edit account response:", data); // Debug log
+            
             if (data.token) {
                 accounts[editingIndex] = { username: newUsername, password: newPassword };
                 saveAccounts();
@@ -148,10 +160,13 @@
                 newPassword = "";
                 showPassword = false;
                 errorMessage = "";
+            } else if (data.error) {
+                errorMessage = `Login failed: ${data.error}`;
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
             }
         } catch (e) {
+            console.error("Edit account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
         } finally {
             saving = false;
@@ -161,6 +176,7 @@
     // Cancel editing
     function cancelEdit() {
         editingIndex = -1;
+        showAddForm = false;
         newUsername = "";
         newPassword = "";
         showPassword = false;
@@ -195,6 +211,8 @@
             
             const data = await response.json();
             
+            console.log("Switch account response:", data); // Debug log
+            
             if (data.token) {
                 // Store in localStorage
                 localStorage.setItem("username", account.username);
@@ -212,10 +230,13 @@
                 
                 // Reload page to apply new login
                 location.reload();
+            } else if (data.error) {
+                errorMessage = `Failed to login as ${account.username}: ${data.error}. Credentials may be outdated.`;
             } else {
                 errorMessage = `Failed to login as ${account.username}. Credentials may be outdated.`;
             }
         } catch (e) {
+            console.error("Switch account error:", e); // Debug log
             errorMessage = `Failed to switch to ${account.username}. Please try again.`;
         } finally {
             saving = false;
@@ -242,9 +263,14 @@
                 
                 <!-- Saved Accounts List -->
                 <div class="accounts-list">
-                    <h3>Saved Accounts</h3>
+                    <div class="accounts-header">
+                        <h3>Saved Accounts</h3>
+                        <button class="add-account-btn" on:click={() => { showAddForm = true; editingIndex = -1; }} disabled={saving}>
+                            + Add Account
+                        </button>
+                    </div>
                     {#if accounts.length === 0}
-                        <p class="empty-state">No saved accounts yet. Add one below!</p>
+                        <p class="empty-state">No saved accounts yet. Click "+ Add Account" to get started!</p>
                     {:else}
                         {#each accounts as account, index}
                             <div class="account-item" class:current={account.username === currentUsername}>
@@ -280,69 +306,74 @@
                 </div>
                 
                 <!-- Add/Edit Account Form -->
-                <div class="account-form">
-                    <h3>{editingIndex >= 0 ? 'Edit Account' : 'Add Account'}</h3>
-                    <div class="form-group">
-                        <label for="account-username-input">Username</label>
-                        <input 
-                            id="account-username-input"
-                            type="text" 
-                            bind:value={newUsername}
-                            placeholder="Enter username"
-                            maxlength="20"
-                            disabled={saving}
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="account-password-input">Password</label>
-                        <div class="password-input-wrapper">
-                            {#if showPassword}
-                                <input 
-                                    id="account-password-input"
-                                    type="text"
-                                    bind:value={newPassword}
-                                    placeholder="Enter password"
-                                    maxlength="50"
-                                    disabled={saving}
-                                />
-                            {:else}
-                                <input 
-                                    id="account-password-input"
-                                    type="password"
-                                    bind:value={newPassword}
-                                    placeholder="Enter password"
-                                    maxlength="50"
-                                    disabled={saving}
-                                />
-                            {/if}
-                            <button 
-                                class="password-toggle"
-                                on:click={() => showPassword = !showPassword}
-                                type="button"
-                            >
+                {#if showAddForm || editingIndex >= 0}
+                    <div class="account-form">
+                        <h3>{editingIndex >= 0 ? 'Edit Account' : 'Add Account'}</h3>
+                        <div class="form-group">
+                            <label for="account-username-input">Username</label>
+                            <input 
+                                id="account-username-input"
+                                type="text" 
+                                bind:value={newUsername}
+                                placeholder="Enter username"
+                                maxlength="20"
+                                disabled={saving}
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label for="account-password-input">Password</label>
+                            <div class="password-input-wrapper">
                                 {#if showPassword}
-                                    <img src="/account/hidepassword.svg" alt="Hide" class="invert-on-dark" />
+                                    <input 
+                                        id="account-password-input"
+                                        type="text"
+                                        bind:value={newPassword}
+                                        placeholder="Enter password"
+                                        maxlength="50"
+                                        disabled={saving}
+                                    />
                                 {:else}
-                                    <img src="/account/showpassword.svg" alt="Show" class="invert-on-dark" />
+                                    <input 
+                                        id="account-password-input"
+                                        type="password"
+                                        bind:value={newPassword}
+                                        placeholder="Enter password"
+                                        maxlength="50"
+                                        disabled={saving}
+                                    />
                                 {/if}
-                            </button>
+                                <button 
+                                    class="password-toggle"
+                                    on:click={() => showPassword = !showPassword}
+                                    type="button"
+                                >
+                                    {#if showPassword}
+                                        <img src="/account/hidepassword.svg" alt="Hide" class="invert-on-dark" />
+                                    {:else}
+                                        <img src="/account/showpassword.svg" alt="Show" class="invert-on-dark" />
+                                    {/if}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            {#if editingIndex >= 0}
+                                <button class="form-btn save-btn" on:click={saveEdit} disabled={saving || !newUsername || !newPassword}>
+                                    {saving ? 'Saving...' : 'Save Changes'}
+                                </button>
+                                <button class="form-btn cancel-btn" on:click={cancelEdit} disabled={saving}>
+                                    Cancel
+                                </button>
+                            {:else}
+                                <button class="form-btn add-btn" on:click={addAccount} disabled={saving || !newUsername || !newPassword}>
+                                    {saving ? 'Adding...' : 'Add Account'}
+                                </button>
+                                <button class="form-btn cancel-btn" on:click={() => { showAddForm = false; newUsername = ''; newPassword = ''; errorMessage = ''; }} disabled={saving}>
+                                    Cancel
+                                </button>
+                            {/if}
                         </div>
                     </div>
-                    <div class="form-actions">
-                        {#if editingIndex >= 0}
-                            <button class="form-btn save-btn" on:click={saveEdit} disabled={saving || !newUsername || !newPassword}>
-                                {saving ? 'Saving...' : 'Save Changes'}
-                            </button>
-                            <button class="form-btn cancel-btn" on:click={cancelEdit} disabled={saving}>
-                                Cancel
-                            </button>
-                        {:else}
-                            <button class="form-btn add-btn" on:click={addAccount} disabled={saving || !newUsername || !newPassword}>
-                                {saving ? 'Adding...' : 'Add Account'}
-                            </button>
-                        {/if}
-                    </div>
-                </div>
+                {/if}
                 
                 <div class="modal-footer">
                     <p class="info-text">
@@ -470,14 +501,42 @@
         margin-bottom: 24px;
     }
     
+    .accounts-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
     .accounts-list h3 {
-        margin: 0 0 12px 0;
+        margin: 0;
         font-size: 1.1rem;
         color: #333;
     }
     
     :global(body.dark-mode) .accounts-list h3 {
         color: white;
+    }
+    
+    .add-account-btn {
+        background: #0011ff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .add-account-btn:hover:not(:disabled) {
+        background: #0009cc;
+    }
+    
+    .add-account-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
     
     .empty-state {
