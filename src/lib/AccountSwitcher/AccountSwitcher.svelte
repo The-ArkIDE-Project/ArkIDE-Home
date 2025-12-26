@@ -134,7 +134,6 @@
                 captchaToken = null;
                 addFormCaptchaKey++;
                 errorMessage = "";
-                captchaUsedOnce = true; // NEW
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
                 captchaToken = null;
@@ -207,7 +206,6 @@
                 captchaToken = null;
                 addFormCaptchaKey++;
                 errorMessage = "";
-                captchaUsedOnce = true; // NEW
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
                 captchaToken = null;
@@ -289,7 +287,6 @@
             console.log("Switch account response:", data);
             
             if (data.token) {
-                captchaUsedOnce = true; // NEW (though page will reload)
                 // Store in localStorage
                 localStorage.setItem("username", switchingAccount.username);
                 localStorage.setItem("token", data.token);
