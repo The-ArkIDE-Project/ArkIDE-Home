@@ -51,6 +51,16 @@
     // Open modal
     export function open() {
         loadAccounts();
+        
+        // Check if current username needs to be added or updated
+        if (currentUsername) {
+            const existingIndex = accounts.findIndex(acc => acc.username === currentUsername);
+            if (existingIndex === -1) {
+                // Current account not in list - user needs to add it manually
+                console.log("Current account not in saved accounts - user must add it manually with password");
+            }
+        }
+        
         showModal = true;
         showAddForm = false;
         errorMessage = "";
@@ -291,18 +301,19 @@
                 errorMessage = `Failed to login as ${switchingAccount.username}: ${data.error}. The password may have changed - try editing and re-entering credentials.`;
                 captchaToken = null;
                 captchaKey++;
+                saving = false; // Important: reset saving state on error
             } else {
                 errorMessage = `Failed to login as ${switchingAccount.username}. The password may have changed - try editing and re-entering credentials.`;
                 captchaToken = null;
                 captchaKey++;
+                saving = false; // Important: reset saving state on error
             }
         } catch (e) {
             console.error("Switch account error:", e);
             errorMessage = `Failed to switch to ${switchingAccount.username}. Please try again.`;
             captchaToken = null;
             captchaKey++;
-        } finally {
-            saving = false;
+            saving = false; // Important: reset saving state on error
         }
     }
     
@@ -341,6 +352,11 @@
                             + Add Account
                         </button>
                     </div>
+                    {#if currentUsername && !accounts.some(acc => acc.username === currentUsername)}
+                        <div class="info-message">
+                            💡 To enable switching back to your current account ({currentUsername}), click "+ Add Account" and enter your credentials.
+                        </div>
+                    {/if}
                     {#if accounts.length === 0}
                         <p class="empty-state">No saved accounts yet. Click "+ Add Account" to get started!</p>
                     {:else}
@@ -951,5 +967,19 @@
     
     :global(body.dark-mode) .info-text {
         color: #999;
+    }
+    .info-message {
+        background: rgba(0, 119, 255, 0.1);
+        border: 1px solid rgba(0, 119, 255, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        color: #0077ff;
+        font-size: 0.9rem;
+    }
+
+    :global(body.dark-mode) .info-message {
+        background: rgba(0, 119, 255, 0.15);
+        color: #66b3ff;
     }
 </style>
