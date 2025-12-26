@@ -3,6 +3,7 @@
     import { fade, scale } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import Authentication from "../../resources/authentication.js";
+    import Captcha from "$lib/Captcha.svelte";
     import { PUBLIC_API_URL } from "$env/static/public";
     
     const dispatch = createEventDispatcher();
@@ -19,6 +20,7 @@
     let showPassword = false;
     let saving = false;
     let errorMessage = "";
+    let captchaToken = null;
     
     // Load accounts from localStorage
     function loadAccounts() {
@@ -69,6 +71,11 @@
             return;
         }
         
+        if (!captchaToken) {
+            errorMessage = "Please complete the captcha";
+            return;
+        }
+        
         // Check if account already exists
         if (accounts.some(acc => acc.username === newUsername)) {
             errorMessage = "This account is already saved";
@@ -79,7 +86,7 @@
         errorMessage = "";
         
         try {
-            // Direct API call without captcha for account switcher
+            // Direct API call with captcha
             const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
                 method: "POST",
                 headers: {
@@ -87,7 +94,8 @@
                 },
                 body: JSON.stringify({
                     username: newUsername,
-                    password: newPassword
+                    password: newPassword,
+                    captcha_token: captchaToken
                 })
             });
             
@@ -102,15 +110,19 @@
                 newPassword = "";
                 showPassword = false;
                 showAddForm = false;
+                captchaToken = null;
                 errorMessage = "";
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
+                captchaToken = null; // Reset captcha on error
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
+                captchaToken = null; // Reset captcha on error
             }
         } catch (e) {
             console.error("Add account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
+            captchaToken = null; // Reset captcha on error
         } finally {
             saving = false;
         }
@@ -132,11 +144,16 @@
             return;
         }
         
+        if (!captchaToken) {
+            errorMessage = "Please complete the captcha";
+            return;
+        }
+        
         saving = true;
         errorMessage = "";
         
         try {
-            // Direct API call without captcha
+            // Direct API call with captcha
             const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
                 method: "POST",
                 headers: {
@@ -144,7 +161,8 @@
                 },
                 body: JSON.stringify({
                     username: newUsername,
-                    password: newPassword
+                    password: newPassword,
+                    captcha_token: captchaToken
                 })
             });
             
@@ -159,15 +177,19 @@
                 newUsername = "";
                 newPassword = "";
                 showPassword = false;
+                captchaToken = null;
                 errorMessage = "";
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
+                captchaToken = null; // Reset captcha on error
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
+                captchaToken = null; // Reset captcha on error
             }
         } catch (e) {
             console.error("Edit account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
+            captchaToken = null; // Reset captcha on error
         } finally {
             saving = false;
         }
@@ -180,6 +202,7 @@
         newUsername = "";
         newPassword = "";
         showPassword = false;
+        captchaToken = null;
         errorMessage = "";
     }
     
@@ -355,19 +378,24 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <Captcha on:update={(event) => {
+                            captchaToken = event.detail;
+                        }} />
+                        
                         <div class="form-actions">
                             {#if editingIndex >= 0}
-                                <button class="form-btn save-btn" on:click={saveEdit} disabled={saving || !newUsername || !newPassword}>
+                                <button class="form-btn save-btn" on:click={saveEdit} disabled={saving || !newUsername || !newPassword || !captchaToken}>
                                     {saving ? 'Saving...' : 'Save Changes'}
                                 </button>
                                 <button class="form-btn cancel-btn" on:click={cancelEdit} disabled={saving}>
                                     Cancel
                                 </button>
                             {:else}
-                                <button class="form-btn add-btn" on:click={addAccount} disabled={saving || !newUsername || !newPassword}>
+                                <button class="form-btn add-btn" on:click={addAccount} disabled={saving || !newUsername || !newPassword || !captchaToken}>
                                     {saving ? 'Adding...' : 'Add Account'}
                                 </button>
-                                <button class="form-btn cancel-btn" on:click={() => { showAddForm = false; newUsername = ''; newPassword = ''; errorMessage = ''; }} disabled={saving}>
+                                <button class="form-btn cancel-btn" on:click={() => { showAddForm = false; newUsername = ''; newPassword = ''; captchaToken = null; errorMessage = ''; }} disabled={saving}>
                                     Cancel
                                 </button>
                             {/if}
