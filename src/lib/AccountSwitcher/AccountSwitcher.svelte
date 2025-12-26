@@ -25,6 +25,7 @@
     let switchCaptchaKey = 0; // Separate key for switch dialog
     let switchingAccount = null; // Account being switched to
     let showSwitchCaptcha = false;
+    let captchaUsedOnce = false; // NEW: Track if captcha was used
     
     // Load accounts from localStorage
     function loadAccounts() {
@@ -130,8 +131,9 @@
                 showPassword = false;
                 showAddForm = false;
                 captchaToken = null;
-                addFormCaptchaKey++; // Instead of captchaKey++
+                addFormCaptchaKey++;
                 errorMessage = "";
+                captchaUsedOnce = true; // NEW
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
                 captchaToken = null;
@@ -201,8 +203,9 @@
                 newPassword = "";
                 showPassword = false;
                 captchaToken = null;
-                addFormCaptchaKey++; // Instead of captchaKey++
+                addFormCaptchaKey++;
                 errorMessage = "";
+                captchaUsedOnce = true; // NEW
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
                 captchaToken = null;
@@ -283,6 +286,7 @@
             console.log("Switch account response:", data);
             
             if (data.token) {
+                captchaUsedOnce = true; // NEW (though page will reload)
                 // Store in localStorage
                 localStorage.setItem("username", switchingAccount.username);
                 localStorage.setItem("token", data.token);
@@ -448,6 +452,12 @@
                             </div>
                         </div>
                         
+                        {#if captchaUsedOnce}
+                            <div class="captcha-warning">
+                                ⚠️ Captcha may not work properly after first use. If it fails, please refresh the page.
+                            </div>
+                        {/if}
+                        
                         {#key `add-${addFormCaptchaKey}`}
                             <Captcha on:update={(event) => {
                                 captchaToken = event.detail;
@@ -479,6 +489,12 @@
                     <div class="account-form switch-captcha-dialog">
                         <h3>Switch to {switchingAccount.username}</h3>
                         <p style="margin: 8px 0; color: #666;">Complete the captcha to switch accounts</p>
+                        
+                        {#if captchaUsedOnce}
+                            <div class="captcha-warning">
+                                ⚠️ Captcha may not work properly after first use. If it fails, please refresh the page.
+                            </div>
+                        {/if}
                         
                         {#key `switch-${switchCaptchaKey}`}
                             <Captcha on:update={(event) => {
@@ -987,5 +1003,20 @@
     :global(body.dark-mode) .info-message {
         background: rgba(0, 119, 255, 0.15);
         color: #66b3ff;
+    }
+    .captcha-warning {
+        background: rgba(255, 152, 0, 0.1);
+        border: 1px solid rgba(255, 152, 0, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 12px;
+        color: #f57c00;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    :global(body.dark-mode) .captcha-warning {
+        background: rgba(255, 152, 0, 0.15);
+        color: #ffb74d;
     }
 </style>
