@@ -76,10 +76,21 @@
         errorMessage = "";
         
         try {
-            // Verify credentials before saving
-            const token = await Authentication.verifyPassword(newUsername, newPassword, "bypass");
+            // Direct API call without captcha for account switcher
+            const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: newUsername,
+                    password: newPassword
+                })
+            });
             
-            if (token) {
+            const data = await response.json();
+            
+            if (data.token) {
                 accounts = [...accounts, { username: newUsername, password: newPassword }];
                 saveAccounts();
                 newUsername = "";
@@ -90,11 +101,7 @@
                 errorMessage = "Invalid credentials. Please check and try again.";
             }
         } catch (e) {
-            if (e === "InvalidCaptcha") {
-                errorMessage = "Captcha validation required. Please login normally first.";
-            } else {
-                errorMessage = "Failed to verify credentials. Please try again.";
-            }
+            errorMessage = "Failed to verify credentials. Please try again.";
         } finally {
             saving = false;
         }
@@ -119,10 +126,21 @@
         errorMessage = "";
         
         try {
-            // Verify new credentials
-            const token = await Authentication.verifyPassword(newUsername, newPassword, "bypass");
+            // Direct API call without captcha
+            const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: newUsername,
+                    password: newPassword
+                })
+            });
             
-            if (token) {
+            const data = await response.json();
+            
+            if (data.token) {
                 accounts[editingIndex] = { username: newUsername, password: newPassword };
                 saveAccounts();
                 editingIndex = -1;
@@ -134,11 +152,7 @@
                 errorMessage = "Invalid credentials. Please check and try again.";
             }
         } catch (e) {
-            if (e === "InvalidCaptcha") {
-                errorMessage = "Captcha validation required. Please login normally first.";
-            } else {
-                errorMessage = "Failed to verify credentials. Please try again.";
-            }
+            errorMessage = "Failed to verify credentials. Please try again.";
         } finally {
             saving = false;
         }
@@ -167,22 +181,34 @@
         errorMessage = "";
         
         try {
-            const token = await Authentication.verifyPassword(account.username, account.password, "bypass");
+            // Direct API call without captcha
+            const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: account.username,
+                    password: account.password
+                })
+            });
             
-            if (token) {
+            const data = await response.json();
+            
+            if (data.token) {
                 // Store in localStorage
                 localStorage.setItem("username", account.username);
-                localStorage.setItem("token", token);
+                localStorage.setItem("token", data.token);
                 
                 // Set cookie for cross-subdomain auth
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 30);
                 
                 document.cookie = `arkide_username=${encodeURIComponent(account.username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
-                document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+                document.cookie = `arkide_token=${encodeURIComponent(data.token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
                 
                 // Fire authentication event
-                Authentication.fireAuthenticated(account.username, token);
+                Authentication.fireAuthenticated(account.username, data.token);
                 
                 // Reload page to apply new login
                 location.reload();
@@ -190,11 +216,7 @@
                 errorMessage = `Failed to login as ${account.username}. Credentials may be outdated.`;
             }
         } catch (e) {
-            if (e === "InvalidCaptcha") {
-                errorMessage = `Captcha required. Please login as ${account.username} normally, then try again.`;
-            } else {
-                errorMessage = `Failed to switch to ${account.username}. Please try again.`;
-            }
+            errorMessage = `Failed to switch to ${account.username}. Please try again.`;
         } finally {
             saving = false;
         }
@@ -333,6 +355,10 @@
 {/if}
 
 <style>
+    * {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
     .modal-overlay {
         position: fixed;
         top: 0;
