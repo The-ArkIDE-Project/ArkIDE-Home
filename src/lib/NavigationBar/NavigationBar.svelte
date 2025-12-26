@@ -800,9 +800,9 @@
 
 .profile-dropdown-menu {
     position: fixed;
-    background: rgba(98, 81, 255, 0.80); /* Made semi-transparent */
-    backdrop-filter: blur(10px); /* Add blur effect */
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    background: rgba(98, 81, 255, 0.80);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     padding: 4px 0;
@@ -811,6 +811,8 @@
     border-top-right-radius: 0;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     z-index: 9999;
+    width: 200px;
+    min-width: max-content;
 }
 
 .profile-dropdown-menu button {
