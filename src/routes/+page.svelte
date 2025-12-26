@@ -620,7 +620,7 @@
                         <li>'Keithmas Submition' by hooman_bean</li>
                         <li>'Xmas tree' by w9pti</li>
                     </ul>
-                    <h2>Winners</h2>
+                    <h2>Winner</h2>
                     <ul>
                         <li>'Keithmas Submition' by hooman_bean</li>
                     </ul>
