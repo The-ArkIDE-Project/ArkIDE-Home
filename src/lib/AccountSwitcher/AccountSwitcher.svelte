@@ -21,6 +21,9 @@
     let saving = false;
     let errorMessage = "";
     let captchaToken = null;
+    let captchaKey = 0; // Used to force captcha reload
+    let switchingAccount = null; // Account being switched to
+    let showSwitchCaptcha = false;
     
     // Load accounts from localStorage
     function loadAccounts() {
@@ -65,9 +68,13 @@
         showModal = false;
         editingIndex = -1;
         showAddForm = false;
+        showSwitchCaptcha = false;
+        switchingAccount = null;
         newUsername = "";
         newPassword = "";
         showPassword = false;
+        captchaToken = null;
+        captchaKey++;
         errorMessage = "";
     }
     
@@ -118,18 +125,22 @@
                 showPassword = false;
                 showAddForm = false;
                 captchaToken = null;
+                captchaKey++; // Reset captcha
                 errorMessage = "";
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
-                captchaToken = null; // Reset captcha on error
+                captchaToken = null;
+                captchaKey++; // Reset captcha on error
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
-                captchaToken = null; // Reset captcha on error
+                captchaToken = null;
+                captchaKey++; // Reset captcha on error
             }
         } catch (e) {
             console.error("Add account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
-            captchaToken = null; // Reset captcha on error
+            captchaToken = null;
+            captchaKey++; // Reset captcha on error
         } finally {
             saving = false;
         }
@@ -185,18 +196,22 @@
                 newPassword = "";
                 showPassword = false;
                 captchaToken = null;
+                captchaKey++; // Reset captcha
                 errorMessage = "";
             } else if (data.error) {
                 errorMessage = `Login failed: ${data.error}`;
-                captchaToken = null; // Reset captcha on error
+                captchaToken = null;
+                captchaKey++; // Reset captcha on error
             } else {
                 errorMessage = "Invalid credentials. Please check and try again.";
-                captchaToken = null; // Reset captcha on error
+                captchaToken = null;
+                captchaKey++; // Reset captcha on error
             }
         } catch (e) {
             console.error("Edit account error:", e); // Debug log
             errorMessage = "Failed to verify credentials. Please try again.";
-            captchaToken = null; // Reset captcha on error
+            captchaToken = null;
+            captchaKey++; // Reset captcha on error
         } finally {
             saving = false;
         }
@@ -210,6 +225,7 @@
         newPassword = "";
         showPassword = false;
         captchaToken = null;
+        captchaKey++; // Reset captcha
         errorMessage = "";
     }
     
@@ -231,64 +247,93 @@
         }
     }
     
-    // Switch to account
-    async function switchAccount(account) {
+    // Switch to account - show captcha dialog first
+    function initiateSwitchAccount(account) {
         // Can't switch to current-only accounts (ones without saved password)
         if (account.isCurrent || !account.password) {
             errorMessage = "Cannot switch to this account - password not saved. Please add it properly first.";
             return;
         }
         
+        switchingAccount = account;
+        showSwitchCaptcha = true;
+        captchaToken = null;
+        captchaKey++;
+        errorMessage = "";
+    }
+    
+    // Actually perform the switch after captcha
+    async function performSwitch() {
+        if (!captchaToken) {
+            errorMessage = "Please complete the captcha to switch accounts";
+            return;
+        }
+        
+        if (!switchingAccount) return;
+        
         saving = true;
         errorMessage = "";
         
         try {
-            // For switching, we don't need captcha since credentials were already verified when adding
-            // We can use the token verification endpoint instead
             const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    username: account.username,
-                    password: account.password,
-                    captcha_token: "skip_for_saved_account" // Try sending a placeholder
+                    username: switchingAccount.username,
+                    password: switchingAccount.password,
+                    captcha_token: captchaToken
                 })
             });
             
             const data = await response.json();
             
-            console.log("Switch account response:", data); // Debug log
+            console.log("Switch account response:", data);
             
             if (data.token) {
                 // Store in localStorage
-                localStorage.setItem("username", account.username);
+                localStorage.setItem("username", switchingAccount.username);
                 localStorage.setItem("token", data.token);
                 
                 // Set cookie for cross-subdomain auth
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 30);
                 
-                document.cookie = `arkide_username=${encodeURIComponent(account.username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+                document.cookie = `arkide_username=${encodeURIComponent(switchingAccount.username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
                 document.cookie = `arkide_token=${encodeURIComponent(data.token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
                 
                 // Fire authentication event
-                Authentication.fireAuthenticated(account.username, data.token);
+                Authentication.fireAuthenticated(switchingAccount.username, data.token);
                 
                 // Reload page to apply new login
                 location.reload();
             } else if (data.error) {
-                errorMessage = `Failed to login as ${account.username}: ${data.error}. The password may have changed - try editing and re-entering credentials.`;
+                errorMessage = `Failed to login as ${switchingAccount.username}: ${data.error}. The password may have changed - try editing and re-entering credentials.`;
+                captchaToken = null;
+                captchaKey++;
             } else {
-                errorMessage = `Failed to login as ${account.username}. The password may have changed - try editing and re-entering credentials.`;
+                errorMessage = `Failed to login as ${switchingAccount.username}. The password may have changed - try editing and re-entering credentials.`;
+                captchaToken = null;
+                captchaKey++;
             }
         } catch (e) {
-            console.error("Switch account error:", e); // Debug log
-            errorMessage = `Failed to switch to ${account.username}. Please try again.`;
+            console.error("Switch account error:", e);
+            errorMessage = `Failed to switch to ${switchingAccount.username}. Please try again.`;
+            captchaToken = null;
+            captchaKey++;
         } finally {
             saving = false;
         }
+    }
+    
+    // Cancel switch
+    function cancelSwitch() {
+        showSwitchCaptcha = false;
+        switchingAccount = null;
+        captchaToken = null;
+        captchaKey++;
+        errorMessage = "";
     }
 </script>
 
@@ -338,7 +383,7 @@
                                 <div class="account-actions">
                                     {#if account.username !== currentUsername}
                                         {#if !account.isCurrent}
-                                            <button class="action-btn switch-btn" on:click={() => switchAccount(account)} disabled={saving}>
+                                            <button class="action-btn switch-btn" on:click={() => initiateSwitchAccount(account)} disabled={saving}>
                                                 Switch
                                             </button>
                                         {/if}
@@ -412,7 +457,7 @@
                             </div>
                         </div>
                         
-                        <Captcha on:update={(event) => {
+                        <Captcha key={captchaKey} on:update={(event) => {
                             captchaToken = event.detail;
                         }} />
                         
@@ -428,10 +473,31 @@
                                 <button class="form-btn add-btn" on:click={addAccount} disabled={saving || !newUsername || !newPassword || !captchaToken}>
                                     {saving ? 'Adding...' : 'Add Account'}
                                 </button>
-                                <button class="form-btn cancel-btn" on:click={() => { showAddForm = false; newUsername = ''; newPassword = ''; captchaToken = null; errorMessage = ''; }} disabled={saving}>
+                                <button class="form-btn cancel-btn" on:click={() => { showAddForm = false; newUsername = ''; newPassword = ''; captchaToken = null; captchaKey++; errorMessage = ''; }} disabled={saving}>
                                     Cancel
                                 </button>
                             {/if}
+                        </div>
+                    </div>
+                {/if}
+                
+                <!-- Switch Account Captcha Dialog -->
+                {#if showSwitchCaptcha && switchingAccount}
+                    <div class="account-form switch-captcha-dialog">
+                        <h3>Switch to {switchingAccount.username}</h3>
+                        <p style="margin: 8px 0; color: #666;">Complete the captcha to switch accounts</p>
+                        
+                        <Captcha key={captchaKey} on:update={(event) => {
+                            captchaToken = event.detail;
+                        }} />
+                        
+                        <div class="form-actions">
+                            <button class="form-btn save-btn" on:click={performSwitch} disabled={saving || !captchaToken}>
+                                {saving ? 'Switching...' : 'Switch Account'}
+                            </button>
+                            <button class="form-btn cancel-btn" on:click={cancelSwitch} disabled={saving}>
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 {/if}
@@ -743,6 +809,18 @@
     }
     
     :global(body.dark-mode) .current-session-label {
+        color: #999;
+    }
+    
+    .switch-captcha-dialog {
+        border: 2px solid #0011ff;
+    }
+    
+    .switch-captcha-dialog p {
+        font-size: 0.9rem;
+    }
+    
+    :global(body.dark-mode) .switch-captcha-dialog p {
         color: #999;
     }
     
