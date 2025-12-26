@@ -448,11 +448,11 @@
                             </div>
                         </div>
                         
-                    {#key addFormCaptchaKey}
-                        <Captcha on:update={(event) => {
-                            captchaToken = event.detail;
-                        }} />
-                    {/key}
+                        {#key `add-${addFormCaptchaKey}`}
+                            <Captcha on:update={(event) => {
+                                captchaToken = event.detail;
+                            }} />
+                        {/key}
                         
                         <div class="form-actions">
                             {#if editingIndex >= 0}
@@ -480,7 +480,7 @@
                         <h3>Switch to {switchingAccount.username}</h3>
                         <p style="margin: 8px 0; color: #666;">Complete the captcha to switch accounts</p>
                         
-                        {#key switchCaptchaKey}
+                        {#key `switch-${switchCaptchaKey}`}
                             <Captcha on:update={(event) => {
                                 captchaToken = event.detail;
                             }} />
