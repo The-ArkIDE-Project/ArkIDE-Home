@@ -614,36 +614,16 @@
                     <h2 style="text-align:center; margin-bottom: 0;">
                         Keithmas Event 2025! (Dec 10th to the 25th)
                     </h2>
-                    <p style="text-align:center;">
-                        Join us for the Keithmas Event 2025! Participate in fun activities and earn exclusive badges!
-                    </p>
-                    <h2>Event Details</h2>
+                    <h1>THE KEITHMAS EVENT IS OVER, HERE ARE THE WINNERS!</h1>
+                    <h2>Nominated</h2>
                     <ul>
-                        <li>Submitted projects must have the #keithmas tag somewhere in the project so we can find them easier</li>
-                        <li>@Insomnia64 must be tagged in the notes/credits/instructions</li>
-                        <li>must clarify in the project or in the notes/instructions that its a keithmas submission</li>
-                        <li>must be a christmas-related project, christmas themed. </li>
-                        <li>Can be any type of project like animation, art, game, etc. </li>
-                        <li>You will be blacklisted from the year's keithmas for commenting hateful messages on contestants comment sections. </li>
-                        <li>@keith_official will post the results on dec. 26th </li>
+                        <li>'Keithmas Submition' by hooman_bean</li>
                     </ul>
-                    <h2>Badges</h2>
+                    <h2>Winners</h2>
                     <ul>
-                        <li><strong>Participated in Keithmas 2025</strong>: Awarded to all participants who submit a project.</li>
-                        <li><strong>Keithmas 2025 Nominee</strong>: Given to the top 3-4 projects selected by the ArkIDE team.</li>
-                        <li><strong>Keithmas 2025 Winner</strong>: Awarded to one project that is voted on by the ArkIDE team.</li>
+                        <li>1st Place: 'Keithmas Submition' by hooman_bean</li>
                     </ul>
-                    <h2>How to Participate</h2>
-                    <ul>
-                        <li>Simply post a project with the #keithmas tag and all of the other requirements shown above.</li>
-                    </ul>
-                    <h2>Dates</h2>
-                    <ul>
-                        <li>Event Start: December 10th, 2025</li>
-                        <li>Submission Deadline: December 25th, 2025</li>
-                        <li>Winners Announcement: December 26th, 2025</li>
-                    </ul>
-
+                    <h3>Thats it, only 1 winner and 1 nommenee becuase no one submitted anything.</h3>
                 </div>
             </ContentCategory>
 
@@ -698,8 +678,7 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>I am probably going to take a break on updates for the holidays, Remember, Participate in Keithmas!</li>
-                                <li>Introduce the Keithmas Event (PARTICIPATE!!! ITS EASY!)</li>
+                                <li>Update keithmas results</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
