@@ -250,7 +250,7 @@
         showSwitchCaptcha = true;
         errorMessage = "";
     }
-    
+
     // Actually perform the switch after captcha
     async function performSwitch() {
         if (!captchaToken) {
@@ -446,9 +446,11 @@
                             </div>
                         </div>
                         
-                        <Captcha key={captchaKey} on:update={(event) => {
+                    {#key captchaKey}
+                        <Captcha on:update={(event) => {
                             captchaToken = event.detail;
                         }} />
+                    {/key}
                         
                         <div class="form-actions">
                             {#if editingIndex >= 0}
