@@ -812,7 +812,7 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     z-index: 9999;
     width: 200px;
-    min-width: max-content;
+    min-width: 210px;
 }
 
 .profile-dropdown-menu button {
