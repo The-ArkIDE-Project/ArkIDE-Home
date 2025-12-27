@@ -548,7 +548,7 @@
     }
     
     .modal-content {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.568);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: 16px;
@@ -563,7 +563,7 @@
     }
     
     :global(body.dark-mode) .modal-content {
-        background: rgba(34, 34, 34, 0.95);
+        background: rgba(34, 34, 34, 0.568);
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
