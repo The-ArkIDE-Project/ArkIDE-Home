@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { PUBLIC_API_URL } from "$env/static/public";
 
     // Components (adjust import paths as needed for your project)
@@ -23,8 +23,33 @@
     let loading = true;
     let error = null;
     let isDarkMode = false;
+    let thumbnailUrl = "";
+    let darkModeObserver;
+    let originalDarkModeState = false;
 
     onMount(async () => {
+        // Save the original dark mode state
+        originalDarkModeState = document.body.classList.contains('dark-mode');
+        
+        // Force dark mode on this page only
+        document.body.classList.add('dark-mode');
+        
+        // Prevent light mode toggle on this page
+        darkModeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    if (!document.body.classList.contains('dark-mode')) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            });
+        });
+        
+        darkModeObserver.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
         // Get project ID from URL hash
         const hash = window.location.hash;
         console.log("Hash:", hash);
@@ -32,6 +57,8 @@
         if (hash && hash.length > 1) {
             projectId = hash.substring(1);
             console.log("Project ID:", projectId);
+            // Set thumbnail URL
+            thumbnailUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=thumbnail`;
         }
 
         // Check if dark mode is enabled
@@ -45,6 +72,21 @@
         } else {
             error = "No project ID provided in URL hash";
             loading = false;
+        }
+    });
+
+
+    onDestroy(() => {
+        // Disconnect observer
+        if (darkModeObserver) {
+            darkModeObserver.disconnect();
+        }
+        
+        // Restore the original dark mode state
+        if (originalDarkModeState) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
         }
     });
 
@@ -163,7 +205,7 @@ function parseContent(text) {
 
 <NavigationBar />
 
-<div class="main">
+<div class="main" style="--thumbnail-bg: url('{thumbnailUrl}')">
     <NavigationMargin />
 
     {#if loading}
@@ -373,12 +415,12 @@ function parseContent(text) {
         padding: 16px;
         border: 1px solid rgba(0, 0, 0, 0.35);
         border-radius: 4px;
-        background: white;
+        background: rgba(255, 255, 255, 0.637);
     }
 
     :global(body.dark-mode) .info-box {
         border-color: rgba(255, 255, 255, 0.35);
-        background: #1a1a1a;
+        background: #1b1b1bb4;
     }
 
     .info-box h3 {
@@ -412,9 +454,6 @@ function parseContent(text) {
         margin-top: 32px;
     }
 
-    :global(body.dark-mode) .vote-embed {
-        border-color: rgba(255, 255, 255, 0.15);
-    }
 
     @media (max-width: 1200px) {
         .main-content {
@@ -425,17 +464,7 @@ function parseContent(text) {
             padding-bottom: 56.25%; /* 16:9 aspect ratio for smaller screens */
         }
     }
-    .see-inside-container {
-        padding: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.35);
-        border-radius: 4px;
-        background: white;
-    }
 
-    :global(body.dark-mode) .see-inside-container {
-        border-color: rgba(255, 255, 255, 0.35);
-        background: #1a1a1a;
-    }
     .title-container {
         display: flex;
         justify-content: space-between;
@@ -554,17 +583,6 @@ function parseContent(text) {
         font-style: italic;
     }
 
-.emoji-inline {
-    width: 20px !important;
-    height: 20px !important;
-    max-width: 20px !important;
-    max-height: 20px !important;
-    vertical-align: middle;
-    display: inline-block;
-    margin: 0 2px;
-    user-select: none;
-    object-fit: contain;
-}
 
 :global(.emoji-inline) {
     width: 20px !important;
@@ -578,45 +596,6 @@ function parseContent(text) {
     object-fit: contain;
 }
 
-.mention-link {
-    color: #0074d9;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.mention-link:hover {
-    color: #0056a8;
-    text-decoration: underline;
-}
-
-:global(body.dark-mode) .mention-link {
-    color: #4dabf7;
-}
-
-:global(body.dark-mode) .mention-link:hover {
-    color: #74c0fc;
-}
-
-.hashtag-link {
-    color: #0074d9;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.hashtag-link:hover {
-    color: #0056a8;
-    text-decoration: underline;
-}
-
-:global(body.dark-mode) .hashtag-link {
-    color: #4dabf7;
-}
-
-:global(body.dark-mode) .hashtag-link:hover {
-    color: #74c0fc;
-}
 
 :global(.mention-link),
 :global(.hashtag-link) {
@@ -649,5 +628,33 @@ function parseContent(text) {
 
 :global(body.dark-mode) .empty-content {
     color: #666;
+}
+.main::before {
+    content: '';
+    position: fixed;
+    top: -30px;
+    left: -42px;
+    width: calc(100% + 80px);
+    height: calc(100% + 80px);
+    background-image: var(--thumbnail-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(20px);
+    z-index: -1;
+    opacity: 1;
+}
+
+:global(body.dark-mode) .main::before {
+    filter: blur(20px) brightness(0.2);
+}
+
+.main {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    min-width: 1000px;
+    --thumbnail-bg: url('');
 }
 </style>
