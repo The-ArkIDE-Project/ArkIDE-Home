@@ -119,13 +119,13 @@
             <li>Violation 2: Temporary Ban ban of 1-2 Months and your PFP will be changed to a sonic fetish PFP (dont ask)</li>
             <button on:click={playTomato} class="tomato-button">inconspicuous red button</button>
 
-            <audio bind:this={audioElement} src="tomato.mp3" preload="auto"></audio>
+            <audio bind:this={audioElement} src="/tomato.mp3" preload="auto"></audio>
 
             {#if showTomato}
                 <div class="tomato-fullscreen">
                     <img 
                         bind:this={tomatoGif}
-                        src="tomato.gif" 
+                        src="/tomato.gif" 
                         alt="Tomato" 
                         on:load={onTomatoLoad}
                         class="tomato-gif"
