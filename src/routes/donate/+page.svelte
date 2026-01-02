@@ -126,7 +126,8 @@
                         </p>
                         <a
                             target="_blank"
-                            href="https://www.cash.app/$JeremyGamer13"
+                            class="donation-unavailable"
+                            href="/error?error=404"
                             style="text-decoration: none !important;"
                         >
                             <button
@@ -136,8 +137,8 @@
                                 <img src="/cashapp.png" alt="Cash App" />
                                 <span>
                                     <LocalizedText
-                                        text="Cash App"
-                                        key="payment.cashapp"
+                                        text="(unavailable)"
+                                        key="project.status.unavailable"
                                         lang={currentLang}
                                     />
                                 </span>
@@ -185,6 +186,7 @@
                                 </span>
                             </button>
                         </a>
+                        <p>I'm sorry that there's no donation options right now, I'm working on getting one working.</p>
                     </div>
                     <div class="donation-images">
                         <img
@@ -199,14 +201,14 @@
 
                 <p class="small">
                     <LocalizedText
-                        text="ArkIDE is not affiliated with Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation."
+                        text="ArkIDE is not affiliated with Scratch, TurboWarp, Penguinmod, the Scratch Team, or the Scratch Foundation."
                         key="home.footer.notaffiliated"
                         lang={currentLang}
                     />
                 </p>
                 <p class="small">
                     <LocalizedText
-                        text="You can always donate to our parent projects Scratch or TurboWarp as well, to help them stay online."
+                        text="You can always donate to our parent projects Scratch, TurboWarp, or PenguinMod as well, to help them stay online."
                         key="donate.parents"
                         dolink={true}
                         lang={currentLang}
@@ -227,6 +229,10 @@
                 <a class="small" target="_blank" href={LINK.donate.turbowarp}>
                     TurboWarp
                 </a>
+                <br />
+                <a class="small" target="_blank" href="https://penguinmod.com/donate/">
+                    PenguinMod
+                </a>
             </div>
             <div class="section-details">
                 <p style="text-align: center;">
@@ -245,7 +251,7 @@
                         'en'
                     ))
                     // we serve __ projects
-                    .replace('$1', (25000).toLocaleString())}
+                    .replace('$1', (200).toLocaleString())}
                 </div>
                 <div class="detail-card" bind:this={forceHtmlClass2} style="background: darkviolet">
                     {@html String(TranslationHandler.text(
@@ -256,7 +262,7 @@
                         'en'
                     ))
                     // we send __ gb of stuff
-                    .replace('$1', (2800).toLocaleString())}
+                    .replace('$1', (1000).toLocaleString())}
                 </div>
                 <div class="detail-card" bind:this={forceHtmlClass3} style="background: #ffb300">
                     {@html String(TranslationHandler.text(
@@ -267,7 +273,7 @@
                         'en'
                     ))
                     // we handle ___ reqs
-                    .replace('$1', (100000000).toLocaleString())}
+                    .replace('$1', (120000).toLocaleString())}
                 </div>
             </div>
         </div>
