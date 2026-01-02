@@ -234,7 +234,7 @@ function parseContent(text) {
                         </a>
                     </div>
                 </div>
-                <Button on:click={() => window.location.href = `https://studio.arkide.site/editor.html#${projectId}`}>
+                <Button on:click={() => window.location.href = `https://studio.arkide.site/editor.html?fromprojectpage#${projectId}`}>
                     <span class="see-inside-content">
                         <img 
                             src="https://scratch.mit.edu/svgs/project/see-inside-white.svg" 
