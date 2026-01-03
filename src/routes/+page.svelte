@@ -679,7 +679,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Update keithmas results</li>
+                                <li>Remake the Viewer page</li>
+                                <li>Add a screenshot thing to the editor</li>
+                                <li>PLEASE give me more ideas on stuff to add to ArkIDE! (join our discord)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
