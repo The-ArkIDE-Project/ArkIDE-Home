@@ -255,7 +255,8 @@ function parseContent(text) {
                         title="{projectData.title}"
                         frameborder="0"
                         allowfullscreen
-                        sandbox="allow-scripts allow-same-origin allow-storage-access-by-user-activation"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-presentation allow-top-navigation-by-user-activation allow-downloads allow-storage-access-by-user-activation"
+                        allow="camera *; microphone *; geolocation *; accelerometer *; gyroscope *; magnetometer *; fullscreen *; picture-in-picture *; display-capture *; autoplay *; encrypted-media *; midi *; usb *; serial *; hid *; payment *; web-share *; clipboard-read *; clipboard-write *"
                         style="color-scheme: auto"
                     ></iframe>
                 </div>
