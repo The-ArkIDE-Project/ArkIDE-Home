@@ -681,7 +681,8 @@
                             <ul>
                                 <li>Remake the Viewer page</li>
                                 <li>Add a screenshot thing to the editor</li>
-                                <li>PLEASE give me more ideas on stuff to add to ArkIDE! (join our discord)</li>
+                                <li>Migrate to ArkIDE-Blocks instead of Penguinmod-Blocks</li>
+                                <li>Update editor extensions</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
