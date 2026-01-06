@@ -679,9 +679,7 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Remake the Viewer page</li>
-                                <li>Add a screenshot thing to the editor</li>
-                                <li>Migrate to ArkIDE-Blocks instead of Penguinmod-Blocks</li>
+                                <li>Remove christmas stuff</li>
                                 <li>Update editor extensions</li>
                                 <li>Update ArkIDE Desktop</li>
                                 <li>General Bug Fixing.</li>
