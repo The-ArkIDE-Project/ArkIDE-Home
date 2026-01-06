@@ -683,6 +683,7 @@
                                 <li>Add a screenshot thing to the editor</li>
                                 <li>Migrate to ArkIDE-Blocks instead of Penguinmod-Blocks</li>
                                 <li>Update editor extensions</li>
+                                <li>Update ArkIDE Desktop</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 

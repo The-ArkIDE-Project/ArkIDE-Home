@@ -17,7 +17,7 @@
         currentLang = lang;
     });
 
-let version = "2.11.0";
+let version = "2.12.0";
 // Download links - replace these with your actual download URLs
 const downloads = {
     windows: {
@@ -210,6 +210,7 @@ $: fileName = getFileName(selectedOS, selectedArch);
                 <li>Quick launch from your desktop</li>
                 <li>Discord RPC Compatibility, so people can see that your coding on ArkIDE</li>
                 <li>Verson checker to see when your desktop app is out-of-date</li>
+                <li>Flatpak Compatibility for easy installation on Linux</li>
             </ul>
         </div>
 
