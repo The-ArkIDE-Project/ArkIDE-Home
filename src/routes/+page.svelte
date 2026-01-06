@@ -448,7 +448,7 @@
     <p style="width: 100%; text-align: center;">
         <i>
             <LocalizedText
-                text="ArkIDE is feeling chrismas-y. Even though at the time of writing its november lol."
+                text="Welcome to ArkIDE! I have nothing else to put here so yeah."
                 key="home.scratchnote"
                 lang={currentLang}
             />
@@ -466,11 +466,11 @@
                             alt="Profile"
                             class="profile-picture"
                         />
-                        <img
+                         <!--<img
                             src="/hat.png"
                             alt="Christmas Hat"
                             class="christmas-hat"
-                        />
+                        /> -->
                     </div>
                     <h1>
                         {TranslationHandler.text(
@@ -1150,7 +1150,7 @@
     color: gray;
 }
 
-    /* Chrismas stuff :D */
+    /* Chrismas stuff :D 
 .profile-picture-container {
     position: relative;
     display: inline-block;
@@ -1171,7 +1171,7 @@
     z-index: 10;
     animation: festiveWiggle 2s ease-in-out infinite;
 }
-
+*/
 @keyframes festiveWiggle {
     0%, 100% { transform: translateX(-50%) rotate(-2deg); }
     50% { transform: translateX(-50%) rotate(2deg); }

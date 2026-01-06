@@ -1293,11 +1293,11 @@ Promise.all([
                         <div class="subuser-section">
                             <div class="user-username">
                                 <div class="profile-picture-container">
-                                    <img
+                                    <!--<img
                                         src="/hat.png"
                                         alt="Christmas Hat"
                                         class="christmas-hat"
-                                    />
+                                    />-->
                                     <img
                                         style="border-color:{isDonator ? "#a237db" : "#efefef"}"
                                         src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
@@ -2682,7 +2682,7 @@ Promise.all([
         border-style: solid;
         border-width: 2px;
     }
-    .christmas-hat {
+    /*.christmas-hat {
         position: absolute;
         top: -42px;
         left: 55%;
@@ -2692,6 +2692,7 @@ Promise.all([
         z-index: 10;
         pointer-events: none;
     }
+        */
     :global(html[dir="rtl"]) .profile-picture {
         margin-right: initial;
         margin-left: 8px;
