@@ -70,6 +70,24 @@
     }
 
     fetchLatestCommit();
+    // I have this piece of shit server. I godda spend 60 fucking dollars to fix it.
+    let countdownTime = '';
+    const targetDate = new Date('2026-01-09T01:25:00').getTime();
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = now - targetDate;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownTime = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
     let catText = '⠀';
     let existingInterval;
@@ -328,6 +346,11 @@
         buttonHref={"/donate"}
     />
     <StatusAlert />
+
+    <div class="countdown-banner">
+    <div>Time elapsed since the server has crashed on Jan 9th at 1:25AM</div>
+    <div class="countdown-timer">{countdownTime}</div>
+    </div>
 
     {#if !loggedIn}
         <div class="section-info">
@@ -1510,4 +1533,21 @@
         display: flex;
         flex-direction: row;
     }
+    .countdown-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem;
+    margin: 0;
+    font-weight: bold;
+}
+.countdown-timer {
+    font-size: 2rem;
+    margin-top: 0.5rem;
+    font-family: 'Courier New', monospace;
+}
 </style>
