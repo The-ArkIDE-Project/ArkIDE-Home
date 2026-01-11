@@ -21,7 +21,7 @@
         { name: "ArkIDE Home", url: "https://arkide.site/hat.png" },
         { name: "ArkIDE Editor", url: "https://studio.arkide.site/" },
         { name: "Asset Library", url: "https://library.arkide.site/" },
-        { name: "ArkIDE API", url: "https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=ark2" },
+        { name: "ArkIDE API", url: "https://arkideapi.arc360hub.com/api/v1/users/getpfp?username=ark" },
         { name: "ArkIDE Basic API", url: "https://arkidebasicapi.arkide.site/" },
         { name: "ArkIDE Packager", url: "https://packager.arkide.site/" },
         { name: "Extensions Store", url: "https://extensions.arkide.site/" }
