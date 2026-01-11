@@ -346,12 +346,12 @@
         buttonHref={"/donate"}
     />
     <StatusAlert />
-
+    <!-- I think i have gotten it under control enough to remove this.
     <div class="countdown-banner">
     <div>Time elapsed since the server has crashed on Jan 9th at 1:25AM</div>
     <div class="countdown-timer">{countdownTime}</div>
     </div>
-
+    -->
     {#if !loggedIn}
         <div class="section-info">
             <div style="margin-left: 8rem;">
