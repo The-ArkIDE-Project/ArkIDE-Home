@@ -702,9 +702,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Remove christmas stuff</li>
-                                <li>Update editor extensions</li>
-                                <li>Update ArkIDE Desktop</li>
+                                <li>Add a screenshot button to the project toolbar</li>
+                                <li>Update ArkIDE Editor Packages</li>
+                                <li>FINALLY fix the damn servers</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
