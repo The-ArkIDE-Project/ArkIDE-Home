@@ -705,6 +705,7 @@
                                 <li>Add a screenshot button to the project toolbar</li>
                                 <li>Update ArkIDE Editor Packages</li>
                                 <li>FINALLY fix the damn servers</li>
+                                <li>Update desktop to 2.13.0 (i have to go to 3.x.x soon lmao or change the versioning system)</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
