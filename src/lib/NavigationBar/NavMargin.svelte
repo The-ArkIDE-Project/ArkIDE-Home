@@ -89,7 +89,7 @@
     
 
     let homeRunCount = 0;
-    const maxHomeRuns = 3;
+    const maxHomeRuns = 5;
     
     const runHomeDetection = () => {
         detectBackgroundColor();
@@ -103,7 +103,7 @@
                     return; 
                 }
             }
-            timeoutId = setTimeout(runHomeDetection, 500);
+            timeoutId = setTimeout(runHomeDetection, 800);
         }
     };
     
