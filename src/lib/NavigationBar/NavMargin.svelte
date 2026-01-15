@@ -116,11 +116,16 @@
         if (intervalId) clearInterval(intervalId);
         if (timeoutId) clearTimeout(timeoutId);
         
+        // Homepage special handling
         if (window.location.pathname === '/') {
+            // Wait 1000ms before checking login status and setting color
             timeoutId = setTimeout(() => {
+                // Check if "Sign up" exists on the page
                 if (isUserLoggedIn()) {
-                    backgroundColor = '#222';
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    backgroundColor = isDarkMode ? 'rgb(17, 17, 17)' : 'rgb(255, 255, 255)';
                 } else {
+                    // User is not logged in ("Sign up" exists), run normal detection
                     homeRunCount = 0;
                     runHomeDetection();
                 }
@@ -139,10 +144,23 @@
         // Start the initial detection
         startDetectionLoop();
         
+        const observer = new MutationObserver(() => {
+            if (window.location.pathname === '/' && isUserLoggedIn()) {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                backgroundColor = isDarkMode ? 'rgb(17, 17, 17)' : 'rgb(255, 255, 255)';
+            }
+        });
+        
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+        
         // Cleanup
         return () => {
             if (intervalId) clearInterval(intervalId);
             if (timeoutId) clearTimeout(timeoutId);
+            observer.disconnect();
         };
     });
 </script>
