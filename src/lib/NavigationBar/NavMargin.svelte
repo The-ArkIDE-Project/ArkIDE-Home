@@ -82,24 +82,43 @@
         const foundColor = detectBackgroundColor();
         runCount++;
         
-        // Stop if we found a valid color or reached max runs
         if (!foundColor && runCount < maxRuns) {
             timeoutId = setTimeout(runDetection, 500);
         }
     };
     
+
+    let homeRunCount = 0;
+    const maxHomeRuns = 3;
+    
+    const runHomeDetection = () => {
+        detectBackgroundColor();
+        homeRunCount++;
+        
+        if (homeRunCount < maxHomeRuns) {
+            const match = backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+            if (match) {
+                const [, r, g, b] = match;
+                if (homeRunCount >= 1 && (r !== '0' || g !== '0' || b !== '0')) {
+                    return; 
+                }
+            }
+            timeoutId = setTimeout(runHomeDetection, 500);
+        }
+    };
+    
     const startDetectionLoop = () => {
-        // Clear any existing interval or timeout
         if (intervalId) clearInterval(intervalId);
         if (timeoutId) clearTimeout(timeoutId);
         
-        // Check if we're on the /status page
-        if (window.location.pathname === '/status') {
-            // Update every second for status page
-            detectStatusPageColor(); // Run immediately
+        if (window.location.pathname === '/') {
+            homeRunCount = 0;
+            runHomeDetection();
+        }
+        else if (window.location.pathname === '/status') {
+            detectStatusPageColor(); 
             intervalId = setInterval(detectStatusPageColor, 1000);
         } else {
-            // Reset counter and start normal detection loop
             runCount = 0;
             runDetection();
         }
