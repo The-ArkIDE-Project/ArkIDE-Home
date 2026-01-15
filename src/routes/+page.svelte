@@ -703,9 +703,9 @@
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
                                 <li>Add a screenshot button to the project toolbar</li>
-                                <li>Update ArkIDE Editor Packages</li>
-                                <li>FINALLY fix the damn servers</li>
-                                <li>Update desktop to 2.13.0 (i have to go to 3.x.x soon lmao or change the versioning system)</li>
+                                <li>Update the website navbar look</li>
+                                <li>Disable the custom cursor by defualt as its kinda broken</li>
+                                <li>Make the search reccomendations thing way smoother/quicker</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
@@ -719,6 +719,7 @@
 
                             <p>All art is by Insomnia64!!</p>
                             <p>ArkIDE is NOT affiliated with Penguinmod, Scratch, or Turbowarp in any way; this is a separate project.</p>
+                            <p>This app is still in heavy development, so if you dont like any of the changes we make just tell us on our discord.</p>
                         </div>
                     </div>
                     <div class="category-footer">
@@ -1157,7 +1158,6 @@
                 <a target="_blank" href={LINK.donate.scratch}>Scratch</a>
             </div>
         </div>
-        <p class="footer-note">A project by Ark360 Studios, &copy; 2020-2025. All rights reserved.</p>
     </div>
 </div>
 
@@ -1277,7 +1277,7 @@
     }
 
     .section-info {
-        background: #0026ff;
+        background: #5900ff;
         height: 24rem;
         color: white;
         display: flex;

@@ -93,7 +93,7 @@
         token = localStorage.getItem("token");
         // Load custom cursor setting from localStorage
 const cursorSetting = localStorage.getItem('customCursorEnabled');
-accountInformation.settings.customCursor = cursorSetting === null ? true : cursorSetting === 'true';
+accountInformation.settings.customCursor = cursorSetting === null ? false : cursorSetting === 'true';
         if (!token || !username) {
             loggedIn = false;
             return;
@@ -105,7 +105,7 @@ accountInformation.settings.customCursor = cursorSetting === null ? true : curso
                 setupLoginInfo(_loginMethods, _privateProfile, _cfsp, _standing, isEmailVerified, email);
             })
             .catch((e) => {
-                console.log("AAAAAAAAAAAAa", e);
+                console.log("AAAAAAAAAAAAa", e); // what
                 loggedIn = false;
             });
     });

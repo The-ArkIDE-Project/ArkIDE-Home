@@ -264,7 +264,7 @@
 		
 		searchTimeout = setTimeout(() => {
 			fetchSearchRecommendations(searchQuery);
-		}, 1000);
+		}, 200); // makes it way smoother to use
 	}
 
 	function openProject(projectId, projectTitle) {
@@ -588,12 +588,13 @@
 
 .bar {
     position: fixed;
-    width: 100%;
-    left: 0px;
-    top: 0px;
-    background: rgba(88, 42, 255, 0.80); /* Made semi-transparent (was var(--penguinmod-color)) */
-    backdrop-filter: blur(10px); /* Add blur effect */
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    width: auto; 
+    left: 50%;
+    transform: translateX(-50%); 
+    top: 1rem; 
+    background: rgba(48, 62, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     height: 3rem;
     color: white;
     display: flex;
@@ -605,9 +606,15 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.75rem;
     font-weight: bold;
-    min-width: 1000px;
+    min-width: auto; 
+    max-width: calc(100% - 2rem); 
     z-index: 1000;
-	cursor: url('cur.png'), auto;
+    cursor: url('cur.png'), auto;
+    border-radius: 2rem; 
+    padding: 0 1rem; 
+	padding-left: 82px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+	border: 4px solid rgba(191, 157, 255, 0.2);
 }
 
     .bar :global(a) {
@@ -800,7 +807,7 @@
 
 .profile-dropdown-menu {
     position: fixed;
-    background: rgba(98, 81, 255, 0.80);
+    background: rgba(48, 62, 255, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 4px;
@@ -877,21 +884,21 @@
 	}
 
 .search-recommendations {
-    background: rgba(98, 81, 255, 0.65) !important;
+    background: rgba(48, 62, 255, 0.7) !important;
     position: fixed;
-    top: calc(3rem + 4px);
+    top: calc(3rem + 20px);
     /* left and width set via inline style */
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 8px;
-    z-index: 999;
+    z-index: 999999;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
 
 :global(body.dark-mode) .search-recommendations {
-    background: rgba(98, 81, 255, 0.65) !important;
+    background: rgba(48, 62, 255, 0.7) !important;
     border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);

@@ -7,7 +7,7 @@
     export let text = "";
     export let textLocalize = true;
     export let textBreakup = false;
-    export let backColor = "rgb(118, 80, 168)";
+    export let backColor = "rgba(118, 80, 168, 0.80)";
     export let textColor = "black";
     export let dismissable = true;
 
@@ -94,32 +94,49 @@
 
 <style>
     .alert-banner {
-        position: relative;
-        background: rgb(118, 80, 168);
+        position: fixed; 
+        top: 4.5rem; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        width: auto; 
+        max-width: calc(100% - 2rem); 
+        background: rgba(255, 251, 0, 0.7) !important; 
         font-weight: bold;
         text-align: center;
-        padding: 20px 0;
+        padding: 12px 20px; 
         color: white;
+        border-radius: 2rem; 
+        z-index: 999; 
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px); 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        border: 4px solid rgba(244, 255, 150, 0.2);
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px); 
+        z-index: 1000;
     }
+
     .alert-banner * {
         margin-block: 0;
     }
+
     .alert-banner > p {
         position: relative;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        gap: 8px; 
     }
 
     .alert-banner img {
-        height: 32px;
-        margin-right: 12px;
+        height: 24px; 
+        margin-right: 0; 
     }
 
     :global(html[dir="rtl"]) .alert-banner img {
         margin-right: initial;
-        margin-left: 16px;
+        margin-left: 0;
     }
 
     .alert-banner button {
@@ -127,40 +144,50 @@
         outline: 1px solid white;
         cursor: pointer;
         font-weight: bold;
-        border-radius: 4px;
+        border-radius: 1rem; 
         color: white;
         background: transparent;
-        font-size: 16px;
-        padding: 6px 16px;
-        margin: 0 6px;
-        margin-left: 16px;
+        font-size: 14px; 
+        padding: 4px 12px; 
+        margin: 0; 
+        transition: 0.15s ease all;
     }
+
+    .alert-banner button:hover {
+        padding: 8px 16px;
+        transition: 0.15s ease all;
+    }
+
     .alert-banner button[data-toolight=true] {
         color: black;
         outline-color: black;
     }
+
     .alert-banner button:active {
         background: rgba(0, 0, 0, 0.25);
     }
 
     :global(html[dir="rtl"]) .alert-banner button {
         margin-left: initial;
-        margin-right: 16px;
+        margin-right: 0;
     }
 
     .alert-dismiss {
         outline: 0 !important;
-        position: absolute;
-        right: 16px;
-        width: 32px;
-        height: 32px;
+        position: relative; 
+        right: initial; 
+        width: 24px; 
+        height: 24px; 
         background: url("/dismiss.svg") !important;
         background-size: cover !important;
+        flex-shrink: 0; 
     }
+
     :global(html[dir="rtl"]) .alert-dismiss {
         right: initial;
-        left: 16px;
+        left: initial;
     }
+
     .alert-dismiss:active {
         filter: brightness(0.5);
     }
