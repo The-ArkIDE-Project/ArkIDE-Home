@@ -13,12 +13,17 @@
     let intervalId = null;
     let timeoutId = null;
     
+    const isUserLoggedIn = () => {
+        const bodyText = document.body.innerText || document.body.textContent;
+        return !bodyText.includes("Sign up"); 
+    };
+    
     const detectBackgroundColor = () => {
         try {
-            // Check if we're on the /viewer page
-            if (window.location.pathname === '/viewer') {
+            // Check if we're on the /viewer or /profile page
+            if (window.location.pathname === '/viewer' || window.location.pathname.startsWith('/profile')) {
                 backgroundColor = 'transparent';
-                return true; // Stop the loop for viewer page
+                return true; // Stop the loop for viewer/profile page
             }
             
             // Get center X coordinate, 80px down from top
@@ -112,8 +117,14 @@
         if (timeoutId) clearTimeout(timeoutId);
         
         if (window.location.pathname === '/') {
-            homeRunCount = 0;
-            runHomeDetection();
+            timeoutId = setTimeout(() => {
+                if (isUserLoggedIn()) {
+                    backgroundColor = '#222';
+                } else {
+                    homeRunCount = 0;
+                    runHomeDetection();
+                }
+            }, 1000);
         }
         else if (window.location.pathname === '/status') {
             detectStatusPageColor(); 
