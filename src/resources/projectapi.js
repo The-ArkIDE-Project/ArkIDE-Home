@@ -50,7 +50,7 @@ getFollowers(username) {
         .then(r => r.json());
 }
 async deleteMessage(messageId) {
-    const response = await fetch(`${API}/api/v1/users/messages/${messageId}`, {
+    const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/messages/${messageId}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${this.token}`
