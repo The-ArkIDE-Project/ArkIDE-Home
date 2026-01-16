@@ -607,14 +607,14 @@
     font-size: 0.75rem;
     font-weight: bold;
     min-width: auto; 
-    max-width: calc(100% - 2rem); 
+    max-width: 95%;
     z-index: 1000;
     cursor: url('cur.png'), auto;
     border-radius: 2rem; 
     padding: 0 1rem; 
-	padding-left: 82px;
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-	border: 4px solid rgba(191, 157, 255, 0.2);
+    padding-left: 82px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 4px solid rgba(191, 157, 255, 0.2);
 }
 
     .bar :global(a) {
