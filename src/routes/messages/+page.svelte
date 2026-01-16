@@ -962,7 +962,52 @@
                                         ))
                                     }
                                 </a>
-                            {:else}
+                            {:else if message.message.type === "comment"}
+    <p>
+        <a href={`/profile?user=${message.message.commenter.username}`}>
+            <b>{message.message.commenter.username}</b>
+        </a>
+        {message.message.isReply ? " replied to a comment on your project " : " commented on your project "}
+        <a href={`${PUBLIC_STUDIO_URL}/#${message.message.project.id}`}>
+            <b>{message.message.project.title}</b>
+        </a>
+    </p>
+    <p style="margin-left: 16px; font-style: italic;">
+        "{message.message.comment.content}"
+    </p>
+{:else if message.message.type === "commentReply"}
+    <p>
+        <a href={`/profile?user=${message.message.commenter.username}`}>
+            <b>{message.message.commenter.username}</b>
+        </a>
+        {" replied to your comment on "}
+        <a href={`${PUBLIC_STUDIO_URL}/#${message.message.project.id}`}>
+            <b>{message.message.project.title}</b>
+        </a>
+    </p>
+    <p style="margin-left: 16px; font-style: italic;">
+        "{message.message.comment.content}"
+    </p>
+{:else if message.message.type === "profileComment"}
+    <p>
+        <a href={`/profile?user=${message.message.commenter.username}`}>
+            <b>{message.message.commenter.username}</b>
+        </a>
+        {message.message.isReply ? " replied to a comment on your profile" : " commented on your profile"}
+    </p>
+    <p style="margin-left: 16px; font-style: italic;">
+        "{message.message.comment.content}"
+    </p>
+{:else if message.message.type === "profileCommentReply"}
+    <p>
+        <a href={`/profile?user=${message.message.commenter.username}`}>
+            <b>{message.message.commenter.username}</b>
+        </a>
+        {" replied to your comment on their profile"}
+    </p>
+    <p style="margin-left: 16px; font-style: italic;">
+        "{message.message.comment.content}"
+    </p>
                                 <!-- what is this? -->
                                 <p>
                                     Unknown Message;
