@@ -49,6 +49,20 @@ getFollowers(username) {
     return fetch(`https://arkideapi.arc360hub.com/api/v1/users/meta/getfollowing?username=${encodeURIComponent(username)}`)
         .then(r => r.json());
 }
+async deleteMessage(messageId) {
+    const response = await fetch(`${API}/api/v1/users/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${this.token}`
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to delete message');
+    }
+    
+    return await response.json();
+}
 async getAllUsers() {
     const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/getAllUsers`, {
         method: 'GET',

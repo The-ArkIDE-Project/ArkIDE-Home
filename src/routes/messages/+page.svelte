@@ -249,6 +249,20 @@
         pageUpdateCount += 1;
     }
 
+    function deleteMessage(id) {
+        if (!confirm("Are you sure you want to delete this message?")) {
+            return;
+        }
+        
+        ProjectClient.deleteMessage(id).then(() => {
+            messages = messages.filter(m => m.id !== id);
+            pageUpdateCount += 1;
+        }).catch(err => {
+            console.error(err);
+            alert("Failed to delete message");
+        });
+    }
+
     function disputeMessage(id) {
         if (
             !confirm(
@@ -381,6 +395,15 @@
                                 readMessages.includes(message.id)}
                             on:click={() => markAsRead(message.id)}
                         >
+                                <div class="message-actions">
+                                <button 
+                                    class="delete-message-btn"
+                                    on:click|stopPropagation={() => deleteMessage(message.id)}
+                                    title="Delete message"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
                             {#if message.message.type === "modresponse"
                                 || message.message.type === "modMessage"
                                 || message.message.type === "reject"
@@ -1008,16 +1031,17 @@
     <p style="margin-left: 16px; font-style: italic;">
         "{message.message.comment.content}"
     </p>
-                                <!-- what is this? -->
-                                <p>
-                                    Unknown Message;
-                                    <LocalizedText
-                                        text="An error occurred. Please try again later."
-                                        key="generic.error"
-                                        lang={currentLang}
-                                    />
-                                </p>
-                            {/if}
+                        {:else}
+                            <!-- what is this? -->
+                            <p>
+                                Unknown Message;
+                                <LocalizedText
+                                    text="An error occurred. Please try again later."
+                                    key="generic.error"
+                                    lang={currentLang}
+                                />
+                            </p>
+                        {/if}
                             {#if message.disputable}
                                 <details>
                                     <summary>
@@ -1274,4 +1298,26 @@
     :global(body.dark-mode) .follower-added span {
         color: white;
     }
+    .message-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.message {
+    position: relative;
+}
+
+.delete-message-btn {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.delete-message-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+}
 </style>
