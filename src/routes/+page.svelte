@@ -629,6 +629,7 @@
                 </div>
             </ContentCategory>
                 {:else if loggedIn && selectedFrontTabSelected === "vote"}
+            <!-- 
             <ContentCategory header="Keithmas 2025 event">
                 <div class="category-content" style="display:flex; flex-direction:column; gap:1rem;">
 
@@ -650,6 +651,7 @@
                     <h3>Thats it, only 1 winner and 2 nominees.</h3>
                 </div>
             </ContentCategory>
+            -->
 
         {:else if loggedIn && selectedFrontTabSelected === "new"}
             <ContentCategory
