@@ -165,4 +165,4 @@
     });
 </script>
 
-<div style="height: 3rem; background: {backgroundColor}" />
+<div style="height: 3.5rem; background: {backgroundColor}" />
