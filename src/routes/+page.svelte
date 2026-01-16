@@ -797,6 +797,7 @@
                         lang={currentLang}
                     />
                 </button>
+                <!--
                 <button
                     class="section-toggle-button"
                     data-active={selectedFrontTabSelected === "vote"}
@@ -806,7 +807,7 @@
                 >
                     Keithmas Event!
                 </button>
-
+                -->
             </div>
         </div>
     {/if}
