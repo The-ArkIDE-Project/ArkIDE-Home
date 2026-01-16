@@ -1512,7 +1512,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                 {#if selectedProjectName}
                     <a
                         target="_blank"
-                        href={`${PUBLIC_STUDIO_URL}/#${lastSelectedProjectId}`}
+                        href={`https://https://arkide.site/viewer#${lastSelectedProjectId}`}
                         style="color: dodgerblue"
                     >
                         <p>
@@ -2349,7 +2349,7 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                         {#if content.commentData}
                             <p><strong>Comment by:</strong> <a href={`https://penguinmod.com/profile?user=${content.commentData.username}`} target="_blank">{content.commentData.username}</a></p>
                             {#if content.commentType === "project"}
-                                <p><strong>Project:</strong> <a href={`${PUBLIC_STUDIO_URL}/#${content.commentData.projectId}`} target="_blank">View Project</a></p>
+                                <p><strong>Project:</strong> <a href={`https://https://arkide.site/viewer#${content.commentData.projectId}`} target="_blank">View Project</a></p>
                             {:else if content.commentType === "profile"}
                                 <p><strong>Profile Comment</strong></p>
                                 <p><strong>Profile:</strong> <a href={`https://penguinmod.com/profile?id=${content.commentData.profileUserId}`} target="_blank">View Profile</a></p>
@@ -2434,9 +2434,9 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
                                     <p>
                                         View project at
                                         <a
-                                            href={`${PUBLIC_STUDIO_URL}/#${content.targetID}`}
+                                            href={`https://https://arkide.site/viewer#${content.targetID}`}
                                         >
-                                            {`${PUBLIC_STUDIO_URL}/#${content.targetID}`}
+                                            {`https://https://arkide.site/viewer#${content.targetID}`}
                                         </a>
                                         or
                                         <button
