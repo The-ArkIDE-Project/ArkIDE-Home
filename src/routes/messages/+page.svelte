@@ -645,7 +645,7 @@
                             {:else if message.message.type === "remix"}
                                 <p>
                                     <a
-                                        href={`${PUBLIC_STUDIO_URL}/#${message.message.newProject.id}`}
+                                        href={`https://arkide.site/viewer#${message.message.newProject.id}`}
                                         target="_blank"
                                     >
                                         {String(
@@ -710,7 +710,7 @@
                                 </p>
                                 <p>
                                     <a
-                                        href={`${PUBLIC_STUDIO_URL}/#${message.message.project.id}`}
+                                        href={`https://arkide.site/viewer#${message.message.project.id}`}
                                         target="_blank"
                                     >
                                         <LocalizedText
@@ -991,7 +991,7 @@
             <b>{message.message.commenter.username}</b>
         </a>
         {message.message.isReply ? " replied to a comment on your project " : " commented on your project "}
-        <a href={`${PUBLIC_STUDIO_URL}/#${message.message.project.id}`}>
+        <a href={`https://arkide.site/viewer#${message.message.project.id}`}>
             <b>{message.message.project.title}</b>
         </a>
     </p>
@@ -1004,7 +1004,7 @@
             <b>{message.message.commenter.username}</b>
         </a>
         {" replied to your comment on "}
-        <a href={`${PUBLIC_STUDIO_URL}/#${message.message.project.id}`}>
+        <a href={`https://arkide.site/viewer##${message.message.project.id}`}>
             <b>{message.message.project.title}</b>
         </a>
     </p>
