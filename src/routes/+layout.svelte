@@ -103,25 +103,11 @@ function applyVerifiedBadges() {
                     let modifiedSvg = svgContent
                         .replace(/fill="(?!none|transparent)([^"]*)"/g, `fill="${svgColor}"`)
                         .replace(/stroke="(?!none|transparent)([^"]*)"/g, `stroke="${svgColor}"`)
-                        .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign}; display: inline-block;"`);
+                        .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign};"`);
                     
-                    const fragment = document.createDocumentFragment();
-                    const parts = text.split(regex);
-                    const matches = text.match(regex) || [];
-                    
-                    parts.forEach((part, i) => {
-                        if (part) fragment.appendChild(document.createTextNode(part));
-                        if (i < matches.length) {
-                            const span = document.createElement('span');
-                            span.className = 'verified-username';
-                            span.style.display = 'inline';
-                            span.style.whiteSpace = 'nowrap';
-                            span.innerHTML = `${matches[i]}${modifiedSvg}`;
-                            fragment.appendChild(span);
-                        }
-                    });
-                    
-                    parent?.replaceChild(fragment, node);
+                    const span = document.createElement('span');
+                    span.innerHTML = text.replace(regex, `<span class="verified-username">${username}${modifiedSvg}</span>`);
+                    parent?.replaceChild(span, node);
                 });
         }
     });
