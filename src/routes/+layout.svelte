@@ -75,69 +75,41 @@ function applyVerifiedBadges() {
 
     nodesToReplace.forEach(({ node, username }) => {
         const text = node.textContent;
-        const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(escapedUsername, 'gi');
+        const regex = new RegExp(`\\b${username}\\b`, 'g');
         
-        const matches = text.match(regex);
-        if (!matches || matches.length === 0) return;
-        
-        const parent = node.parentElement;
-        if (!parent) return;
-        
-        const computedStyle = window.getComputedStyle(parent);
-        const fontSize = computedStyle.fontSize;
-        const fontSizeNum = parseFloat(fontSize);
-        const badgeSize = fontSizeNum * 0.85;
-        
-        const isDarkMode = document.documentElement.classList.contains('dark') || 
-                           document.body.classList.contains('dark') ||
-                           window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        const svgColor = isDarkMode ? '#9d7fff' : '#7e5eff';
-        const verticalAlign = fontSizeNum > 20 ? 'baseline' : 'middle';
-        
-        fetch('/verified.svg')
-            .then(response => response.text())
-            .then(svgContent => {
-                let modifiedSvg = svgContent
-                    .replace(/fill="(?!none|transparent)([^"]*)"/g, `fill="${svgColor}"`)
-                    .replace(/stroke="(?!none|transparent)([^"]*)"/g, `stroke="${svgColor}"`)
-                    .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign}; display: inline-block; margin-left: 2px;"`);
-                
-                const fragment = document.createDocumentFragment();
-                let lastIndex = 0;
-                
-                // Find all matches and their positions
-                const newRegex = new RegExp(escapedUsername, 'gi');
-                let match;
-                while ((match = newRegex.exec(text)) !== null) {
-                    // Add text before the match
-                    if (match.index > lastIndex) {
-                        fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
-                    }
+        if (regex.test(text)) {
+            const parent = node.parentElement;
+            const computedStyle = parent ? window.getComputedStyle(parent) : null;
+            const fontSize = computedStyle ? computedStyle.fontSize : '16px';
+            const fontSizeNum = parseFloat(fontSize);
+            const badgeSize = fontSizeNum * 0.85; // 85% of text size
+            
+            // Check if dark mode is enabled
+            const isDarkMode = document.documentElement.classList.contains('dark') || 
+                               document.body.classList.contains('dark') ||
+                               window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Purple color in both modes, lighter in dark mode
+            const svgColor = isDarkMode ? '#9d7fff' : '#7e5eff';
+            
+            // Adjust vertical alignment for larger text
+            const verticalAlign = fontSizeNum > 20 ? 'baseline' : 'middle';
+            
+            // Fetch and modify the SVG
+            fetch('/verified.svg')
+                .then(response => response.text())
+                .then(svgContent => {
+                    // Replace all color attributes in the SVG with our color, but keep transparent/none values
+                    let modifiedSvg = svgContent
+                        .replace(/fill="(?!none|transparent)([^"]*)"/g, `fill="${svgColor}"`)
+                        .replace(/stroke="(?!none|transparent)([^"]*)"/g, `stroke="${svgColor}"`)
+                        .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign};"`);
                     
-                    // Add the matched username
-                    fragment.appendChild(document.createTextNode(match[0]));
-                    
-                    // Add the badge SVG
-                    const temp = document.createElement('div');
-                    temp.innerHTML = modifiedSvg;
-                    const svgElement = temp.firstElementChild;
-                    if (svgElement) {
-                        fragment.appendChild(svgElement.cloneNode(true));
-                    }
-                    
-                    lastIndex = newRegex.lastIndex;
-                }
-                
-                // Add any remaining text
-                if (lastIndex < text.length) {
-                    fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
-                }
-                
-                parent.replaceChild(fragment, node);
-            })
-            .catch(err => console.error('Failed to load verified badge:', err));
+                    const span = document.createElement('span');
+                    span.innerHTML = text.replace(regex, `<span class="verified-username">${username}${modifiedSvg}</span>`);
+                    parent?.replaceChild(span, node);
+                });
+        }
     });
 }
 
@@ -156,16 +128,6 @@ updateCursorStyle();
 <slot />
 
 <style>
-/* Verified badge styling */
-:global(.verified-username) {
-    display: inline !important;
-    white-space: nowrap !important;
-}
-:global(.verified-badge) {
-    display: inline-block !important;
-    margin-left: 2px;
-}
-
 /* Global cursor styles - only apply when enabled */
 :global(body.custom-cursor-enabled *) {
     cursor: url('/cur.png'), auto !important;
