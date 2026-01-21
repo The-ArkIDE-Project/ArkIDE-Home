@@ -1444,33 +1444,22 @@ async function fetchBanner(username) {
                             <div class="profile-banner-container">
                                 {#if bannerImageUrl}
                                     <div class="profile-banner" 
-                                        style="background-image: url('{bannerImageUrl}');">
+                                        style="background-image: url('{bannerImageUrl}');"
+                                        on:error={() => bannerImageUrl = ''}>
                                     </div>
                                 {:else}
                                     <div class="profile-banner profile-banner-default"></div>
                                 {/if}
 
-                                <!-- Banner Edit and Delete Buttons (visible to profile owner AND admins) -->
+                                <!-- Banner Edit Button (visible to profile owner AND admins) -->
                                 {#if loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)}
-                                    <div class="banner-buttons">
-                                        <button 
-                                            class="banner-edit-button" 
-                                            on:click={() => isEditingBanner = true}
-                                            title="Edit banner"
-                                        >
-                                            <img src="/pencil.png" alt="Edit" style="height: 20px; filter: invert(1);" />
-                                        </button>
-                                        
-                                        {#if bannerImageUrl}
-                                            <button 
-                                                class="banner-delete-button" 
-                                                on:click={deleteBanner}
-                                                title="Delete banner"
-                                            >
-                                                <img src="/notallowed.png" alt="Delete" style="height: 20px; filter: invert(1);" />
-                                            </button>
-                                        {/if}
-                                    </div>
+                                    <button 
+                                        class="banner-edit-button" 
+                                        on:click={() => isEditingBanner = true}
+                                        title="Edit banner"
+                                    >
+                                        <img src="/pencil.png" alt="Edit" style="height: 20px; filter: invert(1);" />
+                                    </button>
                                 {/if}
                             </div>
                         {/if}
@@ -3909,59 +3898,34 @@ async function fetchBanner(username) {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.banner-buttons {
+.profile-banner-container {
+    position: relative;
+    width: 80%;
+    margin: 10px auto 0;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-banner-container .profile-banner {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    z-index: 3;
-    display: flex;
-    gap: 8px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.banner-edit-button,
-.banner-delete-button {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-}
-
-.banner-edit-button:hover,
-.banner-delete-button:hover {
-    background: rgba(0, 0, 0, 0.8);
-    transform: scale(1.05);
-}
-
-.banner-delete-button {
-    background: rgba(220, 53, 69, 0.6);
-}
-
-.banner-delete-button:hover {
-    background: rgba(220, 53, 69, 0.9);
-}
-
-:global(body.dark-mode) .banner-edit-button,
-:global(body.dark-mode) .banner-delete-button {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-:global(body.dark-mode) .banner-edit-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-:global(body.dark-mode) .banner-delete-button {
-    background: rgba(220, 53, 69, 0.6);
-}
-
-:global(body.dark-mode) .banner-delete-button:hover {
-    background: rgba(220, 53, 69, 0.9);
+.scratch-modal-back {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
 }
 
 </style>
