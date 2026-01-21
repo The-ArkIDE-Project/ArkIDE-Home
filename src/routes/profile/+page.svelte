@@ -1155,7 +1155,7 @@ Promise.all([
         console.log("hiii");
         showAnyways = true;
     }
-    async function uploadBanner() {
+async function uploadBanner() {
     if (!bannerUploadInput || !bannerUploadInput.files || !bannerUploadInput.files[0]) {
         alert("Please select a banner image");
         return;
@@ -1163,13 +1163,11 @@ Promise.all([
 
     const file = bannerUploadInput.files[0];
     
-    // Check file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
         alert("Banner must be less than 2MB");
         return;
     }
 
-    // Check file type
     if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
         alert("Banner must be a PNG or JPEG image");
         return;
@@ -1179,6 +1177,11 @@ Promise.all([
 
     const formData = new FormData();
     formData.append('banner', file);
+    
+    // If admin editing someone else's banner, add the target username
+    if (loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()) {
+        formData.append('targetUser', user);
+    }
 
     const token = localStorage.getItem("token");
 
@@ -1189,7 +1192,6 @@ Promise.all([
         });
 
         if (response.ok) {
-            // Force reload the banner with a cache-busting parameter
             bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}&t=${Date.now()}`;
             isEditingBanner = false;
             alert("Banner updated successfully!");
@@ -1206,12 +1208,23 @@ Promise.all([
 }
 
 async function deleteBanner() {
-    if (!confirm("Are you sure you want to delete your banner?")) return;
+    const isAdmin = loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase();
+    
+    if (!confirm(isAdmin 
+        ? `(Admin) Are you sure you want to delete ${user}'s banner?` 
+        : "Are you sure you want to delete your banner?")) return;
 
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/deletebanner?token=${token}`, {
+        let url = `${PUBLIC_API_URL}/api/v1/users/deletebanner?token=${token}`;
+        
+        // If admin deleting someone else's banner, add the target username
+        if (isAdmin) {
+            url += `&targetUser=${encodeURIComponent(user)}`;
+        }
+        
+        const response = await fetch(url, {
             method: 'DELETE'
         });
 
@@ -1364,9 +1377,10 @@ async function deleteBanner() {
                 style={backgroundImageUrl ? `--bg-image: url('${backgroundImageUrl}');` : ''}
             >
             
-                {#if user}
-                    <!-- Banner Section (separate from profile header) -->
-                    <div class="profile-banner-container" style="position: relative; width: 80%; margin: 10px auto 0; border-radius: 12px; overflow: hidden; height: 200px;">
+            {#if user}
+                <!-- Banner Section (only show if banner exists OR if viewing own profile/admin) -->
+                {#if bannerImageUrl || (loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()) || loggedInAdmin}
+                    <div class="profile-banner-container" style="position: relative; width: 80%; margin: 10px auto 0; margin-top: 80px; border-radius: 12px; overflow: hidden; height: 200px;">
                         {#if bannerImageUrl}
                             <div class="profile-banner" 
                                 style="background-image: url('{bannerImageUrl}');"
@@ -1376,8 +1390,8 @@ async function deleteBanner() {
                             <div class="profile-banner profile-banner-default"></div>
                         {/if}
 
-                        <!-- Banner Edit Button -->
-                        {#if loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()}
+                        <!-- Banner Edit Button (visible to profile owner AND admins) -->
+                        {#if loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)}
                             <button 
                                 class="banner-edit-button" 
                                 on:click={() => isEditingBanner = true}
@@ -1391,7 +1405,13 @@ async function deleteBanner() {
                         {#if isEditingBanner}
                             <div class="scratch-modal-back">
                                 <div class="scratch-modal">
-                                    <div class="scratch-modal-title">Edit Profile Banner</div>
+                                    <div class="scratch-modal-title">
+                                        {#if loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()}
+                                            (Admin) Edit {user}'s Profile Banner
+                                        {:else}
+                                            Edit Profile Banner
+                                        {/if}
+                                    </div>
                                     <div class="scratch-modal-content">
                                         <p>Upload a banner image (max 2MB, 1200x300px recommended)</p>
                                         <input 
@@ -1405,7 +1425,13 @@ async function deleteBanner() {
                                             {#if !isBannerUploading}
                                                 <button class="modal-button modal-button-primary" on:click={uploadBanner}>Upload Banner</button>
                                                 {#if bannerImageUrl}
-                                                    <button class="modal-button modal-button-danger" on:click={deleteBanner}>Delete Banner</button>
+                                                    <button class="modal-button modal-button-danger" on:click={deleteBanner}>
+                                                        {#if loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()}
+                                                            (Admin) Delete Banner
+                                                        {:else}
+                                                            Delete Banner
+                                                        {/if}
+                                                    </button>
                                                 {/if}
                                                 <button class="modal-button modal-button-secondary" on:click={() => isEditingBanner = false}>Cancel</button>
                                             {:else}
@@ -1417,59 +1443,60 @@ async function deleteBanner() {
                             </div>
                         {/if}
                     </div>
+                {/if}
 
-                    <!-- Profile Section (below banner) -->
-                    <div class="section-user">
-                        <div class="section-user-header">
-                            <div class="subuser-section">
-                                <div class="user-username">
-                                    <div class="profile-picture-container">
-                                        <img
-                                            style="border-color:{isDonator ? '#a237db' : '#efefef'}"
-                                            src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
-                                            alt="Profile"
-                                            class="profile-picture"
-                                        />
-                                    </div>
-                                    <div class="user-after-image">
-                                        {#if isDonator}
-                                            <h1 class="donator-color">{fullProfile.real_username || user}</h1>
-                                        {:else}
-                                            <h1>{fullProfile.real_username || user}</h1>
-                                        {/if}
-                                        
-                                        {#if isProfilePrivate && !loggedInAdmin && (!isBlocked || showAnyways)}
-                                            <img src="/account/lock.svg" alt="Private" title="This profile is private." />
+                <!-- Profile Section (below banner) -->
+                <div class="section-user">
+                    <div class="section-user-header">
+                        <div class="subuser-section">
+                            <div class="user-username">
+                                <div class="profile-picture-container">
+                                    <img
+                                        style="border-color:{isDonator ? '#a237db' : '#efefef'}"
+                                        src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
+                                        alt="Profile"
+                                        class="profile-picture"
+                                    />
+                                </div>
+                                <div class="user-after-image">
+                                    {#if isDonator}
+                                        <h1 class="donator-color">{fullProfile.real_username || user}</h1>
+                                    {:else}
+                                        <h1>{fullProfile.real_username || user}</h1>
+                                    {/if}
+                                    
+                                    {#if isProfilePrivate && !loggedInAdmin && (!isBlocked || showAnyways)}
+                                        <img src="/account/lock.svg" alt="Private" title="This profile is private." />
+                                    {/if}
+                                </div>
+                            </div>
+                            {#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
+                                <div class="follower-section">
+                                    <p class="follower-count">
+                                        {followerCount - Number(followOnLoad) + Number(isFollowingUser)} followers
+                                    </p>
+                                    <div>
+                                        {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
+                                            {#key isFollowingUser}
+                                                <button
+                                                    class={`follower-button${isDonator ? ' follower-button-donator' : ''}${isFollowingUser ? ' follower-button-following' : ''}`}
+                                                    on:click={safeFollowUser}
+                                                >
+                                                    {#if isFollowingUser}
+                                                        Unfollow
+                                                    {:else}
+                                                        Follow
+                                                    {/if}
+                                                </button>
+                                            {/key}
                                         {/if}
                                     </div>
                                 </div>
-                                {#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
-                                    <div class="follower-section">
-                                        <p class="follower-count">
-                                            {followerCount - Number(followOnLoad) + Number(isFollowingUser)} followers
-                                        </p>
-                                        <div>
-                                            {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
-                                                {#key isFollowingUser}
-                                                    <button
-                                                        class={`follower-button${isDonator ? ' follower-button-donator' : ''}${isFollowingUser ? ' follower-button-following' : ''}`}
-                                                        on:click={safeFollowUser}
-                                                    >
-                                                        {#if isFollowingUser}
-                                                            Unfollow
-                                                        {:else}
-                                                            Follow
-                                                        {/if}
-                                                    </button>
-                                                {/key}
-                                            {/if}
-                                        </div>
-                                    </div>
-                                {/if}
-                            </div>
+                            {/if}
                         </div>
                     </div>
-                {/if}
+                </div>
+            {/if}
 
             {#if isBlocked && !showAnyways}
                 <div class="section-private">
