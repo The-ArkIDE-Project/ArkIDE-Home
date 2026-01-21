@@ -68,6 +68,11 @@
     let replyContent = '';
     let commentsEnabled = null;
     let canToggleComments = false;
+    let bannerImageUrl = '';
+    let isEditingBanner = false;
+    let bannerUploadInput;
+    let isBannerUploading = false;
+
 
     $: {
         if (profileFeaturedProject && profileFeaturedProject !== 'none' && profileFeaturedProject.id) {
@@ -1150,6 +1155,78 @@ Promise.all([
         console.log("hiii");
         showAnyways = true;
     }
+    async function uploadBanner() {
+    if (!bannerUploadInput || !bannerUploadInput.files || !bannerUploadInput.files[0]) {
+        alert("Please select a banner image");
+        return;
+    }
+
+    const file = bannerUploadInput.files[0];
+    
+    // Check file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+        alert("Banner must be less than 2MB");
+        return;
+    }
+
+    // Check file type
+    if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
+        alert("Banner must be a PNG or JPEG image");
+        return;
+    }
+
+    isBannerUploading = true;
+
+    const formData = new FormData();
+    formData.append('banner', file);
+
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/setbanner?token=${token}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // Force reload the banner with a cache-busting parameter
+            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}&t=${Date.now()}`;
+            isEditingBanner = false;
+            alert("Banner updated successfully!");
+        } else {
+            const error = await response.json();
+            alert("Failed to upload banner: " + (error.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Failed to upload banner:", err);
+        alert("Failed to upload banner");
+    } finally {
+        isBannerUploading = false;
+    }
+}
+
+async function deleteBanner() {
+    if (!confirm("Are you sure you want to delete your banner?")) return;
+
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/deletebanner?token=${token}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            bannerImageUrl = '';
+            isEditingBanner = false;
+            alert("Banner deleted successfully!");
+        } else {
+            alert("Failed to delete banner");
+        }
+    } catch (err) {
+        console.error("Failed to delete banner:", err);
+        alert("Failed to delete banner");
+    }
+}
 </script>
 
 <svelte:head>
@@ -1289,8 +1366,60 @@ Promise.all([
             
             {#if user}
                 <div class="section-user">
-                    <div class="section-user-header">
-                        <div class="subuser-section">
+                    <div class="section-user-header" style="position: relative; overflow: hidden;">
+                        <!-- Banner Background -->
+                        {#if bannerImageUrl}
+                            <div class="profile-banner" 
+                                style="background-image: url('{bannerImageUrl}');"
+                                on:error={() => bannerImageUrl = ''}>
+                            </div>
+                        {:else}
+                            <div class="profile-banner profile-banner-default"></div>
+                        {/if}
+
+                        <!-- Banner Edit Button -->
+                        {#if loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()}
+                            <button 
+                                class="banner-edit-button" 
+                                on:click={() => isEditingBanner = true}
+                                title="Edit banner"
+                            >
+                                <img src="/pencil.png" alt="Edit" style="height: 20px; filter: invert(1);" />
+                            </button>
+                        {/if}
+
+                        <!-- Banner Edit Modal -->
+                        {#if isEditingBanner}
+                            <div class="scratch-modal-back">
+                                <div class="scratch-modal">
+                                    <div class="scratch-modal-title">Edit Profile Banner</div>
+                                    <div class="scratch-modal-content">
+                                        <p>Upload a banner image (max 2MB, 1200x300px recommended)</p>
+                                        <input 
+                                            type="file" 
+                                            accept="image/png,image/jpeg,image/jpg"
+                                            bind:this={bannerUploadInput}
+                                            style="margin: 12px 0;"
+                                        />
+                                        
+                                        <div style="display: flex; gap: 8px; margin-top: 16px;">
+                                            {#if !isBannerUploading}
+                                                <button class="modal-button modal-button-primary" on:click={uploadBanner}>Upload Banner</button>
+                                                {#if bannerImageUrl}
+                                                    <button class="modal-button modal-button-danger" on:click={deleteBanner}>Delete Banner</button>
+                                                {/if}
+                                                <button class="modal-button modal-button-secondary" on:click={() => isEditingBanner = false}>Cancel</button>
+                                            {:else}
+                                                <p>Uploading...</p>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+
+                        <!-- Profile content -->
+                        <div class="subuser-section" style="position: relative; z-index: 2;">
                             <div class="user-username">
                                 <div class="profile-picture-container">
                                     <!--<img
@@ -1299,7 +1428,7 @@ Promise.all([
                                         class="christmas-hat"
                                     />-->
                                     <img
-                                        style="border-color:{isDonator ? "#a237db" : "#efefef"}"
+                                        style="border-color:{isDonator ? '#a237db' : '#efefef'}"
                                         src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
                                         alt="Profile"
                                         class="profile-picture"
@@ -1313,47 +1442,26 @@ Promise.all([
                                     {/if}
                                     
                                     {#if isProfilePrivate && !loggedInAdmin && (!isBlocked || showAnyways)}
-                                        <img
-                                            src="/account/lock.svg"
-                                            alt="Private"
-                                            title={TranslationHandler.textSafe(
-                                                "profile.private.note",
-                                                currentLang,
-                                                "This profile is private."
-                                            )}
-                                        />
+                                        <img src="/account/lock.svg" alt="Private" title="This profile is private." />
                                     {/if}
                                 </div>
                             </div>
                             {#if (!isBlocked || showAnyways) && !isProfilePrivate || String(user).toLowerCase() === String(loggedInUser).toLowerCase() || (isProfilePublicToFollowers && isFollowedByUser) || loggedInAdmin}
                                 <div class="follower-section">
                                     <p class="follower-count">
-                                        {TranslationHandler.text(
-                                            "profile.followers",
-                                            currentLang
-                                        ).replace("$1", followerCount - Number(followOnLoad) + Number(isFollowingUser))}
+                                        {followerCount - Number(followOnLoad) + Number(isFollowingUser)} followers
                                     </p>
                                     <div>
                                         {#if !(loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase())}
                                             {#key isFollowingUser}
                                                 <button
-                                                    class={`follower-button
-                                                        ${isDonator ? ' follower-button-donator' : ''}
-                                                        ${isFollowingUser ? ' follower-button-following' : ''}`}
+                                                    class={`follower-button${isDonator ? ' follower-button-donator' : ''}${isFollowingUser ? ' follower-button-following' : ''}`}
                                                     on:click={safeFollowUser}
                                                 >
                                                     {#if isFollowingUser}
-                                                        <LocalizedText
-                                                            text="Unfollow"
-                                                            key="profile.unfollow"
-                                                            lang={currentLang}
-                                                        />
+                                                        Unfollow
                                                     {:else}
-                                                        <LocalizedText
-                                                            text="Follow"
-                                                            key="profile.follow"
-                                                            lang={currentLang}
-                                                        />
+                                                        Follow
                                                     {/if}
                                                 </button>
                                             {/key}
@@ -1365,72 +1473,47 @@ Promise.all([
                     </div>
                 </div>
             {/if}
+
             {#if isBlocked && !showAnyways}
                 <div class="section-private">
-                    <img
-                        src="/account/status_warn.svg"
-                        alt="Blocked"
-                        title="Blocked"
-                    />
-
+                    <img src="/account/status_warn.svg" alt="Blocked" title="Blocked" />
                     <p style="margin-block-end: 4px">
-                        <LocalizedText
-                            text="You have this user currently blocked."
-                            key="profile.blockednote"
-                            lang={currentLang}
-                        />
+                        <LocalizedText text="You have this user currently blocked." key="profile.blockednote" lang={currentLang} />
                     </p>
                     <p style="margin-block-start: 4px">
-                        <LocalizedText
-                            text="If you are blocking this user for harassment, please also report them."
-                            key="profile.blockednote2"
-                            lang={currentLang}
-                        />
+                        <LocalizedText text="If you are blocking this user for harassment, please also report them." key="profile.blockednote2" lang={currentLang} />
                     </p>
-                    <div
-                        class="button-container"
-                    >
-                        <button
-                            class="unblock-button"
-                            on:click={unblock}
-                        >
-                            <LocalizedText
-                                text="Unblock"
-                                key="profile.unblock"
-                                lang={currentLang}
-                            />
+                    <div class="button-container">
+                        <button class="unblock-button" on:click={unblock}>
+                            <LocalizedText text="Unblock" key="profile.unblock" lang={currentLang} />
                         </button>
-
-                        <button
-                            class="show-anyways"
-                            on:click={setShowAnyways}
-                        >
-                            <LocalizedText
-                                text="Continue"
-                                key="account.settings.continue"
-                                lang={currentLang}
-                            />
+                        <button class="show-anyways" on:click={setShowAnyways}>
+                            <LocalizedText text="Continue" key="account.settings.continue" lang={currentLang} />
                         </button>
                     </div>
                     <div style="height:16px" />
-                    <a
-                        href={`/report?type=user&id=${user}`}
-                        target="_blank"
-                        class="report-link"
-                        style="color: red !important;"
-                    >
-                        <img
-                            class="report-icon"
-                            src="/report_flag.png"
-                            style="margin: 0 4px"
-                            alt="Report"
-                        />
-                        <LocalizedText
-                            text="Report"
-                            key="report.title"
-                            lang={currentLang}
-                        />
+                    <a href={`/report?type=user&id=${user}`} target="_blank" class="report-link" style="color: red !important;">
+                        <img class="report-icon" src="/report_flag.png" style="margin: 0 4px" alt="Report" />
+                        <LocalizedText text="Report" key="report.title" lang={currentLang} />
                     </a>
+                </div>
+            {:else if isProfilePrivate && String(user).toLowerCase() !== String(loggedInUser).toLowerCase() && !(isProfilePublicToFollowers && isFollowedByUser) && !loggedInAdmin}
+                <div class="section-private">
+                    <img src="/account/lock.svg" alt="Private" title="Private" />
+                    {#if isProfilePublicToFollowers}
+                        <p>
+                            <LocalizedText 
+                                text={"This profile is private. Only people {{NAME}} follows can see their profile."} 
+                                key="profile.private.followers" 
+                                lang={currentLang} 
+                                replace={{"{{NAME}}": user}} 
+                            />
+                        </p>
+                    {:else}
+                        <p>
+                            <LocalizedText text="This profile is private. You cannot view it." key="profile.private" lang={currentLang} />
+                        </p>
+                    {/if}
                 </div>
             {:else}
             {#if isProfilePrivate && String(user).toLowerCase() !== String(loggedInUser).toLowerCase() && !(isProfilePublicToFollowers && isFollowedByUser) && !loggedInAdmin}
@@ -3670,6 +3753,118 @@ Promise.all([
 
 .cancel-reply:hover {
     opacity: 1;
+}
+
+/* Add these styles to your profile page <style> section */
+
+.profile-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    filter: brightness(0.7);
+}
+
+.profile-banner-default {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+:global(body.dark-mode) .profile-banner-default {
+    background: linear-gradient(135deg, #2d3561 0%, #3d2856 100%);
+}
+
+.banner-edit-button {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 3;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.banner-edit-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+:global(body.dark-mode) .banner-edit-button {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+:global(body.dark-mode) .banner-edit-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-button-primary {
+    background: linear-gradient(135deg, rgba(89, 0, 255, 0.8), rgba(150, 60, 255, 0.9));
+    color: white;
+}
+
+.modal-button-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(89, 0, 255, 0.4);
+}
+
+.modal-button-danger {
+    background: rgba(220, 53, 69, 0.8);
+    color: white;
+}
+
+.modal-button-danger:hover {
+    background: rgba(220, 53, 69, 1);
+    transform: scale(1.05);
+}
+
+.modal-button-secondary {
+    background: rgba(128, 128, 128, 0.3);
+    color: inherit;
+}
+
+.modal-button-secondary:hover {
+    background: rgba(128, 128, 128, 0.5);
+}
+
+:global(body.dark-mode) .modal-button-secondary {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+:global(body.dark-mode) .modal-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Update the section-user-header to have proper height for the banner */
+.section-user-header {
+    min-height: 200px;
+    position: relative;
+}
+
+/* Make sure content is above the banner */
+.subuser-section {
+    position: relative;
+    z-index: 2;
 }
 
 </style>
