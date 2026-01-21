@@ -536,6 +536,8 @@ function parseContent(text) {
 
                 isFollowedByUser = fullProfile.isFollowing;
 
+                fetchBanner(user);
+
                 let profileFeatured = fullProfile.myFeaturedProject;
                 if (profileFeatured === -1) {
                     profileFeatured = 0
@@ -1192,7 +1194,8 @@ async function uploadBanner() {
         });
 
         if (response.ok) {
-            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}&t=${Date.now()}`;
+            // Refresh the banner
+            await fetchBanner(user);
             isEditingBanner = false;
             alert("Banner updated successfully!");
         } else {
@@ -1238,6 +1241,22 @@ async function deleteBanner() {
     } catch (err) {
         console.error("Failed to delete banner:", err);
         alert("Failed to delete banner");
+    }
+}
+async function fetchBanner(username) {
+    try {
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/getbanner?username=${encodeURIComponent(username)}`);
+        
+        if (response.ok) {
+            // Create a blob URL from the response
+            const blob = await response.blob();
+            bannerImageUrl = URL.createObjectURL(blob);
+        } else {
+            bannerImageUrl = '';
+        }
+    } catch (error) {
+        console.error('Failed to fetch banner:', error);
+        bannerImageUrl = '';
     }
 }
 </script>
