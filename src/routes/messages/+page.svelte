@@ -1004,7 +1004,7 @@
             <b>{message.message.commenter.username}</b>
         </a>
         {" replied to your comment on "}
-        <a href={`https://arkide.site/viewer##${message.message.project.id}`}>
+        <a href={`https://arkide.site/viewer#${message.message.project.id}`}>
             <b>{message.message.project.title}</b>
         </a>
     </p>

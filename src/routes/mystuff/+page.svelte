@@ -215,6 +215,9 @@
                 key="mystuff.title"
                 lang={currentLang}
             />
+            {#if loggedIn === true && projects[0] !== "notfound" && projects.length > 0}
+                <span class="project-counter">({projects.length})</span>
+            {/if}
         </h1>
     </div>
 
@@ -502,5 +505,10 @@
     .dropdown-option-red:focus,
     .dropdown-option-red:hover {
         background: #ff5151;
+    }
+    .project-counter {
+        margin-left: 0.5rem;
+        font-size: 0.9em;
+        opacity: 0.9;
     }
 </style>
