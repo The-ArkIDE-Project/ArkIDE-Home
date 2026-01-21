@@ -1439,7 +1439,7 @@ async function fetchBanner(username) {
                             </div>
                         {/if}
 
-                        <!-- Banner Section (only show if banner exists OR if viewing own profile/admin) -->
+                        <!-- 
                         {#if bannerImageUrl || (loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()) || loggedInAdmin}
                             <div class="profile-banner-container">
                                 {#if bannerImageUrl}
@@ -1451,7 +1451,7 @@ async function fetchBanner(username) {
                                     <div class="profile-banner profile-banner-default"></div>
                                 {/if}
 
-                                <!-- Banner Edit Button (visible to profile owner AND admins) -->
+                                
                                 {#if loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)}
                                     <button 
                                         class="banner-edit-button" 
@@ -1463,6 +1463,7 @@ async function fetchBanner(username) {
                                 {/if}
                             </div>
                         {/if}
+                        -->
 
                         <!-- Profile Section (below banner) -->
                         <div class="section-user">
