@@ -3810,7 +3810,6 @@ async function fetchBanner(username) {
     background-position: center;
     background-repeat: no-repeat;
     z-index: 0;
-    filter: brightness(0.7);
 }
 
 .profile-banner-default {
