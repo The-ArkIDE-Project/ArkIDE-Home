@@ -704,10 +704,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add a screenshot button to the project toolbar</li>
-                                <li>Update the website navbar look</li>
-                                <li>Disable the custom cursor by defualt as its kinda broken</li>
-                                <li>Make the search reccomendations thing way smoother/quicker</li>
+                                <li>Add a block pinning feature and the ability to export scripts as a PNG to the editor</li>
+                                <li>Add a feature to set a custom banner on your profile</li>
+                                <li>Push desktop to 2.13.1</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
