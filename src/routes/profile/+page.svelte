@@ -82,11 +82,6 @@
         }
     }
 
-    $: {
-        if (user) {
-            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}`;
-        }
-    }
     let followingList = [];
     let followerslist = [];
     
@@ -1171,13 +1166,11 @@ async function uploadBanner() {
 
     const file = bannerUploadInput.files[0];
     
-    // Check file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
         alert("Banner must be less than 2MB");
         return;
     }
 
-    // Check file type
     if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
         alert("Banner must be a PNG or JPEG image");
         return;
@@ -1197,10 +1190,10 @@ async function uploadBanner() {
         });
 
         if (response.ok) {
-            // Force reload the banner with a cache-busting parameter
-            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}&t=${Date.now()}`;
             isEditingBanner = false;
             alert("Banner updated successfully!");
+            // Hard reload to clear cache
+            window.location.reload(true);
         } else {
             const error = await response.json();
             alert("Failed to upload banner: " + (error.error || "Unknown error"));
@@ -1224,14 +1217,10 @@ async function deleteBanner() {
         });
 
         if (response.ok) {
-            bannerImageUrl = '';
             isEditingBanner = false;
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 100);
-            
             alert("Banner deleted successfully!");
+            // Hard reload to clear cache
+            window.location.reload(true);
         } else {
             const error = await response.json();
             console.error("Delete error:", error);
@@ -1244,11 +1233,18 @@ async function deleteBanner() {
 }
 async function fetchBanner(username) {
     try {
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/getbanner?username=${encodeURIComponent(username)}`);
+        // Add timestamp to prevent caching
+        const cacheBuster = Date.now();
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/getbanner?username=${encodeURIComponent(username)}&t=${cacheBuster}`, {
+            cache: 'no-store' // Disable caching
+        });
         
         if (response.ok) {
-            // Create a blob URL from the response
             const blob = await response.blob();
+            // Revoke old blob URL if it exists to prevent memory leaks
+            if (bannerImageUrl && bannerImageUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(bannerImageUrl);
+            }
             bannerImageUrl = URL.createObjectURL(blob);
         } else {
             bannerImageUrl = '';
