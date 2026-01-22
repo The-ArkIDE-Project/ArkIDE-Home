@@ -81,6 +81,12 @@
             backgroundImageUrl = '';
         }
     }
+
+    $: {
+        if (user) {
+            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}`;
+        }
+    }
     let followingList = [];
     let followerslist = [];
     
@@ -1165,11 +1171,13 @@ async function uploadBanner() {
 
     const file = bannerUploadInput.files[0];
     
+    // Check file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
         alert("Banner must be less than 2MB");
         return;
     }
 
+    // Check file type
     if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
         alert("Banner must be a PNG or JPEG image");
         return;
@@ -1179,11 +1187,6 @@ async function uploadBanner() {
 
     const formData = new FormData();
     formData.append('banner', file);
-    
-    // If admin editing someone else's banner, add the target username
-    if (loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()) {
-        formData.append('targetUser', user);
-    }
 
     const token = localStorage.getItem("token");
 
@@ -1194,8 +1197,8 @@ async function uploadBanner() {
         });
 
         if (response.ok) {
-            // Refresh the banner
-            await fetchBanner(user);
+            // Force reload the banner with a cache-busting parameter
+            bannerImageUrl = `${PUBLIC_API_URL}/api/v1/users/getbanner?username=${user}&t=${Date.now()}`;
             isEditingBanner = false;
             alert("Banner updated successfully!");
         } else {
@@ -1211,36 +1214,41 @@ async function uploadBanner() {
 }
 
 async function deleteBanner() {
-    const isAdmin = loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase();
-    
-    if (!confirm(isAdmin 
-        ? `(Admin) Are you sure you want to delete ${user}'s banner?` 
-        : "Are you sure you want to delete your banner?")) return;
+    if (!confirm("Are you sure you want to delete your banner?")) return;
 
     const token = localStorage.getItem("token");
 
     try {
-        let url = `${PUBLIC_API_URL}/api/v1/users/deletebanner?token=${token}`;
-        
-        // If admin deleting someone else's banner, add the target username
-        if (isAdmin) {
-            url += `&targetUser=${encodeURIComponent(user)}`;
-        }
-        
-        const response = await fetch(url, {
-            method: 'DELETE'
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/deletebanner`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: token,
+                username: user // Include username for admin deletions
+            })
         });
 
         if (response.ok) {
+            // Clear the banner URL with cache-busting
             bannerImageUrl = '';
             isEditingBanner = false;
+            
+            // Force a page reload to ensure banner is gone
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+            
             alert("Banner deleted successfully!");
         } else {
-            alert("Failed to delete banner");
+            const error = await response.json();
+            console.error("Delete error:", error);
+            alert("Failed to delete banner: " + (error.error || "Unknown error"));
         }
     } catch (err) {
         console.error("Failed to delete banner:", err);
-        alert("Failed to delete banner");
+        alert("Failed to delete banner: " + err.message);
     }
 }
 async function fetchBanner(username) {
