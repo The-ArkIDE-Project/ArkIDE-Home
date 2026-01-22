@@ -1447,7 +1447,7 @@ async function fetchBanner(username) {
                             </div>
                         {/if}
 
-
+                            <!--
                         {#if bannerImageUrl || (loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()) || loggedInAdmin}
                             <div class="profile-banner-container">
                                 {#if bannerImageUrl}
@@ -1471,7 +1471,7 @@ async function fetchBanner(username) {
                                 {/if}
                             </div>
                         {/if}
-
+                        -->
 
                         <!-- Profile Section (below banner) -->
                         <div class="section-user">
