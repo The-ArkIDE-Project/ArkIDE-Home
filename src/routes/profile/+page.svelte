@@ -1219,23 +1219,14 @@ async function deleteBanner() {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/deletebanner`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                token: token,
-                username: user // Include username for admin deletions
-            })
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/deletebanner?token=${token}&username=${user}`, {
+            method: 'DELETE'
         });
 
         if (response.ok) {
-            // Clear the banner URL with cache-busting
             bannerImageUrl = '';
             isEditingBanner = false;
             
-            // Force a page reload to ensure banner is gone
             setTimeout(() => {
                 window.location.reload();
             }, 100);
@@ -1447,7 +1438,7 @@ async function fetchBanner(username) {
                             </div>
                         {/if}
 
-                            <!--
+
                         {#if bannerImageUrl || (loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase()) || loggedInAdmin}
                             <div class="profile-banner-container">
                                 {#if bannerImageUrl}
@@ -1471,7 +1462,7 @@ async function fetchBanner(username) {
                                 {/if}
                             </div>
                         {/if}
-                        -->
+
 
                         <!-- Profile Section (below banner) -->
                         <div class="section-user">
