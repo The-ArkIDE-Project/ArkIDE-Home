@@ -1177,8 +1177,8 @@ async function compressImage(file, maxSizeMB = 2) {
                 let width = img.width;
                 let height = img.height;
                 
-                // Calculate new dimensions while maintaining aspect ratio
-                const maxDimension = 1920;
+                // Only resize if image is extremely large (over 3000px)
+                const maxDimension = 3000;
                 if (width > maxDimension || height > maxDimension) {
                     if (width > height) {
                         height = (height / width) * maxDimension;
@@ -1194,14 +1194,21 @@ async function compressImage(file, maxSizeMB = 2) {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Try different quality levels to get under maxSizeMB
-                let quality = 0.9;
+                // Start with high quality and only reduce if needed
+                let quality = 0.95;
+                const targetSize = maxSizeMB * 1024 * 1024;
+                
                 const attemptCompress = () => {
                     canvas.toBlob((blob) => {
-                        if (blob.size <= maxSizeMB * 1024 * 1024 || quality <= 0.1) {
+                        console.log(`Compression attempt: quality=${quality.toFixed(2)}, size=${(blob.size / 1024 / 1024).toFixed(2)}MB`);
+                        
+                        // If we're under target size or quality is too low, accept it
+                        if (blob.size <= targetSize || quality <= 0.5) {
+                            console.log(`Final: quality=${quality.toFixed(2)}, size=${(blob.size / 1024 / 1024).toFixed(2)}MB`);
                             resolve(blob);
                         } else {
-                            quality -= 0.1;
+                            // Reduce quality in smaller steps for finer control
+                            quality -= 0.05;
                             attemptCompress();
                         }
                     }, 'image/jpeg', quality);
