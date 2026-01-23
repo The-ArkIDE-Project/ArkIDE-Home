@@ -17,7 +17,7 @@
         currentLang = lang;
     });
 
-let version = "2.13.1";
+let version = "2.13.2";
 // Download links - replace these with your actual download URLs
 const downloads = {
     windows: {
