@@ -68,6 +68,15 @@
     let replyContent = '';
     let commentsEnabled = null;
     let canToggleComments = false;
+    let bannerPreviewUrl = '';
+    let showCropper = false;
+    let cropperCanvas;
+    let cropperImage;
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let imagePosition = { x: 0, y: 0 };
+    let imageScale = 1;
+    let minScale = 1;
     let bannerImageUrl = '';
     let isEditingBanner = false;
     let bannerUploadInput;
@@ -1158,41 +1167,219 @@ Promise.all([
         console.log("hiii");
         showAnyways = true;
     }
-async function uploadBanner() {
+async function compressImage(file, maxSizeMB = 2) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                // Calculate new dimensions while maintaining aspect ratio
+                const maxDimension = 1920;
+                if (width > maxDimension || height > maxDimension) {
+                    if (width > height) {
+                        height = (height / width) * maxDimension;
+                        width = maxDimension;
+                    } else {
+                        width = (width / height) * maxDimension;
+                        height = maxDimension;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Try different quality levels to get under maxSizeMB
+                let quality = 0.9;
+                const attemptCompress = () => {
+                    canvas.toBlob((blob) => {
+                        if (blob.size <= maxSizeMB * 1024 * 1024 || quality <= 0.1) {
+                            resolve(blob);
+                        } else {
+                            quality -= 0.1;
+                            attemptCompress();
+                        }
+                    }, 'image/jpeg', quality);
+                };
+                attemptCompress();
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleBannerFileSelect() {
     if (!bannerUploadInput || !bannerUploadInput.files || !bannerUploadInput.files[0]) {
-        alert("Please select a banner image");
         return;
     }
 
-    const file = bannerUploadInput.files[0];
+    let file = bannerUploadInput.files[0];
     
-    if (file.size > 2 * 1024 * 1024) {
-        alert("Banner must be less than 2MB");
-        return;
-    }
-
     if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
         alert("Banner must be a PNG or JPEG image");
         return;
     }
 
+    // Compress if needed
+    if (file.size > 2 * 1024 * 1024) {
+        try {
+            const compressed = await compressImage(file, 2);
+            file = new File([compressed], file.name, { type: 'image/jpeg' });
+        } catch (err) {
+            console.error("Failed to compress image:", err);
+            alert("Failed to compress image");
+            return;
+        }
+    }
+
+    // Load image for cropping
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        bannerPreviewUrl = e.target.result;
+        showCropper = true;
+        
+        // Reset cropper state
+        setTimeout(() => {
+            if (cropperImage) {
+                const canvas = cropperCanvas;
+                const img = cropperImage;
+                
+                // Calculate scale to fit
+                const canvasWidth = 1200;
+                const canvasHeight = 300;
+                const scaleX = canvasWidth / img.naturalWidth;
+                const scaleY = canvasHeight / img.naturalHeight;
+                minScale = Math.max(scaleX, scaleY);
+                imageScale = minScale;
+                
+                // Center image
+                imagePosition = {
+                    x: (canvasWidth - img.naturalWidth * imageScale) / 2,
+                    y: (canvasHeight - img.naturalHeight * imageScale) / 2
+                };
+                
+                drawCropper();
+            }
+        }, 100);
+    };
+    reader.readAsDataURL(file);
+}
+
+function drawCropper() {
+    if (!cropperCanvas || !cropperImage) return;
+    
+    const ctx = cropperCanvas.getContext('2d');
+    const canvasWidth = 1200;
+    const canvasHeight = 300;
+    
+    // Clear canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+    // Draw image
+    ctx.drawImage(
+        cropperImage,
+        imagePosition.x,
+        imagePosition.y,
+        cropperImage.naturalWidth * imageScale,
+        cropperImage.naturalHeight * imageScale
+    );
+    
+    // Draw crop overlay
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(0, 0, canvasWidth, canvasHeight);
+    ctx.setLineDash([]);
+}
+
+function handleMouseDown(e) {
+    isDragging = true;
+    const rect = cropperCanvas.getBoundingClientRect();
+    dragStart = {
+        x: e.clientX - rect.left - imagePosition.x,
+        y: e.clientY - rect.top - imagePosition.y
+    };
+}
+
+function handleMouseMove(e) {
+    if (!isDragging) return;
+    const rect = cropperCanvas.getBoundingClientRect();
+    imagePosition = {
+        x: e.clientX - rect.left - dragStart.x,
+        y: e.clientY - rect.top - dragStart.y
+    };
+    drawCropper();
+}
+
+function handleMouseUp() {
+    isDragging = false;
+}
+
+function handleWheel(e) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newScale = Math.max(minScale, Math.min(imageScale * delta, 5));
+    
+    // Zoom towards mouse position
+    const rect = cropperCanvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const scaleChange = newScale / imageScale;
+    imagePosition = {
+        x: mouseX - (mouseX - imagePosition.x) * scaleChange,
+        y: mouseY - (mouseY - imagePosition.y) * scaleChange
+    };
+    
+    imageScale = newScale;
+    drawCropper();
+}
+
+async function uploadCroppedBanner() {
+    if (!cropperCanvas) return;
+    
     isBannerUploading = true;
-
-    const formData = new FormData();
-    formData.append('banner', file);
-
-    const token = localStorage.getItem("token");
-
+    
     try {
+        // Create final cropped canvas
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 1200;
+        finalCanvas.height = 300;
+        const ctx = finalCanvas.getContext('2d');
+        
+        // Draw the cropped portion
+        ctx.drawImage(cropperCanvas, 0, 0);
+        
+        // Convert to blob
+        const blob = await new Promise(resolve => {
+            finalCanvas.toBlob(resolve, 'image/jpeg', 0.9);
+        });
+        
+        // Upload
+        const formData = new FormData();
+        formData.append('banner', blob, 'banner.jpg');
+        
+        const token = localStorage.getItem("token");
+        
         const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/setbanner?token=${token}`, {
             method: 'POST',
             body: formData
         });
-
+        
         if (response.ok) {
+            showCropper = false;
             isEditingBanner = false;
+            bannerPreviewUrl = '';
             alert("Banner updated successfully!");
-            // Hard reload to clear cache
             window.location.reload(true);
         } else {
             const error = await response.json();
@@ -1203,6 +1390,16 @@ async function uploadBanner() {
         alert("Failed to upload banner");
     } finally {
         isBannerUploading = false;
+    }
+}
+
+function cancelCrop() {
+    showCropper = false;
+    bannerPreviewUrl = '';
+    imagePosition = { x: 0, y: 0 };
+    imageScale = 1;
+    if (bannerUploadInput) {
+        bannerUploadInput.value = '';
     }
 }
 
@@ -1395,7 +1592,7 @@ async function fetchBanner(username) {
                         <!-- Banner Edit Modal (moved outside banner container to cover entire screen) -->
                         {#if isEditingBanner}
                             <div class="scratch-modal-back">
-                                <div class="scratch-modal">
+                                <div class="scratch-modal" style="max-width: {showCropper ? '1250px' : '600px'};">
                                     <div class="scratch-modal-title">
                                         {#if loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()}
                                             (Admin) Edit {user}'s Profile Banner
@@ -1404,17 +1601,18 @@ async function fetchBanner(username) {
                                         {/if}
                                     </div>
                                     <div class="scratch-modal-content">
-                                        <p>Upload a banner image (max 2MB, 1200x300px recommended)</p>
-                                        <input 
-                                            type="file" 
-                                            accept="image/png,image/jpeg,image/jpg"
-                                            bind:this={bannerUploadInput}
-                                            style="margin: 12px 0;"
-                                        />
-                                        
-                                        <div style="display: flex; gap: 8px; margin-top: 16px;">
-                                            {#if !isBannerUploading}
-                                                <button class="modal-button modal-button-primary" on:click={uploadBanner}>Upload Banner</button>
+                                        {#if !showCropper}
+                                            <p>Upload a banner image (max 2MB, 1200x300px recommended)</p>
+                                            <p style="font-size: 0.9em; opacity: 0.7;">Images over 2MB will be automatically compressed</p>
+                                            <input 
+                                                type="file" 
+                                                accept="image/png,image/jpeg,image/jpg"
+                                                bind:this={bannerUploadInput}
+                                                on:change={handleBannerFileSelect}
+                                                style="margin: 12px 0;"
+                                            />
+                                            
+                                            <div style="display: flex; gap: 8px; margin-top: 16px;">
                                                 {#if bannerImageUrl}
                                                     <button class="modal-button modal-button-danger" on:click={deleteBanner}>
                                                         {#if loggedInAdmin && String(user).toLowerCase() !== String(loggedInUser).toLowerCase()}
@@ -1425,10 +1623,43 @@ async function fetchBanner(username) {
                                                     </button>
                                                 {/if}
                                                 <button class="modal-button modal-button-secondary" on:click={() => isEditingBanner = false}>Cancel</button>
-                                            {:else}
-                                                <p>Uploading...</p>
-                                            {/if}
-                                        </div>
+                                            </div>
+                                        {:else}
+                                            <div class="cropper-container">
+                                                <p style="margin-bottom: 12px;">Drag to move, scroll to zoom</p>
+                                                <canvas
+                                                    bind:this={cropperCanvas}
+                                                    width="1200"
+                                                    height="300"
+                                                    style="border: 2px solid #ccc; cursor: move; max-width: 100%;"
+                                                    on:mousedown={handleMouseDown}
+                                                    on:mousemove={handleMouseMove}
+                                                    on:mouseup={handleMouseUp}
+                                                    on:mouseleave={handleMouseUp}
+                                                    on:wheel={handleWheel}
+                                                />
+                                                <img
+                                                    bind:this={cropperImage}
+                                                    src={bannerPreviewUrl}
+                                                    alt="Preview"
+                                                    style="display: none;"
+                                                    on:load={drawCropper}
+                                                />
+                                            </div>
+                                            
+                                            <div style="display: flex; gap: 8px; margin-top: 16px;">
+                                                {#if !isBannerUploading}
+                                                    <button class="modal-button modal-button-primary" on:click={uploadCroppedBanner}>
+                                                        Upload Banner
+                                                    </button>
+                                                    <button class="modal-button modal-button-secondary" on:click={cancelCrop}>
+                                                        Cancel
+                                                    </button>
+                                                {:else}
+                                                    <p>Uploading...</p>
+                                                {/if}
+                                            </div>
+                                        {/if}
                                     </div>
                                 </div>
                             </div>
@@ -3921,6 +4152,16 @@ async function fetchBanner(username) {
     width: 100% !important;
     height: 100% !important;
     z-index: 9999 !important;
+}
+.cropper-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.scratch-modal {
+    transition: max-width 0.3s ease;
 }
 
 </style>
