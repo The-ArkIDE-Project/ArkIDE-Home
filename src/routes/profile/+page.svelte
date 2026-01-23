@@ -1246,29 +1246,10 @@ async function handleBannerFileSelect() {
         bannerPreviewUrl = e.target.result;
         showCropper = true;
         
-        // Reset cropper state
+        // Reset cropper state - wait for image to load
         setTimeout(() => {
-            if (cropperImage) {
-                const canvasWidth = 1200;
-                const canvasHeight = 300;
-                const imgWidth = cropperImage.naturalWidth;
-                const imgHeight = cropperImage.naturalHeight;
-                
-                // Calculate scale to fit (cover the entire canvas)
-                const scaleX = canvasWidth / imgWidth;
-                const scaleY = canvasHeight / imgHeight;
-                minScale = Math.max(scaleX, scaleY);
-                imageScale = minScale;
-                
-                // Center image
-                const scaledWidth = imgWidth * imageScale;
-                const scaledHeight = imgHeight * imageScale;
-                imagePosition = {
-                    x: (canvasWidth - scaledWidth) / 2,
-                    y: (canvasHeight - scaledHeight) / 2
-                };
-                
-                drawCropper();
+            if (cropperImage && cropperImage.complete) {
+                resetCropper();
             }
         }, 100);
     };
@@ -1294,6 +1275,31 @@ function drawCropper() {
         cropperImage.naturalWidth * imageScale,
         cropperImage.naturalHeight * imageScale
     );
+}
+
+function resetCropper() {
+    if (!cropperImage) return;
+    
+    const canvasWidth = 1200;
+    const canvasHeight = 300;
+    const imgWidth = cropperImage.naturalWidth;
+    const imgHeight = cropperImage.naturalHeight;
+    
+    // Calculate scale to fit
+    const scaleX = canvasWidth / imgWidth;
+    const scaleY = canvasHeight / imgHeight;
+    minScale = Math.max(scaleX, scaleY);
+    imageScale = minScale;
+    
+    // Center image
+    const scaledWidth = imgWidth * imageScale;
+    const scaledHeight = imgHeight * imageScale;
+    imagePosition = {
+        x: (canvasWidth - scaledWidth) / 2,
+        y: (canvasHeight - scaledHeight) / 2
+    };
+    
+    drawCropper();
 }
 
 function handleMouseDown(e) {
