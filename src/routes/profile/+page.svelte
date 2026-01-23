@@ -1249,21 +1249,23 @@ async function handleBannerFileSelect() {
         // Reset cropper state
         setTimeout(() => {
             if (cropperImage) {
-                const canvas = cropperCanvas;
-                const img = cropperImage;
-                
-                // Calculate scale to fit
                 const canvasWidth = 1200;
                 const canvasHeight = 300;
-                const scaleX = canvasWidth / img.naturalWidth;
-                const scaleY = canvasHeight / img.naturalHeight;
+                const imgWidth = cropperImage.naturalWidth;
+                const imgHeight = cropperImage.naturalHeight;
+                
+                // Calculate scale to fit (cover the entire canvas)
+                const scaleX = canvasWidth / imgWidth;
+                const scaleY = canvasHeight / imgHeight;
                 minScale = Math.max(scaleX, scaleY);
                 imageScale = minScale;
                 
                 // Center image
+                const scaledWidth = imgWidth * imageScale;
+                const scaledHeight = imgHeight * imageScale;
                 imagePosition = {
-                    x: (canvasWidth - img.naturalWidth * imageScale) / 2,
-                    y: (canvasHeight - img.naturalHeight * imageScale) / 2
+                    x: (canvasWidth - scaledWidth) / 2,
+                    y: (canvasHeight - scaledHeight) / 2
                 };
                 
                 drawCropper();
@@ -1292,13 +1294,6 @@ function drawCropper() {
         cropperImage.naturalWidth * imageScale,
         cropperImage.naturalHeight * imageScale
     );
-    
-    // Draw crop overlay
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(0, 0, canvasWidth, canvasHeight);
-    ctx.setLineDash([]);
 }
 
 function handleMouseDown(e) {
@@ -1626,18 +1621,20 @@ async function fetchBanner(username) {
                                             </div>
                                         {:else}
                                             <div class="cropper-container">
-                                                <p style="margin-bottom: 12px;">Drag to move, scroll to zoom</p>
-                                                <canvas
-                                                    bind:this={cropperCanvas}
-                                                    width="1200"
-                                                    height="300"
-                                                    style="border: 2px solid #ccc; cursor: move; max-width: 100%;"
-                                                    on:mousedown={handleMouseDown}
-                                                    on:mousemove={handleMouseMove}
-                                                    on:mouseup={handleMouseUp}
-                                                    on:mouseleave={handleMouseUp}
-                                                    on:wheel={handleWheel}
-                                                />
+                                                <p style="margin-bottom: 12px;">Drag to move • Scroll to zoom • Click "Reset" to center</p>
+                                                <div style="position: relative; display: inline-block;">
+                                                    <canvas
+                                                        bind:this={cropperCanvas}
+                                                        width="1200"
+                                                        height="300"
+                                                        style="border: 2px solid #ccc; cursor: move; max-width: 100%; display: block;"
+                                                        on:mousedown={handleMouseDown}
+                                                        on:mousemove={handleMouseMove}
+                                                        on:mouseup={handleMouseUp}
+                                                        on:mouseleave={handleMouseUp}
+                                                        on:wheel={handleWheel}
+                                                    />
+                                                </div>
                                                 <img
                                                     bind:this={cropperImage}
                                                     src={bannerPreviewUrl}
@@ -1651,6 +1648,9 @@ async function fetchBanner(username) {
                                                 {#if !isBannerUploading}
                                                     <button class="modal-button modal-button-primary" on:click={uploadCroppedBanner}>
                                                         Upload Banner
+                                                    </button>
+                                                    <button class="modal-button modal-button-secondary" on:click={resetCropper}>
+                                                        Reset Position
                                                     </button>
                                                     <button class="modal-button modal-button-secondary" on:click={cancelCrop}>
                                                         Cancel
