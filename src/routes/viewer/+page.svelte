@@ -197,10 +197,25 @@ function parseContent(text) {
 
 <svelte:head>
     <title>{projectData ? projectData.title : 'Loading...'} - ArkIDE Project</title>
+    
+    <!-- Primary Meta Tags -->
     <meta name="title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
+    <meta name="description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{typeof window !== 'undefined' ? window.location.href : ''}" />
     <meta property="og:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
-    <meta property="twitter:title" content="{projectData ? projectData.title : 'ArkIDE Project'}">
-    <meta name="description" content="{projectData ? projectData.instructions : 'View this ArkIDE project'}">
+    <meta property="og:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
+    <meta property="og:image" content="{thumbnailUrl}" />
+    <meta property="og:site_name" content="ArkIDE" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="{typeof window !== 'undefined' ? window.location.href : ''}" />
+    <meta property="twitter:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
+    <meta property="twitter:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
+    <meta property="twitter:image" content="{thumbnailUrl}" />
 </svelte:head>
 
 <NavigationBar />
