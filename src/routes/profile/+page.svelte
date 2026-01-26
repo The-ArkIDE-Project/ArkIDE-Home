@@ -4369,11 +4369,4 @@ function insertEmoji(emojiName) {
     position: relative;
 }
 
-.comment-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 8px;
-}
-
 </style>
