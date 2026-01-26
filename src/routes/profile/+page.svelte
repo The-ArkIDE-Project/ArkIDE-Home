@@ -62,6 +62,9 @@
     let commentCount = 0;
     let isLoadingComments = false;
     let newCommentContent = '';
+    let showEmojiPicker = false;
+let emojiMap = {};
+let emojisLoaded = false;
     let editingCommentId = null;
     let editingCommentContent = '';
     let replyingToCommentId = null;
@@ -641,9 +644,9 @@ Promise.all([
         }
         fetchProfile();
         
-        // ADD THESE LINES HERE:
         await fetchCommentsStatus();
         await fetchProfileComments();
+        await loadEmojis();
         
         // Check if user can toggle comments
         if (loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)) {
@@ -1458,6 +1461,32 @@ async function fetchBanner(username) {
         console.error('Failed to fetch banner:', error);
         bannerImageUrl = '';
     }
+}
+async function loadEmojis() {
+    try {
+        const emojis = await EmojiList.fetch();
+        emojis.forEach(emojiName => {
+            if (typeof emojiName === 'string') {
+                emojiMap[emojiName] = true;
+            }
+        });
+        emojisLoaded = true;
+    } catch (err) {
+        console.error("Failed to load emojis:", err);
+    }
+}
+
+function getEmojiList() {
+    return Object.keys(emojiMap).map(name => ({
+        name,
+        url: `https://library.arkide.site/files/emojis/${name}.png`
+    }));
+}
+
+function insertEmoji(emojiName) {
+    const emojiCode = `:${emojiName}:`;
+    newCommentContent += emojiCode;
+    showEmojiPicker = false;
 }
 </script>
 
@@ -2351,17 +2380,51 @@ async function fetchBanner(username) {
                         maxLength="500"
                         class="comment-textarea"
                     />
-                    <button 
-                        class="comment-submit-button" 
-                        on:click={() => postComment()}
-                        disabled={!newCommentContent.trim()}
-                    >
-                        <LocalizedText
-                            text="Post"
-                            key="profile.comments.post"
-                            lang={currentLang}
-                        />
-                    </button>
+                    <div class="comment-actions">
+                        <div class="left-actions">
+                            <span class="char-count">{newCommentContent.length}/500</span>
+                            <button 
+                                class="emoji-picker-btn" 
+                                on:click={() => showEmojiPicker = !showEmojiPicker}
+                                title="Add emoji"
+                                type="button"
+                            >
+                                😊
+                            </button>
+                        </div>
+                        <button 
+                            class="comment-submit-button" 
+                            on:click={() => postComment()}
+                            disabled={!newCommentContent.trim()}
+                        >
+                            <LocalizedText
+                                text="Post"
+                                key="profile.comments.post"
+                                lang={currentLang}
+                            />
+                        </button>
+                    </div>
+                    
+                    {#if showEmojiPicker && emojisLoaded}
+                        <div class="emoji-picker">
+                            <div class="emoji-picker-header">
+                                <span>Pick an emoji</span>
+                                <button class="emoji-close" on:click={() => showEmojiPicker = false}>×</button>
+                            </div>
+                            <div class="emoji-grid">
+                                {#each getEmojiList() as emoji}
+                                    <button 
+                                        class="emoji-item" 
+                                        on:click={() => insertEmoji(emoji.name)}
+                                        title=":{emoji.name}:"
+                                        type="button"
+                                    >
+                                        <img src={emoji.url} alt={emoji.name} />
+                                    </button>
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
                 </div>
             {:else if !loggedIn}
                 <p style="opacity:0.5;text-align:center;padding:20px;">
@@ -3101,7 +3164,8 @@ async function fetchBanner(username) {
     .section-user-header {
         margin: 10px;
         margin-top: 20px;
-        width: 80%;
+        width: 1400px;
+        max-width: 90%;
         vertical-align: middle;
         display: flex;
         flex-direction: column;
@@ -4139,7 +4203,8 @@ async function fetchBanner(username) {
 
 .profile-banner-container {
     position: relative;
-    width: 80%;
+    width: 1400px;
+    min-width: 1400px;
     margin: 10px auto 0;
     border-radius: 12px;
     overflow: hidden;
