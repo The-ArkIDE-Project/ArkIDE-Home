@@ -2332,7 +2332,6 @@ function insertEmoji(emojiName) {
     <div style="width: 100%; overflow: hidden; padding: 16px; box-sizing: border-box;">
         <div class="comments-section" style="width: 100%; overflow: hidden; box-sizing: border-box; padding: 0;">
             <!-- Comments Toggle (only for profile owner and admins) -->
-             <!--
             {#if canToggleComments}
                 <div class="comments-toggle">
                     <button 
@@ -2356,7 +2355,6 @@ function insertEmoji(emojiName) {
                     </button>
                 </div>
             {/if}
-            -->
             <!-- New Comment Box -->
             {#if loggedIn && commentsEnabled}
                 <div class="comment-input-box">
