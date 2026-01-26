@@ -378,7 +378,10 @@ const toggleCommentsEnabled = async () => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ enabled: newState })
+            body: JSON.stringify({ 
+                username: user,
+                enabled: newState 
+            })
         });
 
         console.log("[Toggle] POST response status:", response.status);
@@ -395,8 +398,9 @@ const toggleCommentsEnabled = async () => {
             
             console.log("[Toggle] Updated local commentsEnabled:", commentsEnabled);
         } else {
-            console.error("[Toggle] Failed to toggle comments");
-            alert("Failed to toggle comments");
+            const errorData = await response.json();
+            console.error("[Toggle] Failed to toggle comments:", errorData);
+            alert("Failed to toggle comments: " + (errorData.error || "Unknown error"));
         }
     } catch (err) {
         console.error("[Toggle] Network or unexpected error:", err);
