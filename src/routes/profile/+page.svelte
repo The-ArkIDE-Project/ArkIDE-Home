@@ -4205,8 +4205,8 @@ function insertEmoji(emojiName) {
 
 .profile-banner-container {
     position: relative;
-    width: 1400px;
-    min-width: 1400px;
+    width: 90%;
+    max-width: 1400px;
     margin: 10px auto 0;
     border-radius: 12px;
     overflow: hidden;
