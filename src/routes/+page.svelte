@@ -1139,7 +1139,7 @@
                         lang={currentLang}
                     />
                 </a>
-                <a target="_blank" href="/status">
+                <a target="_blank" href="https://status.arkide.site/">
                     <LocalizedText
                         text="Status Page"
                         key="home.footer.sections.info.status"
