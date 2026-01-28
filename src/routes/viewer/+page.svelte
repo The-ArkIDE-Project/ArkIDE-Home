@@ -2,6 +2,9 @@
     import { onMount, onDestroy } from "svelte";
     import { PUBLIC_API_URL } from "$env/static/public";
 
+    // Get data from server
+    export let data;
+
     // Components (adjust import paths as needed for your project)
     import NavigationBar from "$lib/NavigationBar/NavigationBar.svelte";
     import NavigationMargin from "$lib/NavigationBar/NavMargin.svelte";
@@ -18,12 +21,12 @@
         currentLang = lang;
     });
 
-    let projectId = "";
-    let projectData = null;
-    let loading = true;
-    let error = null;
+    let projectId = data.projectId || "";
+    let projectData = data.projectData || null;
+    let loading = !data.projectData;
+    let error = data.error || null;
     let isDarkMode = false;
-    let thumbnailUrl = "";
+    let thumbnailUrl = data.thumbnailUrl || "";
     let darkModeObserver;
     let originalDarkModeState = false;
 
@@ -50,14 +53,19 @@
             attributeFilter: ['class']
         });
 
-        // Get project ID from URL hash
-        const hash = window.location.hash;
-        console.log("Hash:", hash);
+        // Get project ID from URL hash or from server data
+        if (!projectId) {
+            const hash = window.location.hash;
+            console.log("Hash:", hash);
+            
+            if (hash && hash.length > 1) {
+                projectId = hash.substring(1);
+                console.log("Project ID:", projectId);
+            }
+        }
         
-        if (hash && hash.length > 1) {
-            projectId = hash.substring(1);
-            console.log("Project ID:", projectId);
-            // Set thumbnail URL
+        // Set thumbnail URL if not already set
+        if (projectId && !thumbnailUrl) {
             thumbnailUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=thumbnail`;
         }
 
@@ -67,8 +75,13 @@
         // Load emojis in parallel (don't await)
         loadEmojis().catch(err => console.error("Emoji load error:", err));
 
-        if (projectId && projectId.trim() !== "") {
+        // Fetch project data if we don't have it yet
+        if (!projectData && projectId && projectId.trim() !== "") {
             await fetchProjectData();
+        } else if (projectData) {
+            // We have project data from server, but still need to fetch remix data
+            loading = false;
+            await fetchRemixData();
         } else {
             error = "No project ID provided in URL hash";
             loading = false;
@@ -204,7 +217,6 @@ function parseContent(text) {
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="{typeof window !== 'undefined' ? window.location.href : ''}" />
     <meta property="og:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
     <meta property="og:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
     <meta property="og:image" content="{thumbnailUrl}" />
@@ -212,7 +224,6 @@ function parseContent(text) {
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="{typeof window !== 'undefined' ? window.location.href : ''}" />
     <meta property="twitter:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
     <meta property="twitter:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
     <meta property="twitter:image" content="{thumbnailUrl}" />
