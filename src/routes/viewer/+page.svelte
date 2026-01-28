@@ -206,6 +206,17 @@ function parseContent(text) {
             }
         }
     }
+
+    async function shareProject() {
+        const shareUrl = `${window.location.origin}/viewer?id=${projectId}`;
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            alert('Link copied to clipboard!');
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy link');
+        }
+    }
 </script>
 
 <svelte:head>
@@ -292,6 +303,12 @@ function parseContent(text) {
                     {#if projectData.lastUpdate && projectData.lastUpdate !== projectData.date}
                         <span class="update-date">(Updated: {formatDate(projectData.lastUpdate)})</span>
                     {/if}
+                    <button class="share-button" on:click={shareProject} title="Copy share link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13 7c-1.1 0-2.1.6-2.6 1.5L6.9 6.8c.1-.3.1-.5.1-.8s0-.5-.1-.8l3.5-1.7C10.9 4.4 11.9 5 13 5c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .5.1.8L6.6 4.5C6.1 3.6 5.1 3 4 3 2.3 3 1 4.3 1 6s1.3 3 3 3c1.1 0 2.1-.6 2.6-1.5l3.5 1.7c-.1.3-.1.5-.1.8 0 1.7 1.3 3 3 3s3-1.3 3-3-1.3-3-3-3z"/>
+                        </svg>
+                        Share
+                    </button>
                 </div>
             </div>
 
@@ -678,5 +695,50 @@ function parseContent(text) {
     width: 100%;
     min-width: 1000px;
     --thumbnail-bg: url('');
+}
+.project-dates {
+    margin-top: 12px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+:global(body.dark-mode) .project-dates {
+    color: #ddd;
+}
+
+.update-date {
+    margin-left: 0;
+    font-style: italic;
+}
+
+.share-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #001affad;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-left: auto;
+}
+
+.share-button:hover {
+    background: #0015cc;
+}
+
+:global(body.dark-mode) .share-button {
+    background: #4d6bff;
+}
+
+:global(body.dark-mode) .share-button:hover {
+    background: #6b85ff;
 }
 </style>
