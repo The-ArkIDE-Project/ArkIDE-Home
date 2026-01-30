@@ -334,6 +334,11 @@ function parseContent(text) {
                             </p>
                         </div>
                     {/if}
+                    {#if projectData.softRejected === true || projectData.softRejected === "true"}
+                        <div class="soft-reject-warning">
+                            <p>⚠️ This project was rejected by an admin so it may contain content that is not safe for work, stolen content, or other things like that</p>
+                        </div>
+                    {/if}
                     <div class="info-box">
                         <h3>Instructions</h3>
                         <div class="info-content {!projectData.instructions ? 'empty-content' : ''}">
@@ -740,5 +745,28 @@ function parseContent(text) {
 
 :global(body.dark-mode) .share-button:hover {
     background: #6b85ff;
+}
+.soft-reject-warning {
+    padding: 12px;
+    border: 1px solid rgba(255, 0, 0, 0.5);
+    border-radius: 4px;
+    background: rgba(255, 100, 100, 0.15);
+    font-size: 0.95rem;
+}
+
+:global(body.dark-mode) .soft-reject-warning {
+    border-color: rgba(255, 100, 100, 0.6);
+    background: rgba(255, 100, 100, 0.2);
+}
+
+.soft-reject-warning p {
+    margin: 0;
+    line-height: 1.5;
+    color: #cc0000;
+    font-weight: 500;
+}
+
+:global(body.dark-mode) .soft-reject-warning p {
+    color: #ff6b6b;
 }
 </style>

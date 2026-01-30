@@ -513,7 +513,7 @@ function parseContent(text) {
         "My Favorite",
         "My Favorite Things",
         "What I like",
-        "Why I use PenguinMod",
+        "Why I use ArkIDE",
         "My Life's Work",
         "What I Do",
         "In my spare time...",

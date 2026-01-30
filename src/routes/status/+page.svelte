@@ -295,6 +295,7 @@
 
 <div class="main">
     <NavigationMargin />
+    <h1>Please go to the new status page at: <a href="https://status.arkide.site">https://status.arkide.site</a></h1>
 
     <div class="section-info" class:status-operational={overallStatus === 'operational'} 
                              class:status-issues={overallStatus === 'issues'}
