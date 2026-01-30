@@ -1,7 +1,5 @@
-// +page.server.js
-export async function load({ url }) {
+export async function load({ url, setHeaders }) {
     const projectId = url.searchParams.get('id');
-    console.log('Server load called with projectId:', projectId);
     
     if (!projectId) {
         return {
@@ -14,27 +12,30 @@ export async function load({ url }) {
     
     try {
         const apiUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=metadata`;
-        console.log('Fetching:', apiUrl);
-        
         const response = await fetch(apiUrl);
         
         if (!response.ok) {
-            console.error('API response not OK:', response.status);
             throw new Error('Failed to fetch project data');
         }
         
         const projectData = await response.json();
-        console.log('Fetched project data:', projectData.title);
-        
         const thumbnailUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=thumbnail`;
+        
+        // Set cache headers so Discord can cache the result
+        setHeaders({
+            'cache-control': 'public, max-age=3600'
+        });
         
         return {
             projectData,
             thumbnailUrl,
-            projectId
+            projectId,
+            // Add these for meta tags
+            pageTitle: `${projectData.title} - ArkIDE Project`,
+            pageDescription: projectData.instructions || 'View this ArkIDE project',
+            pageImage: thumbnailUrl
         };
     } catch (err) {
-        console.error('Server load error:', err);
         return {
             projectData: null,
             projectId: null,

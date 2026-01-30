@@ -220,24 +220,24 @@ function parseContent(text) {
 </script>
 
 <svelte:head>
-    <title>{projectData ? projectData.title : 'Loading...'} - ArkIDE Project</title>
+    <title>{data.pageTitle || 'ArkIDE Project'}</title>
     
     <!-- Primary Meta Tags -->
-    <meta name="title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
-    <meta name="description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}">
+    <meta name="title" content="{data.pageTitle || 'ArkIDE Project'}" />
+    <meta name="description" content="{data.pageDescription || 'View this ArkIDE project'}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
-    <meta property="og:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
-    <meta property="og:image" content="{thumbnailUrl}" />
+    <meta property="og:title" content="{data.pageTitle || 'ArkIDE Project'}" />
+    <meta property="og:description" content="{data.pageDescription || 'View this ArkIDE project'}" />
+    <meta property="og:image" content="{data.pageImage || ''}" />
     <meta property="og:site_name" content="ArkIDE" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="{projectData ? projectData.title : 'ArkIDE Project'}" />
-    <meta property="twitter:description" content="{projectData ? (projectData.instructions || 'View this ArkIDE project') : 'View this ArkIDE project'}" />
-    <meta property="twitter:image" content="{thumbnailUrl}" />
+    <meta property="twitter:title" content="{data.pageTitle || 'ArkIDE Project'}" />
+    <meta property="twitter:description" content="{data.pageDescription || 'View this ArkIDE project'}" />
+    <meta property="twitter:image" content="{data.pageImage || ''}" />
 </svelte:head>
 
 <NavigationBar />
