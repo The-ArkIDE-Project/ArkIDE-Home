@@ -12,8 +12,10 @@
     import LocalizedText from "$lib/LocalizedText/Node.svelte";
     import Language from "../../resources/language.js";
     import VoteEmbed from "../embed/vote/+page.svelte"; // Adjust path as needed
+    import ShareModal from "$lib/ShareModal.svelte";
 
     let currentLang = "en";
+    let shareModal;
     onMount(() => {
         Language.forceUpdate();
     });
@@ -207,14 +209,9 @@ function parseContent(text) {
         }
     }
 
-    async function shareProject() {
-        const shareUrl = `${window.location.origin}/viewer?id=${projectId}`;
-        try {
-            await navigator.clipboard.writeText(shareUrl);
-            alert('Link copied to clipboard!');
-        } catch (err) {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy link');
+    function openShareModal() {
+        if (shareModal) {
+            shareModal.open();
         }
     }
 </script>
@@ -303,7 +300,7 @@ function parseContent(text) {
                     {#if projectData.lastUpdate && projectData.lastUpdate !== projectData.date}
                         <span class="update-date">(Updated: {formatDate(projectData.lastUpdate)})</span>
                     {/if}
-                    <button class="share-button" on:click={shareProject} title="Copy share link">
+                    <button class="share-button" on:click={openShareModal} title="Share project">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M13 7c-1.1 0-2.1.6-2.6 1.5L6.9 6.8c.1-.3.1-.5.1-.8s0-.5-.1-.8l3.5-1.7C10.9 4.4 11.9 5 13 5c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .5.1.8L6.6 4.5C6.1 3.6 5.1 3 4 3 2.3 3 1 4.3 1 6s1.3 3 3 3c1.1 0 2.1-.6 2.6-1.5l3.5 1.7c-.1.3-.1.5-.1.8 0 1.7 1.3 3 3 3s3-1.3 3-3-1.3-3-3-3z"/>
                         </svg>
@@ -368,7 +365,11 @@ function parseContent(text) {
             </div>
         </div>
     {/if}
-
+        <ShareModal 
+    bind:this={shareModal}
+    projectId={projectId}
+    projectTitle={projectData?.title || ""}
+/>
     <div style="height: 32px;" />
 </div>
 
