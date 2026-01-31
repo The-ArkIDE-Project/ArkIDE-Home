@@ -217,24 +217,24 @@ function parseContent(text) {
 </script>
 
 <svelte:head>
-    <title>{data.pageTitle || 'ArkIDE Project'}</title>
+    <title>{projectData?.title || 'Loading...'} - ArkIDE</title>
     
     <!-- Primary Meta Tags -->
-    <meta name="title" content="{data.pageTitle || 'ArkIDE Project'}" />
-    <meta name="description" content="{data.pageDescription || 'View this ArkIDE project'}">
-    
+    <meta name="title" content="{projectData?.title || 'ArkIDE Project'} - ArkIDE" />
+    <meta name="description" content="{projectData?.description || 'View this ArkIDE project'}">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="{data.pageTitle || 'ArkIDE Project'}" />
-    <meta property="og:description" content="{data.pageDescription || 'View this ArkIDE project'}" />
-    <meta property="og:image" content="{data.pageImage || ''}" />
+    <meta property="og:title" content="{projectData?.title || 'ArkIDE Project'} - ArkIDE" />
+    <meta property="og:description" content="{projectData?.description || 'View this ArkIDE project'}" />
+    <meta property="og:image" content="{projectData?.image || ''}" />
     <meta property="og:site_name" content="ArkIDE" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="{data.pageTitle || 'ArkIDE Project'}" />
-    <meta property="twitter:description" content="{data.pageDescription || 'View this ArkIDE project'}" />
-    <meta property="twitter:image" content="{data.pageImage || ''}" />
+    <meta property="twitter:title" content="{projectData?.title || 'ArkIDE Project'} - ArkIDE" />
+    <meta property="twitter:description" content="{projectData?.description || 'View this ArkIDE project'}" />
+    <meta property="twitter:image" content="{projectData?.image || ''}" />
 </svelte:head>
 
 <NavigationBar />
