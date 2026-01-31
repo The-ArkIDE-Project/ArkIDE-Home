@@ -944,7 +944,7 @@ function getEmojiList() {
 	}
 
 	.button-text {
-		color: rgba(0, 0, 0, 0.9);
+		color: rgba(255, 255, 255, 0.9);
 		text-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
 	}
 	:global(body.dark-mode) .button-text {
