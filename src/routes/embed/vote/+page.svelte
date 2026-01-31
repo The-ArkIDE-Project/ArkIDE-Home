@@ -580,16 +580,19 @@ function loadCooldownFromStorage() {
         
         if (remaining > 0) {
             commentCooldown = remaining;
+            postButtonEnabled = false; // ADD THIS LINE
             startCooldownTimer();
         } else {
             // Cooldown expired, clear storage and ensure button is enabled
             localStorage.removeItem('commentCooldown');
             localStorage.removeItem('commentCooldownTimestamp');
             commentCooldown = 0;
+            postButtonEnabled = true; // ADD THIS LINE
         }
     } else {
         // No saved cooldown, ensure it's 0
         commentCooldown = 0;
+        postButtonEnabled = true; // ADD THIS LINE
     }
 }
 
@@ -607,9 +610,11 @@ function startCooldownTimer() {
             // Update localStorage with new remaining time
             localStorage.setItem('commentCooldown', commentCooldown.toString());
             localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
+            postButtonEnabled = false; // ADD THIS LINE
         } else {
             // Ensure it's exactly 0
             commentCooldown = 0;
+            postButtonEnabled = true; // ADD THIS LINE - RE-ENABLE BUTTON
             clearInterval(cooldownInterval);
             cooldownInterval = null;
             // Clear from localStorage when done
@@ -618,6 +623,7 @@ function startCooldownTimer() {
         }
     }, 1000);
 }
+
 function forceCheckCooldown() {
     const savedCooldown = localStorage.getItem('commentCooldown');
     
@@ -628,7 +634,8 @@ function forceCheckCooldown() {
         localStorage.removeItem('commentCooldown');
         localStorage.removeItem('commentCooldownTimestamp');
     } else {
-        postButtonEnabled = false; // FORCE DISABLE
+        // Cooldown exists, keep disabled
+        postButtonEnabled = false;
     }
 }
 </script>
