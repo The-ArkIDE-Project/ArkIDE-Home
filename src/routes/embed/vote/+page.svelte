@@ -34,6 +34,19 @@
     let showEmojiPicker = false;
     let commentTextarea;
 
+    // Image handling
+    let imageMap = {};
+    let imagesLoaded = false;
+    let showImagePicker = false;
+
+    // Image library
+    const IMAGE_LIBRARY = [
+        { name: "despair", url: "https://library.arkide.site/files/emojis/despair.png" },
+        { name: "checkmate", url: "https://library.arkide.site/files/emojis/checkmate.png" },
+        { name: "absolutekeith", url: "https://library.arkide.site/files/emojis/absolutekeith.png" },
+        { name: "idontknowityet", url: "https://library.arkide.site/files/emojis/idontknowityet.png" },
+    ];
+
     export let projectId = "";
 
     console.log("TOP OF SCRIPT - projectId prop:", projectId);
@@ -118,6 +131,10 @@
         
         // Load emojis
         loadEmojis();
+
+        // Load images
+        loadImages();
+    
 
         ProjectApi.getProjectMeta(projectId)
             .then((meta) => {
@@ -397,6 +414,14 @@ async function loadEmojis() {
     }
 }
 
+function loadImages() {
+    IMAGE_LIBRARY.forEach(image => {
+        imageMap[image.name] = image.url;
+    });
+    imagesLoaded = true;
+    console.log("Loaded images:", imageMap);
+}
+
 function parseEmojis(text) {
     if (!emojisLoaded || !text) return text;
     
@@ -423,9 +448,22 @@ function parseMentions(text) {
     return result;
 }
 
+function parseImages(text) {
+    if (!imagesLoaded || !text) return text;
+    
+    // Match [img:imagename] pattern
+    return text.replace(/\[img:([a-zA-Z0-9_-]+)\]/g, (match, imageName) => {
+        if (imageMap[imageName]) {
+            return `<img src="${imageMap[imageName]}" alt="${imageName}" class="comment-image" title="[img:${imageName}]" />`;
+        }
+        return match; // Return original if image not found
+    });
+}
+
 function parseContent(text) {
-    // First parse emojis, then mentions
+    // Parse emojis, images, then mentions
     let parsed = parseEmojis(text);
+    parsed = parseImages(parsed);
     parsed = parseMentions(parsed);
     return parsed;
 }
@@ -446,6 +484,28 @@ function insertEmoji(emojiName) {
         newComment += emojiCode;
     }
     showEmojiPicker = false;
+}
+function insertImage(imageName) {
+    const imageCode = `[img:${imageName}]`;
+    if (commentTextarea) {
+        const start = commentTextarea.selectionStart;
+        const end = commentTextarea.selectionEnd;
+        const text = newComment;
+        newComment = text.substring(0, start) + imageCode + text.substring(end);
+        
+        // Set cursor position after inserted image
+        setTimeout(() => {
+            commentTextarea.selectionStart = commentTextarea.selectionEnd = start + imageCode.length;
+            commentTextarea.focus();
+        }, 0);
+    } else {
+        newComment += imageCode;
+    }
+    showImagePicker = false;
+}
+
+function getImageList() {
+    return IMAGE_LIBRARY;
 }
 function getEmojiList() {
     // emojiMap keys are the emoji names
@@ -558,6 +618,14 @@ function getEmojiList() {
                         >
                             😊
                         </button>
+                        <button 
+                            class="image-picker-btn" 
+                            on:click={() => showImagePicker = !showImagePicker}
+                            title="Add image"
+                            type="button"
+                        >
+                            🖼️
+                        </button>
                     </div>
                     <button 
                         class="post-btn" 
@@ -586,6 +654,27 @@ function getEmojiList() {
                                     type="button"
                                 >
                                     <img src={emoji.url} alt={emoji.name} />
+                                </button>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+                {#if showImagePicker && imagesLoaded}
+                    <div class="image-picker">
+                        <div class="image-picker-header">
+                            <span>Pick an image</span>
+                            <button class="image-close" on:click={() => showImagePicker = false}>×</button>
+                        </div>
+                        <div class="image-grid">
+                            {#each getImageList() as image}
+                                <button 
+                                    class="image-item" 
+                                    on:click={() => insertImage(image.name)}
+                                    title="[img:{image.name}]"
+                                    type="button"
+                                >
+                                    <img src={image.url} alt={image.name} />
+                                    <span class="image-name">{image.name}</span>
                                 </button>
                             {/each}
                         </div>
@@ -1408,5 +1497,156 @@ function getEmojiList() {
 :global(body.dark-mode) :global(.mention-link:hover) {
     color: #74c0fc !important;
     text-decoration: underline !important;
+}
+.comment-image {
+    max-width: 300px !important;
+    max-height: 200px !important;
+    width: auto !important;
+    height: auto !important;
+    display: block !important;
+    margin: 8px 0 !important;
+    border-radius: 8px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.image-picker-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+:global(body.dark-mode) .image-picker-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.image-picker-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+:global(body.dark-mode) .image-picker-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.image-picker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    width: 100%;
+    max-width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-sizing: border-box;
+}
+
+:global(body.dark-mode) .image-picker {
+    background: rgba(30, 30, 30, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.image-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+:global(body.dark-mode) .image-picker-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.image-picker-header span {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.image-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+    height: auto;
+    color: rgba(0, 0, 0, 0.6);
+    transition: color 0.2s ease;
+}
+
+:global(body.dark-mode) .image-close {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.image-close:hover {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+:global(body.dark-mode) .image-close:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+}
+
+.image-item {
+    width: 100%;
+    height: auto;
+    padding: 8px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+:global(body.dark-mode) .image-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.image-item:hover {
+    background: rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+
+:global(body.dark-mode) .image-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.image-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.image-name {
+    font-size: 0.75rem;
+    text-align: center;
+    word-break: break-word;
 }
 </style>
