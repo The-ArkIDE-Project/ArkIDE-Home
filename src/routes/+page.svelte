@@ -704,9 +704,8 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add a block pinning feature and the ability to export scripts as a PNG to the editor</li>
-                                <li>Add a feature to set a custom banner on your profile</li>
-                                <li>Push desktop to 2.13.1</li>
+                                <li>Update the viewer page a bunch and add some new features to it.</li>
+                                <li>Add image comments like on tiktok, dont worry theres a set list of images users can use, you cannot upload your own photo. You can submit photos to be added on our discord server though.</li>
                                 <li>General Bug Fixing.</li>
                             </ul>
 
