@@ -143,11 +143,8 @@
         // Load images
         loadImages();
 
-        // get cooldown
-        loadCooldownFromStorage();
-
-        // Start interval to force-check cooldown every second
-        const forceCheckInterval = setInterval(forceCheckCooldown, 1000);
+        // Check cooldown
+        checkAndLoadCooldown();
 
         ProjectApi.getProjectMeta(projectId)
             .then((meta) => {
@@ -194,14 +191,11 @@
                 loaded = true;
                 loadComments();
             });
-        return () => {
-            if (cooldownInterval) {
-                clearInterval(cooldownInterval);
-            }
-            if (forceCheckInterval) {
-                clearInterval(forceCheckInterval);
-            }
-        };
+            return () => {
+                if (cooldownInterval) {
+                    clearInterval(cooldownInterval);
+                }
+            };
     });
 
     // TODO: change this
@@ -230,7 +224,6 @@ let editContent = "";
 let replyingTo = null;
 let commentCooldown = 0;
 let cooldownInterval = null;
-let postButtonEnabled = true;
 
 const API_URL = "https://arkideapi.arc360hub.com";
 
@@ -261,14 +254,6 @@ async function postComment() {
         alert(`Please wait ${commentCooldown} seconds before posting another comment.`);
         return;
     }
-    
-    // Prevent double-posting by immediately setting cooldown
-    commentCooldown = 15;
-    postButtonEnabled = false;
-    
-    // Save to localStorage
-    localStorage.setItem('commentCooldown', '15');
-    localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
     
     // Check if we're replying to a specific comment
     let parentId = null;
@@ -315,21 +300,16 @@ async function postComment() {
             commentPage = 0;
             await loadComments();
             
-            // Start the countdown timer
-            startCooldownTimer();
+            // Start 30 second cooldown
+            const endTime = Date.now() + 30000;
+            localStorage.setItem('commentCooldownEnd', endTime.toString());
+            commentCooldown = 30;
+            startCooldown();
         } else {
-            // Reset cooldown if post failed
-            commentCooldown = 0;
-            localStorage.removeItem('commentCooldown');
-            localStorage.removeItem('commentCooldownTimestamp');
             const error = await response.json();
             alert(error.error || "Failed to post comment");
         }
     } catch (err) {
-        // Reset cooldown if post failed
-        commentCooldown = 0;
-        localStorage.removeItem('commentCooldown');
-        localStorage.removeItem('commentCooldownTimestamp');
         alert("Failed to post comment");
     }
 }
@@ -570,73 +550,52 @@ function getEmojiList() {
     return list;
 }
 
-function loadCooldownFromStorage() {
-    const savedCooldown = localStorage.getItem('commentCooldown');
-    const savedTimestamp = localStorage.getItem('commentCooldownTimestamp');
-    
-    if (savedCooldown && savedTimestamp) {
-        const elapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
-        const remaining = parseInt(savedCooldown) - elapsed;
+function checkAndLoadCooldown() {
+    const savedTime = localStorage.getItem('commentCooldownEnd');
+    if (savedTime) {
+        const endTime = parseInt(savedTime);
+        const now = Date.now();
+        const remaining = Math.ceil((endTime - now) / 1000);
         
         if (remaining > 0) {
             commentCooldown = remaining;
-            postButtonEnabled = false; // ADD THIS LINE
-            startCooldownTimer();
+            startCooldown();
         } else {
-            // Cooldown expired, clear storage and ensure button is enabled
-            localStorage.removeItem('commentCooldown');
-            localStorage.removeItem('commentCooldownTimestamp');
             commentCooldown = 0;
-            postButtonEnabled = true; // ADD THIS LINE
+            localStorage.removeItem('commentCooldownEnd');
         }
     } else {
-        // No saved cooldown, ensure it's 0
         commentCooldown = 0;
-        postButtonEnabled = true; // ADD THIS LINE
     }
 }
 
-function startCooldownTimer() {
-    // Clear any existing interval
+function startCooldown() {
     if (cooldownInterval) {
         clearInterval(cooldownInterval);
-        cooldownInterval = null;
     }
     
     cooldownInterval = setInterval(() => {
-        commentCooldown--;
-        
-        if (commentCooldown > 0) {
-            // Update localStorage with new remaining time
-            localStorage.setItem('commentCooldown', commentCooldown.toString());
-            localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
-            postButtonEnabled = false; // ADD THIS LINE
-        } else {
-            // Ensure it's exactly 0
+        const savedTime = localStorage.getItem('commentCooldownEnd');
+        if (!savedTime) {
             commentCooldown = 0;
-            postButtonEnabled = true; // ADD THIS LINE - RE-ENABLE BUTTON
             clearInterval(cooldownInterval);
             cooldownInterval = null;
-            // Clear from localStorage when done
-            localStorage.removeItem('commentCooldown');
-            localStorage.removeItem('commentCooldownTimestamp');
+            return;
         }
-    }, 1000);
-}
-
-function forceCheckCooldown() {
-    const savedCooldown = localStorage.getItem('commentCooldown');
-    
-    if (!savedCooldown || commentCooldown <= 0) {
-        // No cooldown exists or it's 0, force enable the button
-        commentCooldown = 0;
-        postButtonEnabled = true; // FORCE ENABLE
-        localStorage.removeItem('commentCooldown');
-        localStorage.removeItem('commentCooldownTimestamp');
-    } else {
-        // Cooldown exists, keep disabled
-        postButtonEnabled = false;
-    }
+        
+        const endTime = parseInt(savedTime);
+        const now = Date.now();
+        const remaining = Math.ceil((endTime - now) / 1000);
+        
+        if (remaining <= 0) {
+            commentCooldown = 0;
+            localStorage.removeItem('commentCooldownEnd');
+            clearInterval(cooldownInterval);
+            cooldownInterval = null;
+        } else {
+            commentCooldown = remaining;
+        }
+    }, 100); // Check every 100ms for accuracy
 }
 </script>
 
@@ -753,7 +712,7 @@ function forceCheckCooldown() {
                     <button 
                         class="post-btn" 
                         on:click={postComment} 
-                        disabled={newComment.trim().length === 0 || !postButtonEnabled}
+                        disabled={newComment.trim().length === 0 || commentCooldown > 0}
                         title={commentCooldown > 0 ? `Wait ${commentCooldown}s` : "Post Comment"}
                     >
                         {#if commentCooldown > 0}
