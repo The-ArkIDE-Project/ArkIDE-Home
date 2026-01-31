@@ -301,9 +301,9 @@ async function postComment() {
             await loadComments();
             
             // Start 30 second cooldown
-            const endTime = Date.now() + 30000;
+            const endTime = Date.now() + 15000;
             localStorage.setItem('commentCooldownEnd', endTime.toString());
-            commentCooldown = 30;
+            commentCooldown = 15;
             startCooldown();
         } else {
             const error = await response.json();
