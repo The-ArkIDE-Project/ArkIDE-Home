@@ -198,6 +198,9 @@
             if (cooldownInterval) {
                 clearInterval(cooldownInterval);
             }
+            if (forceCheckInterval) {
+                clearInterval(forceCheckInterval);
+            }
         };
     });
 
