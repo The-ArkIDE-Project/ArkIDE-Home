@@ -51,6 +51,8 @@
         { name: "AAHH", url: "https://arkide.site/ohgod.png" },
         { name: "i'm at a loss", url: "https://arkide.site/imatakeith.png" },
         { name: "pattern recognition", url: "https://arkide.site/patternregognition.png" },
+        { name: "w9ptii ball", url: "https://arkide.site/w9pti-ball.png" },
+        { name: "snork", url: "https://arkide.site/snork.png" },
     ];
 
     export let projectId = "";
