@@ -189,9 +189,14 @@
                 loaded = true;
                 loadComments();
             });
+        return () => {
+            if (cooldownInterval) {
+                clearInterval(cooldownInterval);
+            }
+        };
     });
 
-    // RTODO: change this
+    // TODO: change this
     Authentication.onAuthentication((username, privateCode) => {
         ProjectClient.setUsername(username);
         ProjectClient.setToken(privateCode);
@@ -215,6 +220,8 @@ let newComment = "";
 let editingComment = null;
 let editContent = "";
 let replyingTo = null;
+let commentCooldown = 0;
+let cooldownInterval = null;
 
 const API_URL = "https://arkideapi.arc360hub.com";
 
@@ -240,20 +247,23 @@ async function loadComments() {
 async function postComment() {
     if (!newComment.trim()) return;
     
+    // Check cooldown
+    if (commentCooldown > 0) {
+        alert(`Please wait ${commentCooldown} seconds before posting another comment.`);
+        return;
+    }
+    
     // Check if we're replying to a specific comment
     let parentId = null;
     let content = newComment.trim();
     
     if (replyingTo && replyingTo.commentId) {
-        // Using the reply button - we know exactly which comment to reply to
         parentId = replyingTo.commentId;
-        // Remove the @mention from the content
         const mentionMatch = content.match(/^@\w+\s+(.+)/);
         if (mentionMatch) {
             content = mentionMatch[1];
         }
     } else {
-        // Manual @mention - find the most recent top-level comment by that user
         const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
         if (mentionMatch) {
             const mentionedUser = mentionMatch[1];
@@ -287,6 +297,16 @@ async function postComment() {
             replyingTo = null;
             commentPage = 0;
             await loadComments();
+            
+            // Start cooldown
+            commentCooldown = 30;
+            cooldownInterval = setInterval(() => {
+                commentCooldown--;
+                if (commentCooldown <= 0) {
+                    clearInterval(cooldownInterval);
+                    cooldownInterval = null;
+                }
+            }, 1000);
         } else {
             const error = await response.json();
             alert(error.error || "Failed to post comment");
@@ -646,12 +666,16 @@ function getEmojiList() {
                     <button 
                         class="post-btn" 
                         on:click={postComment} 
-                        disabled={newComment.trim().length === 0}
-                        title="Post Comment"
+                        disabled={newComment.trim().length === 0 || commentCooldown > 0}
+                        title={commentCooldown > 0 ? `Wait ${commentCooldown}s` : "Post Comment"}
                     >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                        </svg>
+                        {#if commentCooldown > 0}
+                            {commentCooldown}s
+                        {:else}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                            </svg>
+                        {/if}
                     </button>
                 </div>
                 
