@@ -230,6 +230,7 @@ let editContent = "";
 let replyingTo = null;
 let commentCooldown = 0;
 let cooldownInterval = null;
+let postButtonEnabled = true;
 
 const API_URL = "https://arkideapi.arc360hub.com";
 
@@ -262,10 +263,11 @@ async function postComment() {
     }
     
     // Prevent double-posting by immediately setting cooldown
-    commentCooldown = 30;
+    commentCooldown = 15;
+    postButtonEnabled = false;
     
     // Save to localStorage
-    localStorage.setItem('commentCooldown', '30');
+    localStorage.setItem('commentCooldown', '15');
     localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
     
     // Check if we're replying to a specific comment
@@ -622,8 +624,11 @@ function forceCheckCooldown() {
     if (!savedCooldown || commentCooldown <= 0) {
         // No cooldown exists or it's 0, force enable the button
         commentCooldown = 0;
+        postButtonEnabled = true; // FORCE ENABLE
         localStorage.removeItem('commentCooldown');
         localStorage.removeItem('commentCooldownTimestamp');
+    } else {
+        postButtonEnabled = false; // FORCE DISABLE
     }
 }
 </script>
@@ -741,7 +746,7 @@ function forceCheckCooldown() {
                     <button 
                         class="post-btn" 
                         on:click={postComment} 
-                        disabled={newComment.trim().length === 0 || commentCooldown > 0}
+                        disabled={newComment.trim().length === 0 || !postButtonEnabled}
                         title={commentCooldown > 0 ? `Wait ${commentCooldown}s` : "Post Comment"}
                     >
                         {#if commentCooldown > 0}
