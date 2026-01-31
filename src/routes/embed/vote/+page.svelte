@@ -45,6 +45,12 @@
         { name: "checkmate", url: "https://library.arkide.site/files/emojis/checkmate.png" },
         { name: "absolutekeith", url: "https://library.arkide.site/files/emojis/absolutekeith.png" },
         { name: "idontknowityet", url: "https://library.arkide.site/files/emojis/idontknowityet.png" },
+        { name: "who me?", url: "https://arkide.site/whome.png" },
+        { name: "bro", url: "https://arkide.site/keithdissapoint.png" },
+        { name: "labubu phonk", url: "https://arkide.site/msuic.png" },
+        { name: "AAHH", url: "https://arkide.site/ohgod.png" },
+        { name: "i'm at a loss", url: "https://arkide.site/imatakeith.png" },
+        { name: "pattern recognition", url: "https://arkide.site/patternregognition.png" },
     ];
 
     export let projectId = "";
@@ -451,9 +457,17 @@ function parseMentions(text) {
 function parseImages(text) {
     if (!imagesLoaded || !text) return text;
     
-    // Match [img:imagename] pattern
+    let imageFound = false;
+    
+    // Match [img:imagename] pattern - only parse the first one
     return text.replace(/\[img:([a-zA-Z0-9_-]+)\]/g, (match, imageName) => {
+        // If we already found an image, return the original text (ignore subsequent images)
+        if (imageFound) {
+            return match;
+        }
+        
         if (imageMap[imageName]) {
+            imageFound = true;
             return `<img src="${imageMap[imageName]}" alt="${imageName}" class="comment-image" title="[img:${imageName}]" />`;
         }
         return match; // Return original if image not found
@@ -1498,16 +1512,27 @@ function getEmojiList() {
     color: #74c0fc !important;
     text-decoration: underline !important;
 }
-.comment-image {
-    max-width: 300px !important;
-    max-height: 200px !important;
-    width: auto !important;
+.comment-image,
+:global(.comment-image) {
+    max-width: 190px !important;
+    max-height: 190px !important;
+    width: 190px !important;
     height: auto !important;
     display: block !important;
     margin: 8px 0 !important;
-    border-radius: 8px;
-    object-fit: contain;
-    cursor: pointer;
+    border-radius: 8px !important;
+    object-fit: contain !important;
+    cursor: pointer !important;
+}
+
+/* Force override for any comment content */
+.comment-content .comment-image,
+.comment-content :global(.comment-image) {
+    max-width: 190px !important;
+    max-height: 190px !important;
+    width: 190px !important;
+    height: auto !important;
+    object-fit: contain !important;
 }
 
 .image-picker-btn {
