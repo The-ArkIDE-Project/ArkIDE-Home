@@ -253,6 +253,9 @@ async function postComment() {
         return;
     }
     
+    // Prevent double-posting by immediately setting cooldown
+    commentCooldown = 30;
+    
     // Check if we're replying to a specific comment
     let parentId = null;
     let content = newComment.trim();
@@ -298,20 +301,29 @@ async function postComment() {
             commentPage = 0;
             await loadComments();
             
-            // Start cooldown
-            commentCooldown = 30;
+            // Clear any existing interval to prevent double countdown
+            if (cooldownInterval) {
+                clearInterval(cooldownInterval);
+            }
+            
+            // Start cooldown interval
             cooldownInterval = setInterval(() => {
                 commentCooldown--;
                 if (commentCooldown <= 0) {
+                    commentCooldown = 0; // Ensure it's exactly 0
                     clearInterval(cooldownInterval);
                     cooldownInterval = null;
                 }
             }, 1000);
         } else {
+            // Reset cooldown if post failed
+            commentCooldown = 0;
             const error = await response.json();
             alert(error.error || "Failed to post comment");
         }
     } catch (err) {
+        // Reset cooldown if post failed
+        commentCooldown = 0;
         alert("Failed to post comment");
     }
 }
