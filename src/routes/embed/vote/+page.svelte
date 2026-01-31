@@ -145,7 +145,9 @@
 
         // get cooldown
         loadCooldownFromStorage();
-    
+
+        // Start interval to force-check cooldown every second
+        const forceCheckInterval = setInterval(forceCheckCooldown, 1000);
 
         ProjectApi.getProjectMeta(projectId)
             .then((meta) => {
@@ -610,6 +612,16 @@ function startCooldownTimer() {
             localStorage.removeItem('commentCooldownTimestamp');
         }
     }, 1000);
+}
+function forceCheckCooldown() {
+    const savedCooldown = localStorage.getItem('commentCooldown');
+    
+    if (!savedCooldown || commentCooldown <= 0) {
+        // No cooldown exists or it's 0, force enable the button
+        commentCooldown = 0;
+        localStorage.removeItem('commentCooldown');
+        localStorage.removeItem('commentCooldownTimestamp');
+    }
 }
 </script>
 
