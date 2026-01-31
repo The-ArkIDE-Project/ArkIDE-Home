@@ -45,13 +45,13 @@
         { name: "checkmate", url: "https://library.arkide.site/files/emojis/checkmate.png" },
         { name: "absolutekeith", url: "https://library.arkide.site/files/emojis/absolutekeith.png" },
         { name: "idontknowityet", url: "https://library.arkide.site/files/emojis/idontknowityet.png" },
-        { name: "who me?", url: "https://arkide.site/whome.png" },
+        { name: "who-me", url: "https://arkide.site/whome.png" },
         { name: "bro", url: "https://arkide.site/keithdissapoint.png" },
-        { name: "labubu phonk", url: "https://arkide.site/msuic.png" },
+        { name: "labubu-phonk", url: "https://arkide.site/msuic.png" },
         { name: "AAHH", url: "https://arkide.site/ohgod.png" },
-        { name: "i'm at a loss", url: "https://arkide.site/imatakeith.png" },
-        { name: "pattern recognition", url: "https://arkide.site/patternregognition.png" },
-        { name: "w9ptii ball", url: "https://arkide.site/w9pti-ball.png" },
+        { name: "im-at-a-loss", url: "https://arkide.site/imatakeith.png" },
+        { name: "pattern-recognition", url: "https://arkide.site/patternregognition.png" },
+        { name: "w9ptii-ball", url: "https://arkide.site/w9pti-ball.png" },
         { name: "snork", url: "https://arkide.site/snork.png" },
     ];
 
