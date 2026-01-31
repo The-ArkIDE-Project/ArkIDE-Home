@@ -591,6 +591,13 @@ function startCooldownTimer() {
     
     cooldownInterval = setInterval(() => {
         commentCooldown--;
+        
+        // Update localStorage with new remaining time
+        if (commentCooldown > 0) {
+            localStorage.setItem('commentCooldown', commentCooldown.toString());
+            localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
+        }
+        
         if (commentCooldown <= 0) {
             commentCooldown = 0;
             clearInterval(cooldownInterval);
@@ -599,6 +606,9 @@ function startCooldownTimer() {
             localStorage.removeItem('commentCooldown');
             localStorage.removeItem('commentCooldownTimestamp');
         }
+        
+        // Force Svelte to re-render by triggering reactivity
+        commentCooldown = commentCooldown;
     }, 1000);
 }
 </script>
