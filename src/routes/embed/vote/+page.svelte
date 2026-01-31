@@ -142,6 +142,9 @@
 
         // Load images
         loadImages();
+
+        // get cooldown
+        loadCooldownFromStorage();
     
 
         ProjectApi.getProjectMeta(projectId)
@@ -256,6 +259,10 @@ async function postComment() {
     // Prevent double-posting by immediately setting cooldown
     commentCooldown = 30;
     
+    // Save to localStorage
+    localStorage.setItem('commentCooldown', '30');
+    localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
+    
     // Check if we're replying to a specific comment
     let parentId = null;
     let content = newComment.trim();
@@ -301,29 +308,21 @@ async function postComment() {
             commentPage = 0;
             await loadComments();
             
-            // Clear any existing interval to prevent double countdown
-            if (cooldownInterval) {
-                clearInterval(cooldownInterval);
-            }
-            
-            // Start cooldown interval
-            cooldownInterval = setInterval(() => {
-                commentCooldown--;
-                if (commentCooldown <= 0) {
-                    commentCooldown = 0; // Ensure it's exactly 0
-                    clearInterval(cooldownInterval);
-                    cooldownInterval = null;
-                }
-            }, 1000);
+            // Start the countdown timer
+            startCooldownTimer();
         } else {
             // Reset cooldown if post failed
             commentCooldown = 0;
+            localStorage.removeItem('commentCooldown');
+            localStorage.removeItem('commentCooldownTimestamp');
             const error = await response.json();
             alert(error.error || "Failed to post comment");
         }
     } catch (err) {
         // Reset cooldown if post failed
         commentCooldown = 0;
+        localStorage.removeItem('commentCooldown');
+        localStorage.removeItem('commentCooldownTimestamp');
         alert("Failed to post comment");
     }
 }
@@ -562,6 +561,45 @@ function getEmojiList() {
         url: `https://library.arkide.site/files/emojis/${name}.png`
     }));
     return list;
+}
+
+function loadCooldownFromStorage() {
+    const savedCooldown = localStorage.getItem('commentCooldown');
+    const savedTimestamp = localStorage.getItem('commentCooldownTimestamp');
+    
+    if (savedCooldown && savedTimestamp) {
+        const elapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
+        const remaining = parseInt(savedCooldown) - elapsed;
+        
+        if (remaining > 0) {
+            commentCooldown = remaining;
+            startCooldownTimer();
+        } else {
+            // Cooldown expired, clear storage
+            localStorage.removeItem('commentCooldown');
+            localStorage.removeItem('commentCooldownTimestamp');
+            commentCooldown = 0;
+        }
+    }
+}
+
+function startCooldownTimer() {
+    // Clear any existing interval
+    if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+    }
+    
+    cooldownInterval = setInterval(() => {
+        commentCooldown--;
+        if (commentCooldown <= 0) {
+            commentCooldown = 0;
+            clearInterval(cooldownInterval);
+            cooldownInterval = null;
+            // Clear from localStorage when done
+            localStorage.removeItem('commentCooldown');
+            localStorage.removeItem('commentCooldownTimestamp');
+        }
+    }, 1000);
 }
 </script>
 
