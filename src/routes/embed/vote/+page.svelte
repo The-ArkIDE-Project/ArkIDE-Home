@@ -575,11 +575,14 @@ function loadCooldownFromStorage() {
             commentCooldown = remaining;
             startCooldownTimer();
         } else {
-            // Cooldown expired, clear storage
+            // Cooldown expired, clear storage and ensure button is enabled
             localStorage.removeItem('commentCooldown');
             localStorage.removeItem('commentCooldownTimestamp');
             commentCooldown = 0;
         }
+    } else {
+        // No saved cooldown, ensure it's 0
+        commentCooldown = 0;
     }
 }
 
@@ -587,17 +590,18 @@ function startCooldownTimer() {
     // Clear any existing interval
     if (cooldownInterval) {
         clearInterval(cooldownInterval);
+        cooldownInterval = null;
     }
     
     cooldownInterval = setInterval(() => {
+        commentCooldown--;
+        
         if (commentCooldown > 0) {
-            commentCooldown = commentCooldown - 1; // This creates a new value, triggering reactivity
-            
             // Update localStorage with new remaining time
             localStorage.setItem('commentCooldown', commentCooldown.toString());
             localStorage.setItem('commentCooldownTimestamp', Date.now().toString());
         } else {
-            // Ensure it's set to 0 and trigger reactivity
+            // Ensure it's exactly 0
             commentCooldown = 0;
             clearInterval(cooldownInterval);
             cooldownInterval = null;
