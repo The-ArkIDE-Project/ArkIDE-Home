@@ -279,7 +279,7 @@
         async function findPopularTag() {
             try {
                 const tags = await ProjectClient.getTags(1);
-                const qualifying = tags.filter(t => t.count > 7);
+                const qualifying = tags.filter(t => t.count >= 7);
                 if (qualifying.length === 0) return null;
                 const picked = qualifying[Math.floor(Math.random() * qualifying.length)];
                 const results = await ProjectApi.searchProjects(0, `#${picked.tag}`, "", "", false, false);
