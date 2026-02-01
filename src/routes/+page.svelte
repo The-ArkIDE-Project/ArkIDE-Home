@@ -226,6 +226,7 @@
 
     let tagForProjects = "";
     let loggedInAdminOrMod = false;
+    
     onMount(async () => {
         Language.forceUpdate();
         const username = localStorage.getItem("username")
@@ -275,22 +276,21 @@
             });
         });
 
-        const CANDIDATE_TAGS = ["game", "platformer", "animation", "art", "music", "quiz", "adventure", "puzzle", "story", "simulator", "horror", "fighting"];
-
         async function findPopularTag() {
-            for (const tag of CANDIDATE_TAGS) {
-                try {
-                    const results = await ProjectApi.searchProjects(0, `#${tag}`, "", "", false, false);
-                    if (results && results.length > 7) {
-                        return { tag: `#${tag}`, projects: results };
-                    }
-                } catch (e) {
-                    // skip failed ones
+            try {
+                const tags = await ProjectClient.getTags(1);
+                const qualifying = tags.filter(t => t.count > 7);
+                if (qualifying.length === 0) return null;
+                const picked = qualifying[Math.floor(Math.random() * qualifying.length)];
+                const results = await ProjectApi.searchProjects(0, `#${picked.tag}`, "", "", false, false);
+                if (results && results.length > 0) {
+                    return { tag: `#${picked.tag}`, projects: results };
                 }
+            } catch (e) {
+                console.log("findPopularTag error:", e);
             }
             return null;
         }
-
         ProjectClient.getFrontPage()
             .then(async results => {
                 projects.today = results.latest;

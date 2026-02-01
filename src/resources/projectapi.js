@@ -290,6 +290,25 @@ async getProfileComment(commentId) {
         })
     }
 
+    async getTags(minCount) {
+        return new Promise((resolve, reject) => {
+            const url = `${OriginApiUrl}/api/v1/projects/tags?minCount=${minCount}`;
+            fetch(url)
+                .then((res) => {
+                    if (!res.ok) {
+                        res.text().then(reject);
+                        return;
+                    }
+                    res.json().then((info) => {
+                        resolve(info);
+                    });
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        })
+    }
+
     static getProjectMeta(id) {
         return new Promise((resolve, reject) => {
             const url = `${OriginApiUrl}/api/v1/projects/getproject?projectID=${id}&requestType=metadata`;
