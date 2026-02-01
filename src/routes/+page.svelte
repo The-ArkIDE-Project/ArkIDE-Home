@@ -275,16 +275,37 @@
             });
         });
 
+        const CANDIDATE_TAGS = ["game", "platformer", "animation", "art", "music", "quiz", "adventure", "puzzle", "story", "simulator", "horror", "fighting"];
+
+        async function findPopularTag() {
+            for (const tag of CANDIDATE_TAGS) {
+                try {
+                    const results = await ProjectApi.searchProjects(0, `#${tag}`, "", "", false, false);
+                    if (results && results.length > 7) {
+                        return { tag: `#${tag}`, projects: results };
+                    }
+                } catch (e) {
+                    // skip failed ones
+                }
+            }
+            return null;
+        }
+
         ProjectClient.getFrontPage()
-            .then(results => {
+            .then(async results => {
                 projects.today = results.latest;
                 projects.featured = results.featured;
                 projects.voted = results.voted;
                 projects.viewed = results.viewed;
-                projects.tagged = results.tagged;
                 if (results.suggested)
                     projects.suggested = results.suggested;
-                tagForProjects = results.selectedTag;
+
+                const popular = await findPopularTag();
+                if (popular) {
+                    tagForProjects = popular.tag;
+                    projects.tagged = popular.projects;
+                }
+
                 projectsLoaded = true;
             })
             .catch(() => {
@@ -696,6 +717,7 @@
                 <!-- NOTE: This section is entirely hard-coded for time-relevant stuff, but avoid making new classes for a topic. -->
                 <div class="category-news">
                     <div class="category-news-content">
+                        <h3>Check out the ArkIDE Project Randomizer <a href="/randomiser">here</a></h3>
                         <h2 style="margin-block:4px;">Welcome to ArkIDE</h2>
                         <div style="width:100%">
                             <p>
@@ -963,7 +985,7 @@
                 </div>
             </ContentCategory>
         {/if}
-        {#if projects.tagged.length > 7}
+        {#if projects.tagged.length > 0}
             <ContentCategory
                 header={String(TranslationHandler.text(
                     "home.sections.sortedbytag",
