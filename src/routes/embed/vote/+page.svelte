@@ -53,6 +53,7 @@
         { name: "pattern-recognition", url: "https://arkide.site/patternregognition.png" },
         { name: "w9ptii-ball", url: "https://arkide.site/w9pti-ball.png" },
         { name: "snork", url: "https://arkide.site/snork.png" },
+        { name: "gar-lick-bread", url: "https://arkide.site/gar-lick-bread.png" },
     ];
 
     export let projectId = "";
