@@ -4,6 +4,7 @@ let customCursorEnabled = true;
 
 // List of verified usernames
 let verifiedUsernames = [];
+let svgCache = null;
 
 onMount(async () => {
 // Check if custom cursor is enabled (default to true)
@@ -73,44 +74,52 @@ function applyVerifiedBadges() {
         }
     }
 
-    nodesToReplace.forEach(({ node, username }) => {
-        const text = node.textContent;
-        const regex = new RegExp(`\\b${username}\\b`, 'g');
-        
-        if (regex.test(text)) {
-            const parent = node.parentElement;
-            const computedStyle = parent ? window.getComputedStyle(parent) : null;
-            const fontSize = computedStyle ? computedStyle.fontSize : '16px';
-            const fontSizeNum = parseFloat(fontSize);
-            const badgeSize = fontSizeNum * 0.85; // 85% of text size
+    // Function to process nodes with the SVG
+    const processNodes = (svgContent) => {
+        nodesToReplace.forEach(({ node, username }) => {
+            const text = node.textContent;
+            const regex = new RegExp(`\\b${username}\\b`, 'g');
             
-            // Check if dark mode is enabled
-            const isDarkMode = document.documentElement.classList.contains('dark') || 
-                               document.body.classList.contains('dark') ||
-                               window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            // Purple color in both modes, lighter in dark mode
-            const svgColor = isDarkMode ? '#9d7fff' : '#7e5eff';
-            
-            // Adjust vertical alignment for larger text
-            const verticalAlign = fontSizeNum > 20 ? 'baseline' : 'middle';
-            
-            // Fetch and modify the SVG
-            fetch('/verified.svg')
-                .then(response => response.text())
-                .then(svgContent => {
-                    // Replace all color attributes in the SVG with our color, but keep transparent/none values
-                    let modifiedSvg = svgContent
-                        .replace(/fill="(?!none|transparent)([^"]*)"/g, `fill="${svgColor}"`)
-                        .replace(/stroke="(?!none|transparent)([^"]*)"/g, `stroke="${svgColor}"`)
-                        .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign};"`);
-                    
-                    const span = document.createElement('span');
-                    span.innerHTML = text.replace(regex, `<span class="verified-username">${username}${modifiedSvg}</span>`);
-                    parent?.replaceChild(span, node);
-                });
-        }
-    });
+            if (regex.test(text)) {
+                const parent = node.parentElement;
+                const computedStyle = parent ? window.getComputedStyle(parent) : null;
+                const fontSize = computedStyle ? computedStyle.fontSize : '16px';
+                const fontSizeNum = parseFloat(fontSize);
+                const badgeSize = fontSizeNum * 0.85;
+                
+                const isDarkMode = document.documentElement.classList.contains('dark') || 
+                                   document.body.classList.contains('dark') ||
+                                   window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                const svgColor = isDarkMode ? '#9d7fff' : '#7e5eff';
+                const verticalAlign = fontSizeNum > 20 ? 'baseline' : 'middle';
+                
+                let modifiedSvg = svgContent
+                    .replace(/fill="(?!none|transparent)([^"]*)"/g, `fill="${svgColor}"`)
+                    .replace(/stroke="(?!none|transparent)([^"]*)"/g, `stroke="${svgColor}"`)
+                    .replace(/<svg/, `<svg class="verified-badge" style="height: ${badgeSize}px; width: ${badgeSize}px; vertical-align: ${verticalAlign};"`);
+                
+                const span = document.createElement('span');
+                span.innerHTML = text.replace(regex, `<span class="verified-username">${username}${modifiedSvg}</span>`);
+                parent?.replaceChild(span, node);
+            }
+        });
+    };
+
+    // Use cached SVG if available, otherwise fetch it
+    if (svgCache) {
+        processNodes(svgCache);
+    } else {
+        fetch('/verified.svg')
+            .then(response => response.text())
+            .then(svgContent => {
+                svgCache = svgContent; // Cache it
+                processNodes(svgContent);
+            })
+            .catch(err => {
+                console.error('Failed to load verified badge SVG:', err);
+            });
+    }
 }
 
 // Listen for storage changes from other tabs/windows
