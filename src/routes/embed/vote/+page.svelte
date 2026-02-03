@@ -55,7 +55,7 @@
         { name: "snork", url: "https://arkide.site/snork.png" },
         { name: "gar-lick-bread", url: "https://arkide.site/gar-lick-bread.png" },
         { name: "ohno", url: "https://arkide.site/ohno.png" },
-        { name: "cat", url: "https://arkide.site/catjpg" },
+        { name: "cat", url: "https://arkide.site/cat.jpg" },
     ];
 
     export let projectId = "";
