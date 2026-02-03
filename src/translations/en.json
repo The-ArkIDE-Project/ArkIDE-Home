@@ -49,7 +49,7 @@
     "home.sections.mostliked": "Most Liked Projects",
     "home.sections.mostviewed": "Most Viewed Projects",
     "home.sections.sortedbytag": "Projects marked as #$1",
-    "home.server.error": "Whoops! Our server's having some problems. Try again later.",
+    "home.server.error": "Whoops! Our server's having some problems. Try again later. If you're still logged in, just refresh the page a few times and all the projects should appear again.",
     "home.footer.notaffiliated": "ArkIDE is not affiliated with Penguinmod, Scratch, TurboWarp, the Scratch Team, or the Scratch Foundation.",
     "home.footer.sections.website": "Website",
     "home.footer.sections.website.editor": "Editor",
