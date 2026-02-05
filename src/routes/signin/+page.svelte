@@ -75,6 +75,7 @@
             // Store in localStorage
             localStorage.setItem("username", username);
             localStorage.setItem("token", token);
+            localStorage.setItem("tw:username", username);
             
             // Set cookie that works across all arkide.site subdomains
             // Cookie will last for 30 days
@@ -83,6 +84,7 @@
 
             document.cookie = `arkide_username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
             document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+            document.cookie = `tw:username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`; // Add this line
             
             return true;
         }
@@ -145,6 +147,7 @@
             // Store in localStorage
             localStorage.setItem("username", username);
             localStorage.setItem("token", token);
+            localStorage.setItem("tw:username", username);
             
             // Set cookie that works across all arkide.site subdomains
             const expiryDate = new Date();
@@ -152,6 +155,7 @@
 
             document.cookie = `arkide_username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
             document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+            document.cookie = `tw:username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`; // Add this line
 
             if (embed) {
                 const opener = window.opener || window.parent;
