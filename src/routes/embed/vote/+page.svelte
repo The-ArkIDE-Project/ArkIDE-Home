@@ -61,7 +61,7 @@
         { name: "keith-obama", url: "https://arkide.site/keith-obama.gif" },
         { name: "hmmm", url: "https://arkide.site/hmmm.png" },
         { name: "stop", url: "https://arkide.site/stop.png" },
-        { name: "suprised", url: "https://arkide.site/suprised.png" },
+        { name: "suprised", url: "https://arkide.site/suprised.jpg" },
         { name: "whoishe", url: "https://arkide.site/whoishe.png" },
     ];
 
