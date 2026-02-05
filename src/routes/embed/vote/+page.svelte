@@ -59,6 +59,10 @@
         { name: "korth", url: "https://arkide.site/korth.png" },
         { name: "ballin", url: "https://arkide.site/ballballballlin.svg" },
         { name: "keith-obama", url: "https://arkide.site/keith-obama.gif" },
+        { name: "hmmm", url: "https://arkide.site/hmmm.png" },
+        { name: "stop", url: "https://arkide.site/stop.png" },
+        { name: "suprised", url: "https://arkide.site/suprised.png" },
+        { name: "whoishe", url: "https://arkide.site/whoishe.png" },
     ];
 
     export let projectId = "";
