@@ -49,7 +49,7 @@
 
 <div class="container">
     <img
-        src="/devposts/{data.slug}.webp"
+        src="/devposts/{data.slug}.png"
         alt={data.slug}
         class="event-banner"
     >

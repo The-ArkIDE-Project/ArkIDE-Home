@@ -1,5 +1,5 @@
-import DevPostShutdownIncident from "./shutdownincident.md?raw";
+import DevPostShutdownIncident from "./arkide-crash.md?raw";
 
 export default {
-    "3-18-2025-shutdown-incident": DevPostShutdownIncident,
+    "1-9-26-shutdown-incident": DevPostShutdownIncident,
 };
