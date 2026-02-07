@@ -726,9 +726,7 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Update the viewer page a bunch and add some new features to it.</li>
-                                <li>Add image comments like on tiktok, dont worry theres a set list of images users can use, you cannot upload your own photo. You can submit photos to be added on our discord server though.</li>
-                                <li>General Bug Fixing.</li>
+                                <li>No recent updates.</li>
                             </ul>
 
                             <p>Here are some photos of the mascot:</p>
