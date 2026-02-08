@@ -153,13 +153,35 @@ function parseHashtags(text) {
     });
 }
 
+function parseLinks(text) {
+    if (!text) return text;
+    
+    const arkideLinkRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.)?arkide\.site[^\s<>]*/gi;
+    
+    return text.replace(arkideLinkRegex, (match) => {
+        // Clean up trailing punctuation that might not be part of the URL
+        let cleanMatch = match.replace(/[.,;!?]+$/, '');
+        
+        // Ensure the URL has a protocol
+        let url = cleanMatch;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        
+        // Create clickable link, preserving any trailing punctuation outside the link
+        const trailingPunct = match.slice(cleanMatch.length);
+        return `<a href="${url}" class="arkide-link" target="_blank" rel="noopener noreferrer">${cleanMatch}</a>${trailingPunct}`;
+    });
+}
+
 function parseContent(text) {
     if (!text) return text;
     
-    // Parse in order: emojis -> mentions -> hashtags
+    // Parse in order: emojis -> mentions -> hashtags -> links
     let parsed = parseEmojis(text);
     parsed = parseMentions(parsed);
     parsed = parseHashtags(parsed);
+    parsed = parseLinks(parsed);
     return parsed;
 }
 
@@ -769,5 +791,25 @@ function parseContent(text) {
 
 :global(body.dark-mode) .soft-reject-warning p {
     color: #ff6b6b;
+}
+:global(.arkide-link) {
+    color: #0074d9 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: color 0.2s ease !important;
+    display: inline !important;
+}
+
+:global(.arkide-link:hover) {
+    color: #0056a8 !important;
+    text-decoration: underline !important;
+}
+
+:global(body.dark-mode) :global(.arkide-link) {
+    color: #4dabf7 !important;
+}
+
+:global(body.dark-mode) :global(.arkide-link:hover) {
+    color: #74c0fc !important;
 }
 </style>
