@@ -153,12 +153,28 @@ function parseHashtags(text) {
     });
 }
 
+// List of allowed link domains - add more as needed
+const allowedLinkDomains = [
+    'arkide.site',
+    'arc360hub.com'
+];
+
 function parseLinks(text) {
     if (!text) return text;
     
-    const arkideLinkRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.)?arkide\.site[^\s<>]*/gi;
+    // Create regex pattern from allowed domains
+    // Escapes dots and joins with OR operator
+    const domainsPattern = allowedLinkDomains
+        .map(domain => domain.replace(/\./g, '\\.'))
+        .join('|');
     
-    return text.replace(arkideLinkRegex, (match) => {
+    // Match any URL with allowed domains (with or without protocol/www, including subdomains)
+    const linkRegex = new RegExp(
+        `(?:https?:\\/\\/)?(?:www\\.)?(?:[a-zA-Z0-9-]+\\.)?(${domainsPattern})[^\\s<>]*`,
+        'gi'
+    );
+    
+    return text.replace(linkRegex, (match) => {
         // Clean up trailing punctuation that might not be part of the URL
         let cleanMatch = match.replace(/[.,;!?]+$/, '');
         
