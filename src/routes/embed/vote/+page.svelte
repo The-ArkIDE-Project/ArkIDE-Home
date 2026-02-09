@@ -63,6 +63,7 @@
         { name: "stop", url: "https://arkide.site/stop.png" },
         { name: "suprised", url: "https://arkide.site/suprised.jpg" },
         { name: "whoishe", url: "https://arkide.site/whoishe.png" },
+        { name: "does-he-know", url: "https://arkide.site/does-he-know.png" },
     ];
 
     export let projectId = "";
