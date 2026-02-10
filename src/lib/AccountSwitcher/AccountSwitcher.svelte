@@ -342,7 +342,9 @@
         <div class="modal-content" on:click|stopPropagation transition:scale={{ duration: 200, easing: quintOut }}>
             <div class="modal-header">
                 <h2>Account Switcher</h2>
-                <button class="close-button" on:click={close}>×</button>
+                <button class="close-button" on:click={close}>
+                    <img src="/x.svg" alt="Close" class="close-icon" />
+                </button>
             </div>
             
             <div class="modal-body">
@@ -538,9 +540,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.384);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -548,95 +548,75 @@
     }
     
     .modal-content {
-        background: rgba(255, 255, 255, 0.568);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        background: rgba(17, 17, 17, 0.788);
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         width: 90%;
         max-width: 600px;
         max-height: 85vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-    }
-    
-    :global(body.dark-mode) .modal-content {
-        background: rgba(34, 34, 34, 0.568);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: rgba(255, 255, 255, 0.15) 4px solid;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
     
     .modal-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        padding: 20px 24px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    :global(body.dark-mode) .modal-header {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 16px 20px;
+        background: #4c3bff;
+        color: white;
+        position: relative;
     }
     
     .modal-header h2 {
         margin: 0;
-        font-size: 1.5rem;
-        color: #333;
-    }
-    
-    :global(body.dark-mode) .modal-header h2 {
-        color: white;
+        font-size: 1.25rem;
+        font-weight: 500;
+        text-align: center;
     }
     
     .close-button {
         background: transparent;
         border: none;
-        font-size: 2rem;
-        color: #666;
+        color: white;
+        font-size: 1.5rem;
         cursor: pointer;
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
-        transition: all 0.2s;
+        border-radius: 96px;
+        transition: background 0.2s;
+        position: absolute;
+        right: 12px;
+        user-select: none;
+        padding: 0;
+        background: rgba(255, 255, 255, 0.1);
     }
     
     .close-button:hover {
-        background: rgba(0, 0, 0, 0.1);
-        color: #333;
-    }
-    
-    :global(body.dark-mode) .close-button {
-        color: #ccc;
-    }
-    
-    :global(body.dark-mode) .close-button:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
+        background: rgba(255, 255, 255, 0.3);
     }
     
     .modal-body {
-        padding: 24px;
+        padding: 20px;
         overflow-y: auto;
         flex: 1;
     }
     
     .error-message {
-        background: rgba(255, 82, 82, 0.15);
-        border: 1px solid #ff5252;
-        border-radius: 8px;
+        background: rgba(255, 107, 107, 0.1);
         padding: 12px;
+        border-radius: 4px;
+        border-left: 3px solid #ff6b6b;
+        font-size: 0.9rem;
+        color: #ff6b6b;
         margin-bottom: 16px;
-        color: #d32f2f;
-        font-weight: 500;
-    }
-    
-    :global(body.dark-mode) .error-message {
-        background: rgba(255, 82, 82, 0.2);
-        color: #ff8a80;
     }
     
     .accounts-list {
@@ -647,33 +627,30 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
     }
     
     .accounts-list h3 {
         margin: 0;
         font-size: 1.1rem;
-        color: #333;
-    }
-    
-    :global(body.dark-mode) .accounts-list h3 {
-        color: white;
+        color: #e0e0e0;
+        font-weight: 500;
     }
     
     .add-account-btn {
-        background: #0011ff;
+        background: #4c3bff;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 4px;
         padding: 8px 16px;
-        font-weight: 600;
+        font-weight: 500;
         font-size: 0.9rem;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: background 0.2s;
     }
     
     .add-account-btn:hover:not(:disabled) {
-        background: #0009cc;
+        background: #3d2ecc;
     }
     
     .add-account-btn:disabled {
@@ -683,13 +660,21 @@
     
     .empty-state {
         text-align: center;
-        color: #666;
+        color: #888;
         padding: 20px;
         font-style: italic;
+        font-size: 0.95rem;
     }
     
-    :global(body.dark-mode) .empty-state {
-        color: #999;
+    .info-message {
+        background: rgba(76, 59, 255, 0.1);
+        border: 1px solid rgba(76, 59, 255, 0.3);
+        border-radius: 4px;
+        padding: 12px;
+        margin-bottom: 12px;
+        color: #9580ff;
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
     
     .account-item {
@@ -697,31 +682,21 @@
         justify-content: space-between;
         align-items: center;
         padding: 12px;
-        background: rgba(98, 81, 255, 0.08);
-        border: 1px solid rgba(98, 81, 255, 0.2);
-        border-radius: 8px;
+        background: #1a1a1a;
+        border: 1px solid #444;
+        border-radius: 4px;
         margin-bottom: 8px;
         transition: all 0.2s;
     }
     
     .account-item:hover {
-        background: rgba(98, 81, 255, 0.12);
-        border-color: rgba(98, 81, 255, 0.3);
+        background: #222;
+        border-color: #555;
     }
     
     .account-item.current {
-        background: rgba(98, 81, 255, 0.15);
-        border-color: rgba(98, 81, 255, 0.4);
-    }
-    
-    :global(body.dark-mode) .account-item {
-        background: rgba(98, 81, 255, 0.15);
-        border-color: rgba(98, 81, 255, 0.3);
-    }
-    
-    :global(body.dark-mode) .account-item:hover {
-        background: rgba(98, 81, 255, 0.2);
-        border-color: rgba(98, 81, 255, 0.4);
+        background: rgba(76, 59, 255, 0.15);
+        border-color: #4c3bff;
     }
     
     .account-info {
@@ -733,7 +708,7 @@
     .account-pfp {
         width: 40px;
         height: 40px;
-        border-radius: 6px;
+        border-radius: 4px;
         object-fit: cover;
     }
     
@@ -745,33 +720,26 @@
     
     .account-username {
         font-weight: 600;
-        color: #333;
-    }
-    
-    :global(body.dark-mode) .account-username {
-        color: white;
+        color: #e0e0e0;
+        font-size: 0.95rem;
     }
     
     .current-badge {
         font-size: 0.75rem;
-        color: #0011ff;
+        color: #4c3bff;
         font-weight: 600;
-    }
-    
-    :global(body.dark-mode) .current-badge {
-        color: #6251ff;
     }
     
     .account-actions {
         display: flex;
-        gap: 8px;
+        gap: 6px;
     }
     
     .action-btn {
         padding: 6px 12px;
         border: none;
-        border-radius: 6px;
-        font-weight: 600;
+        border-radius: 4px;
+        font-weight: 500;
         font-size: 0.85rem;
         cursor: pointer;
         transition: all 0.2s;
@@ -783,118 +751,111 @@
     }
     
     .switch-btn {
-        background: #0011ff;
+        background: #4c3bff;
         color: white;
     }
     
     .switch-btn:hover:not(:disabled) {
-        background: #0009cc;
+        background: #3d2ecc;
     }
     
     .edit-btn {
-        background: rgba(98, 81, 255, 0.15);
-        color: #0011ff;
+        background: transparent;
+        color: #999;
+        border: 1px solid #444;
     }
     
     .edit-btn:hover:not(:disabled) {
-        background: rgba(98, 81, 255, 0.25);
-    }
-    
-    :global(body.dark-mode) .edit-btn {
-        color: #9580ff;
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #666;
+        color: #ccc;
     }
     
     .delete-btn {
-        background: rgba(255, 82, 82, 0.15);
-        color: #d32f2f;
+        background: transparent;
+        color: #ff6b6b;
+        border: 1px solid rgba(255, 107, 107, 0.3);
     }
     
     .delete-btn:hover:not(:disabled) {
-        background: rgba(255, 82, 82, 0.25);
-    }
-    
-    :global(body.dark-mode) .delete-btn {
-        color: #ff8a80;
+        background: rgba(255, 107, 107, 0.1);
+        border-color: rgba(255, 107, 107, 0.5);
     }
     
     .current-session-label {
         font-size: 0.85rem;
-        color: #666;
+        color: #888;
         font-style: italic;
     }
     
-    :global(body.dark-mode) .current-session-label {
-        color: #999;
+    .account-form {
+        background: #1a1a1a;
+        border-radius: 4px;
+        padding: 16px;
+        border: 1px solid #444;
+        margin-bottom: 16px;
     }
     
     .switch-captcha-dialog {
-        border: 2px solid #0011ff;
+        border-color: #4c3bff;
     }
     
     .switch-captcha-dialog p {
-        font-size: 0.9rem;
-    }
-    
-    :global(body.dark-mode) .switch-captcha-dialog p {
-        color: #999;
-    }
-    
-    .account-form {
-        background: rgba(0, 0, 0, 0.03);
-        border-radius: 12px;
-        padding: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-    
-    :global(body.dark-mode) .account-form {
-        background: rgba(255, 255, 255, 0.03);
-        border-color: rgba(255, 255, 255, 0.08);
+        color: #b0b0b0;
+        margin: 8px 0 16px 0;
     }
     
     .account-form h3 {
-        margin: 0 0 12px 0;
+        margin: 0 0 16px 0;
         font-size: 1.1rem;
-        color: #333;
-    }
-    
-    :global(body.dark-mode) .account-form h3 {
-        color: white;
+        color: #e0e0e0;
+        font-weight: 500;
     }
     
     .form-group {
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
     
     .form-group label {
         display: block;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         font-size: 0.9rem;
-        font-weight: 600;
-        color: #555;
-    }
-    
-    :global(body.dark-mode) .form-group label {
-        color: #ccc;
+        font-weight: 500;
+        color: #b0b0b0;
     }
     
     .form-group input {
         width: 100%;
-        padding: 10px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        font-size: 1rem;
-        background: white;
+        padding: 10px 12px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        background: #0d0d0d;
+        color: #e0e0e0;
         box-sizing: border-box;
+        transition: border-color 0.2s;
     }
     
-    :global(body.dark-mode) .form-group input {
-        background: #1a1a1a;
-        border-color: rgba(255, 255, 255, 0.2);
-        color: white;
+    .form-group input:focus {
+        outline: none;
+        border-color: #4c3bff;
+    }
+    
+    .form-group input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .form-group input::placeholder {
+        color: #666;
     }
     
     .password-input-wrapper {
         position: relative;
+    }
+    
+    .password-input-wrapper input {
+        padding-right: 40px;
     }
     
     .password-toggle {
@@ -909,20 +870,29 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .password-toggle:hover {
+        opacity: 1;
     }
     
     .password-toggle img {
         width: 20px;
         height: 20px;
-        opacity: 0.6;
-    }
-    
-    .password-toggle:hover img {
-        opacity: 1;
-    }
-    
-    :global(body.dark-mode) .invert-on-dark {
         filter: invert(1);
+    }
+    
+    .captcha-warning {
+        background: rgba(255, 169, 77, 0.1);
+        border: 1px solid rgba(255, 169, 77, 0.3);
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 12px;
+        color: #ffa94d;
+        font-size: 0.85rem;
+        text-align: center;
     }
     
     .form-actions {
@@ -935,9 +905,9 @@
         flex: 1;
         padding: 10px;
         border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.95rem;
         cursor: pointer;
         transition: all 0.2s;
     }
@@ -948,79 +918,62 @@
     }
     
     .add-btn, .save-btn {
-        background: #0011ff;
+        background: #4c3bff;
         color: white;
     }
     
     .add-btn:hover:not(:disabled), .save-btn:hover:not(:disabled) {
-        background: #0009cc;
+        background: #3d2ecc;
     }
     
     .cancel-btn {
-        background: rgba(0, 0, 0, 0.1);
-        color: #333;
+        background: transparent;
+        color: #999;
+        border: 1px solid #444;
     }
     
     .cancel-btn:hover:not(:disabled) {
-        background: rgba(0, 0, 0, 0.15);
-    }
-    
-    :global(body.dark-mode) .cancel-btn {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-    }
-    
-    :global(body.dark-mode) .cancel-btn:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #666;
+        color: #ccc;
     }
     
     .modal-footer {
         padding-top: 16px;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #444;
         margin-top: 16px;
-    }
-    
-    :global(body.dark-mode) .modal-footer {
-        border-top-color: rgba(255, 255, 255, 0.1);
     }
     
     .info-text {
         font-size: 0.85rem;
-        color: #666;
+        color: #888;
         margin: 0;
         text-align: center;
+        line-height: 1.5;
     }
     
-    :global(body.dark-mode) .info-text {
-        color: #999;
+    /* Scrollbar styling */
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
     }
-    .info-message {
-        background: rgba(0, 119, 255, 0.1);
-        border: 1px solid rgba(0, 119, 255, 0.3);
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 12px;
-        color: #0077ff;
-        font-size: 0.9rem;
+    
+    .modal-body::-webkit-scrollbar-track {
+        background: #1a1a1a;
     }
-
-    :global(body.dark-mode) .info-message {
-        background: rgba(0, 119, 255, 0.15);
-        color: #66b3ff;
+    
+    .modal-body::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
     }
-    .captcha-warning {
-        background: rgba(255, 152, 0, 0.1);
-        border: 1px solid rgba(255, 152, 0, 0.3);
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 12px;
-        color: #f57c00;
-        font-size: 0.85rem;
-        text-align: center;
+    
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
-
-    :global(body.dark-mode) .captcha-warning {
-        background: rgba(255, 152, 0, 0.15);
-        color: #ffb74d;
+    .close-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    transform: rotate(45deg);
+    filter: invert(1);
     }
 </style>

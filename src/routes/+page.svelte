@@ -726,7 +726,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>No recent updates.</li>
+                                <li>Add a report button to the project page</li>
+                                <li>Update the Account Switcher's UI</li>
+                                <li>General bug fixing</li>
                             </ul>
 
                             <p>Here are some photos of the mascot:</p>

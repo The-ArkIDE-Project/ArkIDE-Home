@@ -11,11 +11,13 @@
     import Button from "$lib/Button/Button.svelte";
     import LocalizedText from "$lib/LocalizedText/Node.svelte";
     import Language from "../../resources/language.js";
-    import VoteEmbed from "../embed/vote/+page.svelte"; // Adjust path as needed
+    import VoteEmbed from "../embed/vote/+page.svelte";
     import ShareModal from "$lib/ShareModal.svelte";
+    import ReportModal from "$lib/ReportModal.svelte";
 
     let currentLang = "en";
     let shareModal;
+    let reportModal;
     onMount(() => {
         Language.forceUpdate();
     });
@@ -252,6 +254,12 @@ function parseContent(text) {
             shareModal.open();
         }
     }
+
+    function openReportModal() {
+        if (reportModal) {
+            reportModal.open();
+        }
+    }
 </script>
 
 <svelte:head>
@@ -338,12 +346,23 @@ function parseContent(text) {
                     {#if projectData.lastUpdate && projectData.lastUpdate !== projectData.date}
                         <span class="update-date">(Updated: {formatDate(projectData.lastUpdate)})</span>
                     {/if}
-                    <button class="share-button" on:click={openShareModal} title="Share project">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M13 7c-1.1 0-2.1.6-2.6 1.5L6.9 6.8c.1-.3.1-.5.1-.8s0-.5-.1-.8l3.5-1.7C10.9 4.4 11.9 5 13 5c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .5.1.8L6.6 4.5C6.1 3.6 5.1 3 4 3 2.3 3 1 4.3 1 6s1.3 3 3 3c1.1 0 2.1-.6 2.6-1.5l3.5 1.7c-.1.3-.1.5-.1.8 0 1.7 1.3 3 3 3s3-1.3 3-3-1.3-3-3-3z"/>
-                        </svg>
-                        Share
-                    </button>
+                    <div class="action-buttons">
+                        <button class="share-button" on:click={openShareModal} title="Share project">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M13 7c-1.1 0-2.1.6-2.6 1.5L6.9 6.8c.1-.3.1-.5.1-.8s0-.5-.1-.8l3.5-1.7C10.9 4.4 11.9 5 13 5c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .5.1.8L6.6 4.5C6.1 3.6 5.1 3 4 3 2.3 3 1 4.3 1 6s1.3 3 3 3c1.1 0 2.1-.6 2.6-1.5l3.5 1.7c-.1.3-.1.5-.1.8 0 1.7 1.3 3 3 3s3-1.3 3-3-1.3-3-3-3z"/>
+                            </svg>
+                            Share
+                        </button>
+                        <button class="report-button" on:click={openReportModal} title="Report project">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 0l1.5 5h5.3l-4.3 3.1 1.6 5.1L8 10.1l-4.1 3.1 1.6-5.1L1.2 5h5.3L8 0z" opacity="0.3"/>
+                                <path d="M7.5 1v6h1V1h-1zm0 7v1h1V8h-1z" fill="currentColor"/>
+                                <circle cx="8" cy="8" r="7.5" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <path d="M8 4v5M8 11v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Report
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -407,6 +426,12 @@ function parseContent(text) {
     bind:this={shareModal}
     projectId={projectId}
     projectTitle={projectData?.title || ""}
+/>
+<ReportModal 
+    bind:this={reportModal}
+    projectId={projectId}
+    projectTitle={projectData?.title || ""}
+    reportType="project"
 />
     <div style="height: 32px;" />
 </div>
@@ -655,6 +680,10 @@ function parseContent(text) {
         font-size: 0.9rem;
         opacity: 0.8;
         color: #333;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: space-between;
     }
 
     :global(body.dark-mode) .project-dates {
@@ -827,5 +856,36 @@ function parseContent(text) {
 
 :global(body.dark-mode) :global(.arkide-link:hover) {
     color: #74c0fc !important;
+}
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.report-button:hover {
+    background: #ff3344;
+}
+
+:global(body.dark-mode) .report-button {
+    background: #ff4757;
+}
+
+:global(body.dark-mode) .report-button:hover {
+    background: #ff3344;
 }
 </style>
