@@ -17,13 +17,13 @@ export default {
     penguinjamsupersuperhero: "superhero",
     penguinjamsupersupervillain: "supervillain",
     // penguinjam
-    studiojam: "studiopenguinjamwinner",
+    studiojam: "studioarkidejamwinner",
     // penguinjamdiamond: "penguinjamdiamond", // no translation
-    penguinjamplatinum: "penguinjamplatinum",
-    penguinjamobsidian: "penguinjamobsidian",
-    penguinjamgold: "penguinjamgold",
-    penguinjamsilver: "penguinjamsilver",
-    penguinjambronze: "penguinjambronze",
+    penguinjamplatinum: "arkidejamplatinum",
+    penguinjamobsidian: "arkidejamobsidian",
+    penguinjamgold: "arkidejamgold",
+    penguinjamsilver: "arkidejamsilver",
+    penguinjambronze: "arkidejambronze",
     // generic
     event: "eventwinner",
     participant: "participant",
