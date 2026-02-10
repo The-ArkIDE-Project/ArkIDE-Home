@@ -974,6 +974,5 @@
     height: 16px;
     display: block;
     transform: rotate(45deg);
-    filter: invert(1);
     }
 </style>
