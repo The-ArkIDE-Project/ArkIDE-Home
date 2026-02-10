@@ -64,6 +64,9 @@
         { name: "suprised", url: "https://arkide.site/suprised.jpg" },
         { name: "whoishe", url: "https://arkide.site/whoishe.png" },
         { name: "does-he-know", url: "https://arkide.site/does-he-know.png" },
+        { name: "why-is-he-lying", url: "https://arkide.site/why-is-he-lying.png" },
+        { name: "incorect-buzzer-noise", url: "https://arkide.site/incorect.png" },
+        { name: "tiny-brain", url: "https://arkide.site/tiny-brain.png" },
     ];
 
     export let projectId = "";
