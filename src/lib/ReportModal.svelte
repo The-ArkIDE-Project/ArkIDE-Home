@@ -71,12 +71,19 @@
                 body: JSON.stringify({
                     token: token,
                     report: reportText.trim(),
-                    target: reportType === "project" ? projectId : targetUsername,
+                    target: reportType === "project" ? projectId : targetUsername.toLowerCase(),
                     type: reportType
                 })
             });
             
             const data = await response.json();
+
+            console.log("Submitting report:", {
+                projectId: projectId,
+                reportText: reportText.trim(),
+                reportType: reportType,
+                targetUsername: targetUsername
+            });
             
             if (response.ok && data.success) {
                 submitSuccess = true;
