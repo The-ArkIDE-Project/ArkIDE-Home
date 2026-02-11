@@ -677,7 +677,7 @@ function parseContent(text) {
     }
 
     .update-date {
-        margin-right: 340px;
+        margin-right: 365px;
         font-style: italic;
     }
 
