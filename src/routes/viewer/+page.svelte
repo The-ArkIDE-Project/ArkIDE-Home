@@ -677,7 +677,7 @@ function parseContent(text) {
     }
 
     .update-date {
-        margin-right: 365px;
+        margin-right: 395px;
         font-style: italic;
     }
 
@@ -757,7 +757,7 @@ function parseContent(text) {
 }
 .project-dates {
     margin-top: 12px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     opacity: 0.8;
     color: #333;
     display: flex;
