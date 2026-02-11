@@ -495,7 +495,7 @@ function parseContent(text) {
     .left-column {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 2px;
     }
 
     .embed-container {
@@ -675,23 +675,9 @@ function parseContent(text) {
         border-radius: 50%;
         object-fit: cover;
     }
-    .project-dates {
-        margin-top: 12px;
-        font-size: 0.9rem;
-        opacity: 0.8;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        justify-content: space-between;
-    }
-
-    :global(body.dark-mode) .project-dates {
-        color: #ddd;
-    }
 
     .update-date {
-        margin-left: 8px;
+        margin-right: 340px;
         font-style: italic;
     }
 
