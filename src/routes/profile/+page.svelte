@@ -10,6 +10,7 @@
     import Authentication from "../../resources/authentication.js";
     import ProjectApi from "../../resources/projectapi.js";
     import EmojiList from "../../resources/emojis.js";
+    import censor from "../../resources/basiccensorship.js";
     const ProjectClient = new ProjectApi();
     
     // Static values
@@ -213,6 +214,7 @@ const postComment = async () => {
             }
         }
     }
+    content = censor(content);
     
     const token = localStorage.getItem("token");
     if (!token) {

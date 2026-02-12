@@ -3,6 +3,7 @@
     import Authentication from "../../../resources/authentication.js";
     import ProjectApi from "../../../resources/projectapi.js";
     import EmojiHandler from "../../../resources/emojis.js";
+    import censor from "../../../resources/basiccensorship.js";
     const ProjectClient = new ProjectApi();
 
     // Components
@@ -295,6 +296,7 @@ async function postComment() {
     }
     
     try {
+        content = censor(content);
         const response = await fetch(`${API_URL}/api/v1/projects/comments`, {
             method: "POST",
             headers: {
