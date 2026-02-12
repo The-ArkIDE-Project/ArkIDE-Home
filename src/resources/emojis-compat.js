@@ -304,7 +304,8 @@ const emojiList = [
   "disgust2",
   "checkmate",
   "furry",
-  "despair"
+  "despair",
+  "w9pti"
 ].sort();
 
 export function mockRequest() {
