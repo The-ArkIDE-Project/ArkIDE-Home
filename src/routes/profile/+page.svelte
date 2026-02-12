@@ -2276,7 +2276,7 @@ function insertEmoji(emojiName) {
 
 <!-- "Followers" Section actually showing Following -->
 {#if followingList.length > 0}
-    <ContentCategory header="Followers" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+    <ContentCategory header="Followers ({followingList.length})" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
             {#each followingList as following}
                 <a href={`/profile?user=${encodeURIComponent(following.username)}`} class="following-user-link">
@@ -2293,7 +2293,7 @@ function insertEmoji(emojiName) {
         </div>
     </ContentCategory>
 {:else}
-    <ContentCategory header="Followers" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+    <ContentCategory header="Followers ({followingList.length})" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
             <p style="opacity:0.5">Not following anyone yet.</p>
         </div>
@@ -2302,7 +2302,7 @@ function insertEmoji(emojiName) {
 
 <!-- "Following" Section actually showing Followers -->
 {#if followerslist.length > 0}
-    <ContentCategory header="Following" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+    <ContentCategory header="Following ({followerslist.length})" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; flex-direction: row; align-items: stretch;">
             {#each followerslist as follower}
                 <a href={`/profile?user=${encodeURIComponent(follower.username)}`} class="following-user-link">
@@ -2319,7 +2319,7 @@ function insertEmoji(emojiName) {
         </div>
     </ContentCategory>
 {:else}
-    <ContentCategory header="Following" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
+    <ContentCategory header="Following ({followerslist.length})" style="width:calc(90% - 10px);" stylec="height: 244px;overflow-x:auto;overflow-y:hidden;">
         <div class="following-list" style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
             <p style="opacity:0.5">Not following anyone yet.</p>
         </div>
@@ -3206,6 +3206,7 @@ function insertEmoji(emojiName) {
     text-decoration: none;
     color: inherit;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .following-user-link:hover {

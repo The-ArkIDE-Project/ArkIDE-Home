@@ -135,6 +135,13 @@
             <li>Violation 3: Perminant Ban</li>
 
 
+            <h2>Verification Requirments</h2>
+            <p>Here are the Requirments to get verified on ArkIDE, If you feel you reach these requierments, join our discord and contant an admin.</p>
+            <li>You must have more than 25 Followers</li>
+            <li>You must have a project with 200+ Viewers</li>
+            <li>Optional: If you are an admin you automaticly get verified.</li>
+
+
 
             <h2>General</h2>
             <p>
