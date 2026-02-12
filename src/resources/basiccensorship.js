@@ -1,4 +1,4 @@
-const token = "❤";
+const token = ":w9pti:";
 
 function t(length) {
     const arr = [];
