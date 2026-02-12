@@ -259,6 +259,7 @@ const postComment = async () => {
 
 // Update a comment
 const updateComment = async (commentId, content) => {
+    content = censor(content);
     const token = localStorage.getItem("token");
     if (!token) return;
 

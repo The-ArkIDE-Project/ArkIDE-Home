@@ -336,6 +336,7 @@ function startEdit(comment) {
 }
 
 async function saveEdit(commentId) {
+    editContent = censor(editContent);
     try {
         const response = await fetch(`${API_URL}/api/v1/projects/comments/${commentId}`, {
             method: "PATCH",
