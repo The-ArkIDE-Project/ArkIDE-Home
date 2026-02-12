@@ -136,7 +136,7 @@
 
 
             <h2>Verification Requirments</h2>
-            <p>Here are the Requirments to get verified on ArkIDE, If you feel you reach these requierments, join our discord and contant an admin.</p>
+            <p>Here are the Requirments to get verified on ArkIDE, If you feel you reach these requierments, Fill out our form here: <a href="verification">Verification Page</a>.</p>
             <li>You must have more than 25 Followers</li>
             <li>You must have a project with 200+ Viewers</li>
             <li>Optional: If you are an admin you automaticly get verified.</li>
