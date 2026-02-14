@@ -68,6 +68,8 @@
         { name: "why-is-he-lying", url: "https://arkide.site/why-is-he-lying.png" },
         { name: "incorect-buzzer-noise", url: "https://arkide.site/incorect.png" },
         { name: "tiny-brain", url: "https://arkide.site/tiny-brain.png" },
+        { name: "writing", url: "https://arkide.site/writing.gif" },
+        { name: "ohmy", url: "https://arkide.site/ohmy.png" },
     ];
 
     export let projectId = "";
