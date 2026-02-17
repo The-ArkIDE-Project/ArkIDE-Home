@@ -1180,6 +1180,18 @@
                 <a target="_blank" href={LINK.donate.turbowarp}>TurboWarp</a>
                 <a target="_blank" href={LINK.donate.scratch}>Scratch</a>
             </div>
+            <div class="footer-section">
+                <p>
+                    <LocalizedText
+                        text="Other Projects"
+                        key="home.footer.sections.op"
+                        lang={currentLang}
+                    />
+                </p>
+                <a href="https://optiark.arc360hub.com/">OptiArk (MC Modpack)</a>
+                <a href="https://github.com/arc360alt/videodestroyer">Video Destroyer</a>
+                <a href="https://github.com/arc360alt/PyOS">PyOS</a>
+            </div>
         </div>
     </div>
 </div>
