@@ -11,7 +11,7 @@ export default {
     /**
      * PenguinMod's editor page
      */
-    editor: `${PUBLIC_STUDIO_URL}/editor.html`,
+    editor: `${PUBLIC_STUDIO_URL}/editor.html?fromprojectpage`,
 
     /**
      * PenguinMod's credits page

@@ -1230,19 +1230,19 @@
         width: 100%;
         padding: 24px 0px 48px;
         border-top: rgba(0, 0, 0, 0.3) 1px solid;
-        background: #0004ff15;
+        background: #5500ff15;
         font-weight: bold;
         margin-top: 4px;
         /* border-top-left-radius: 20%; */
         /* border-top-right-radius: 20%; */
     }
     .footer a {
-        color: dodgerblue;
+        color: rgb(130, 62, 255);
         font-weight: normal;
         margin: 2px 0px;
     }
     .footer a:active {
-        color: rgb(15, 77, 139);
+        color: rgb(73, 15, 139);
     }
     .footer-list {
         display: flex;
