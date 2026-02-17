@@ -592,7 +592,7 @@
     left: 50%;
     transform: translateX(-50%); 
     top: 1rem; 
-    background: rgba(48, 62, 255, 0.7);
+    background: rgba(89, 0, 255, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     height: 3rem;
@@ -614,7 +614,7 @@
     padding: 0 1rem; 
     padding-left: 82px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    border: 4px solid rgba(191, 157, 255, 0.2);
+    border: 4px solid rgba(120, 71, 255, 0.2);
 }
 
     .bar :global(a) {

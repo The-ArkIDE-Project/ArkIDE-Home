@@ -50,10 +50,10 @@
     .button-highlight {
         outline: 0px;
         background-color: white;
-        color: #0011ff;
+        color: #5900ff;
     }
     :global(body.dark-mode) .button-highlight {
-        color: #0011ff;
+        color: #5900ff;
     }
 
     :global(body.launcher-mode) .ca-discordButton {

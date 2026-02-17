@@ -62,9 +62,9 @@
         border-radius: 4px;
         outline-width: 2px;
         outline-style: solid;
-        outline-color: rgba(0, 4, 255, 0.35);
+        outline-color: #5900ff95;
         color: white;
-        background-color: #0011ff;
+        background-color: #5900ff;
         cursor: url('link.png'), pointer;
         display: flex;
         flex-direction: row;
@@ -76,7 +76,7 @@
     .button-highlight {
         outline: 0px;
         background-color: white;
-        color: #0011ff;
+        color: #5900ff;
     }
     .button-toggled {
         background-color: transparent !important;

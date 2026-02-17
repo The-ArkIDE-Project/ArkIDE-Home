@@ -1314,7 +1314,7 @@
         justify-content: space-around;
     }
     .section-links {
-        background: #0011ff28;
+        background: #3300ff28;
         color: white;
         display: flex;
         flex-direction: row;
