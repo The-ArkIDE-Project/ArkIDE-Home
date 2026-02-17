@@ -1747,7 +1747,7 @@ function insertEmoji(emojiName) {
                                     <div class="user-username">
                                         <div class="profile-picture-container">
                                             <img
-                                                style="border-color:{isDonator ? '#a237db' : '#efefef'}"
+                                                style="border-color:{isDonator ? '#ffe817' : '#efefef'}"
                                                 src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
                                                 alt="Profile"
                                                 class="profile-picture"
@@ -3133,10 +3133,10 @@ function insertEmoji(emojiName) {
     }
 
     .donator-color {
-        color: #a237db;
+        color: #dbdb37;
     }
     :global(body.dark-mode) .donator-color {
-        color: #c65cff;
+        color: #f7ff5c;
     }
 
     .small {

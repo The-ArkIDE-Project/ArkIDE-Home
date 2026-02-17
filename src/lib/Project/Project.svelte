@@ -373,11 +373,11 @@
         color: #b5bac9;
     }
     .donator-name {
-        color: #a237db;
+        color: #dbdb37;
         font-weight: bold;
     }
     :global(body.dark-mode) .donator-name {
-        color: #c65cff;
+        color: #f7ff5c;
         font-weight: bold;
     }
     .date {
