@@ -33,6 +33,7 @@
     let thumbnailUrl = data.thumbnailUrl || "";
     let darkModeObserver;
     let originalDarkModeState = false;
+    let showTitlePopup = false;
 
     onMount(async () => {
         // Save the original dark mode state
@@ -298,6 +299,14 @@ function parseContent(text) {
             <p>{error}</p>
         </div>
     {:else if projectData}
+     {#if showTitlePopup}
+            <div class="title-popup-overlay" on:click={() => showTitlePopup = false}>
+                <div class="title-popup" on:click|stopPropagation>
+                    <p>{projectData.title}</p>
+                    <button on:click={() => showTitlePopup = false}>Close</button>
+                </div>
+            </div>
+        {/if}
         <div class="content-wrapper">
             <div class="title-container">
                 <div class="title-author-section">
@@ -308,7 +317,7 @@ function parseContent(text) {
                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect fill=%22%23cccccc%22 width=%2264%22 height=%2264%22/%3E%3C/svg%3E'"
                     />
                     <div class="title-text-section">
-                        <h1 class="project-title">{projectData.title}</h1>
+                        <h1 class="project-title" on:click={() => showTitlePopup = true}>{projectData.title}</h1>
                         <a href="/profile?user={projectData.author.username}" class="title-author-link">
                             by {projectData.author.username}
                         </a>
@@ -597,12 +606,17 @@ function parseContent(text) {
     .title-text-section {
         display: flex;
         flex-direction: column;
+        min-width: 0;
     }
 
     .project-title {
         font-size: 2.4rem;
         margin: 0;
         color: #001affad;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 800px;
     }
 
     .title-author-link {
@@ -872,5 +886,56 @@ function parseContent(text) {
 
 :global(body.dark-mode) .report-button:hover {
     background: #ff3344;
+}
+.project-title {
+    cursor: pointer;
+}
+
+.title-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.title-popup {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+}
+
+:global(body.dark-mode) .title-popup {
+    background: #1b1b1b;
+    color: white;
+}
+
+.title-popup p {
+    font-size: 1.5rem;
+    margin: 0 0 16px 0;
+    word-break: break-word;
+}
+
+.title-popup button {
+    padding: 8px 20px;
+    background: #001affad;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.title-popup button:hover {
+    background: #0015cc;
+}
+
+:global(body.dark-mode) .title-popup button {
+    background: #4d6bff;
 }
 </style>
