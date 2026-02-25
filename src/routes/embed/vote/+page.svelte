@@ -70,6 +70,7 @@
         { name: "tiny-brain", url: "https://arkide.site/tiny-brain.png" },
         { name: "writing", url: "https://arkide.site/writing.gif" },
         { name: "ohmy", url: "https://arkide.site/ohmy.png" },
+        { name: "aaaaa", url: "https://arkide.site/aaaaa.png" },
     ];
 
     export let projectId = "";
