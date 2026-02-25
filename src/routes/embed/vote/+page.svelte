@@ -71,6 +71,11 @@
         { name: "writing", url: "https://arkide.site/writing.gif" },
         { name: "ohmy", url: "https://arkide.site/ohmy.png" },
         { name: "aaaaa", url: "https://arkide.site/aaaaa.png" },
+        { name: "average-gtavl-project", url: "https://extras.arkide.site/arkide-images/average-gtavl-project.svg" },
+        { name: "good-answer-nephew", url: "https://extras.arkide.site/arkide-images/good-answer-nephew.svg" },
+        { name: "statement", url: "https://extras.arkide.site/arkide-images/Statement.svg" },
+        { name: "statement2", url: "https://extras.arkide.site/arkide-images/Statement2.svg" },
+        { name: "why-is-this-so-mad", url: "https://extras.arkide.site/arkide-images/why-is-this-so-mad.svg" },
     ];
 
     export let projectId = "";
