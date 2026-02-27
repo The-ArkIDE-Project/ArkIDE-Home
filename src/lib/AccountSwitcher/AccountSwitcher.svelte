@@ -260,6 +260,7 @@
 
     // In performSwitch():
     async function performSwitch() {
+    console.log("performSwitch called, switchCaptchaToken:", switchCaptchaToken ? "has value" : "null/undefined");
         if (!switchCaptchaToken) {
             errorMessage = "Please complete the captcha to switch accounts";
             return;
@@ -304,6 +305,7 @@
         showSwitchCaptcha = false;
         switchingAccount = null;
         captchaToken = null;
+        switchCaptchaToken = null;
         switchCaptchaKey++; // Instead of captchaKey++
         errorMessage = "";
     }
