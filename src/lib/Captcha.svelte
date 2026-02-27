@@ -21,13 +21,33 @@
     dispatch("update", false);
   };
 
-  onMount(() => {
+onMount(() => {
     if (String(PUBLIC_CAPTCHA_ENABLED) === "false") return;
 
     window.on_captcha_complete = (token) => dispatch("update", token);
     window.on_captcha_expired = () => dispatch("update", false);
     window.on_captcha_error = () => dispatch("update", false);
-  });
+
+    const renderCaptcha = () => {
+        if (!window.hcaptcha) {
+            setTimeout(renderCaptcha, 100);
+            return;
+        }
+        const elements = document.querySelectorAll(".h-captcha");
+        elements.forEach(el => {
+            if (!el.getAttribute("data-hcaptcha-widget-id")) {
+                hcaptcha.render(el, {
+                    sitekey: PUBLIC_CAPTCHA_SITEKEY,
+                    callback: "on_captcha_complete",
+                    "expired-callback": "on_captcha_expired",
+                    "error-callback": "on_captcha_error"
+                });
+            }
+        });
+    };
+
+    setTimeout(renderCaptcha, 100);
+});
 </script>
 
 <svelte:head>
@@ -59,11 +79,5 @@
     Emulator, Captcha is disabled in .env, see PUBLIC_CAPTCHA_ENABLED
   </div>
 {:else}
-  <div
-    class="h-captcha"
-    data-sitekey={PUBLIC_CAPTCHA_SITEKEY}
-    data-callback="on_captcha_complete"
-    data-expired-callback="on_captcha_expired"
-    data-error-callback="on_captcha_error"
-  />
+<div class="h-captcha" />
 {/if}
