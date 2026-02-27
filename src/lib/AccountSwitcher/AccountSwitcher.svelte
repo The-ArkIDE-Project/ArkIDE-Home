@@ -486,7 +486,7 @@
                         {/key}
                         
                         <div class="form-actions">
-                            <button class="form-btn save-btn" on:click={performSwitch} disabled={saving || !captchaToken}>
+                            <button class="form-btn save-btn" on:click={performSwitch} disabled={saving || !switchCaptchaToken}>
                                 {saving ? 'Switching...' : 'Switch Account'}
                             </button>
                             <button class="form-btn cancel-btn" on:click={cancelSwitch} disabled={saving}>
