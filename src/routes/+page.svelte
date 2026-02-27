@@ -726,8 +726,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Add a report button to the project page</li>
-                                <li>Update the Account Switcher's UI</li>
+                                <li>Switch to hCaptcha from Cloudfalre Turnstile</li>
+                                <li>Fix the account switcher UI</li>
+                                <li>Finnaly make the captcha not randomly invalidate itself</li>
                                 <li>General bug fixing</li>
                             </ul>
 
