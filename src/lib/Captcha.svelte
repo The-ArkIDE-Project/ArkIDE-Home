@@ -29,10 +29,6 @@ onMount(() => {
     window.on_captcha_error = () => dispatch("update", false);
 
     const renderCaptcha = () => {
-        if (!window.hcaptcha) {
-            setTimeout(renderCaptcha, 100);
-            return;
-        }
         const elements = document.querySelectorAll(".h-captcha");
         elements.forEach(el => {
             if (!el.getAttribute("data-hcaptcha-widget-id")) {
@@ -46,18 +42,22 @@ onMount(() => {
         });
     };
 
-    setTimeout(renderCaptcha, 100);
+    if (window.hcaptcha) {
+        setTimeout(renderCaptcha, 100);
+    } else {
+        window.hcaptchaOnLoad = renderCaptcha;
+    }
 });
 </script>
 
 <svelte:head>
-  {#if String(PUBLIC_CAPTCHA_ENABLED) !== "false"}
-    <script
-      src="https://js.hcaptcha.com/1/api.js"
-      async
-      defer
-    ></script>
-  {/if}
+    {#if String(PUBLIC_CAPTCHA_ENABLED) !== "false"}
+        <script
+            src="https://js.hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit"
+            async
+            defer
+        ></script>
+    {/if}
 </svelte:head>
 
 {#if String(PUBLIC_CAPTCHA_ENABLED) === "false"}
