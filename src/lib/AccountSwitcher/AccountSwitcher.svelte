@@ -21,6 +21,7 @@
     let saving = false;
     let errorMessage = "";
     let captchaToken = null;
+    let switchCaptchaToken = null; 
     let addFormCaptchaKey = 0; // Separate key for add/edit form
     let switchCaptchaKey = 0; // Separate key for switch dialog
     let switchingAccount = null; // Account being switched to
