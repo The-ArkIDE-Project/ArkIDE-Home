@@ -573,14 +573,18 @@
     }
     function openUpdateMenu() {
         otherProjects = [];
-        projectPage = 0;
-        lastProjectPage = false;
+        lastProjectPage = true;
         projectPageType = "update";
         updatePageOpen = true;
 
-        ProjectClient.getMyProjects(projectPage).then((projects) => {
-            otherProjects = projects;
-        });
+        async function fetchAllPages(page = 0) {
+            const projects = await ProjectClient.getMyProjects(page);
+            if (projects.length > 0) {
+                otherProjects = [...otherProjects, ...projects];
+                fetchAllPages(page + 1);
+            }
+        }
+        fetchAllPages();
     }
 
     let _window = { location: { origin: null } };
