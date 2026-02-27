@@ -542,7 +542,10 @@
                 projectPageSearch = 0;
                 projectPage += 1;
                 ProjectApi.getProjects(projectPage, false, username, ProjectClient.token).then((projectss) => {
-                    canRemix.push(...projectss);
+                    const filtered = projectss.filter(
+                        (p) => !canRemix.some((i) => i.id === p.id)
+                    );
+                    canRemix.push(...filtered);
                     canRemix = canRemix;
                     lastProjectPage = projectss.length <= 0;
                 });
@@ -564,7 +567,7 @@
         projectPageType = "remix";
         remixPageOpen = true;
 
-        ProjectApi.getProjects(projectPage, false, ProjectClient.token).then((projects) => {
+        ProjectApi.getProjects(projectPage, false, username, ProjectClient.token).then((projects) => {
             canRemix = projects;
         });
     }
@@ -574,7 +577,8 @@
         lastProjectPage = false;
         projectPageType = "update";
         updatePageOpen = true;
-        ProjectClient.getMyProjects().then((projects) => {
+
+        ProjectClient.getMyProjects(projectPage).then((projects) => {
             otherProjects = projects;
         });
     }
