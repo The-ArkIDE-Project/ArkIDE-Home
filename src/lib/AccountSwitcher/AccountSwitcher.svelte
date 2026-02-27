@@ -480,7 +480,8 @@
                         
                         {#key `switch-${switchCaptchaKey}`}
                             <Captcha on:update={(event) => {
-                                captchaToken = event.detail;
+                                switchCaptchaToken = event.detail;
+                                console.log("switch token set:", switchCaptchaToken ? "yes" : "no");
                             }} />
                         {/key}
                         
