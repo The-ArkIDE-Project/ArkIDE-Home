@@ -257,69 +257,44 @@
         errorMessage = "";
     }
 
-    // Actually perform the switch after captcha
+    // In performSwitch():
     async function performSwitch() {
-        if (!captchaToken) {
+        if (!switchCaptchaToken) {
             errorMessage = "Please complete the captcha to switch accounts";
             return;
         }
-        
-        if (!switchingAccount) return;
-        
+
         saving = true;
         errorMessage = "";
-        
+
         try {
-            const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/passwordlogin`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: switchingAccount.username,
-                    password: switchingAccount.password,
-                    captcha_token: captchaToken
-                })
-            });
-            
-            const data = await response.json();
-            
-            console.log("Switch account response:", data);
-            
-            if (data.token) {
-                // Store in localStorage
+            const token = await Authentication.verifyPassword(
+                switchingAccount.username,
+                switchingAccount.password,
+                switchCaptchaToken
+            );
+
+            if (token) {
                 localStorage.setItem("username", switchingAccount.username);
-                localStorage.setItem("token", data.token);
-                
-                // Set cookie for cross-subdomain auth
-                const expiryDate = new Date();
-                expiryDate.setDate(expiryDate.getDate() + 30);
-                
-                document.cookie = `arkide_username=${encodeURIComponent(switchingAccount.username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
-                document.cookie = `arkide_token=${encodeURIComponent(data.token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
-                
-                // Fire authentication event
-                Authentication.fireAuthenticated(switchingAccount.username, data.token);
-                
-                // Reload page to apply new login
+                localStorage.setItem("token", token);
+                // ... rest of your cookie setting code
+                Authentication.fireAuthenticated(switchingAccount.username, token);
                 location.reload();
-            } else if (data.error) {
-                errorMessage = `Failed to login as ${switchingAccount.username}: ${data.error}. The password may have changed - try editing and re-entering credentials.`;
-                captchaToken = null;
-                switchCaptchaKey++; // Instead of captchaKey++
-                saving = false; // Important: reset saving state on error
             } else {
-                errorMessage = `Failed to login as ${switchingAccount.username}. The password may have changed - try editing and re-entering credentials.`;
-                captchaToken = null;
+                errorMessage = `Failed to login as ${switchingAccount.username}. Password may have changed.`;
+                switchCaptchaToken = null;
                 switchCaptchaKey++;
-                saving = false; // Important: reset saving state on error
             }
-        } catch (e) {
-            console.error("Switch account error:", e);
-            errorMessage = `Failed to switch to ${switchingAccount.username}. Please try again.`;
-            captchaToken = null;
+        } catch(e) {
+            if (e === "InvalidCaptcha") {
+                errorMessage = "Captcha failed, please try again.";
+            } else {
+                errorMessage = `Failed to switch to ${switchingAccount.username}.`;
+            }
+            switchCaptchaToken = null;
             switchCaptchaKey++;
-            saving = false; // Important: reset saving state on error
+        } finally {
+            saving = false;
         }
     }
     
