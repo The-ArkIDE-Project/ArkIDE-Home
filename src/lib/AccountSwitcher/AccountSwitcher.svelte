@@ -260,11 +260,12 @@
 
     // In performSwitch():
     async function performSwitch() {
-    console.log("performSwitch called, switchCaptchaToken:", switchCaptchaToken ? "has value" : "null/undefined");
         if (!switchCaptchaToken) {
             errorMessage = "Please complete the captcha to switch accounts";
             return;
         }
+
+        if (!switchingAccount) return;
 
         saving = true;
         errorMessage = "";
@@ -279,7 +280,12 @@
             if (token) {
                 localStorage.setItem("username", switchingAccount.username);
                 localStorage.setItem("token", token);
-                // ... rest of your cookie setting code
+
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30);
+                document.cookie = `arkide_username=${encodeURIComponent(switchingAccount.username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+                document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
+
                 Authentication.fireAuthenticated(switchingAccount.username, token);
                 location.reload();
             } else {
