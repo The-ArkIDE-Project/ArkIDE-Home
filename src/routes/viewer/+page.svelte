@@ -195,12 +195,10 @@ function parseLinks(text) {
 
 function parseContent(text) {
     if (!text) return text;
-    
-    // Parse in order: emojis -> mentions -> hashtags -> links
-    let parsed = parseEmojis(text);
-    parsed = parseMentions(parsed);
+    let parsed = parseMentions(text);
     parsed = parseHashtags(parsed);
     parsed = parseLinks(parsed);
+    parsed = parseEmojis(parsed);
     return parsed;
 }
 
@@ -937,5 +935,12 @@ function parseContent(text) {
 
 :global(body.dark-mode) .title-popup button {
     background: #4d6bff;
+}
+:global(body.dark-mode) .project-title :global(.emoji-inline),
+.project-title :global(.emoji-inline) {
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    max-width: 2.2rem !important;
+    max-height: 2.2rem !important;
 }
 </style>
