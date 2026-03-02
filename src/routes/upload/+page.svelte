@@ -27,6 +27,7 @@
     import Language from "../../resources/language.js";
     // Icons
     import SearchSVG from "../../resources/icons/Search/icon.svelte";
+    import censor from "../../resources/basiccensorship.js";
 
     let projectName = "";
     let currentLang = "en";
@@ -421,6 +422,10 @@
     async function uploadProject() {
         if (isBusyUploading) return;
         isBusyUploading = true;
+
+        components.projectName.value = await censor(components.projectName.value);
+        components.projectInstructions.value = await censor(components.projectInstructions.value);
+        components.projectNotes.value = await censor(components.projectNotes.value);
 
         if (tagsAreTooMany) {
             // TODO: Translation

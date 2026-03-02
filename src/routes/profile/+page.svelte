@@ -115,11 +115,12 @@ let emojisLoaded = false;
     };
     let canSendSaveReq = true;
     let canSendEditedProject = true;
-    const saveEditedBio = () => {
+    const saveEditedBio = async () => {
         if (!canSendSaveReq) return;
         canSendSaveReq = false;
         profileEditingData.isBioInappropriate = false;
         profileEditingData.isBioEditLoading = true;
+        profileEditingData.bio = await censor(profileEditingData.bio);
         ProjectClient.setBio(profileEditingData.bio, String(user).toLowerCase() !== String(loggedInUser).toLowerCase(), user).then(() => {
             fullProfile.bio = profileEditingData.bio;
             profileEditingData.isEditingBio = false;
