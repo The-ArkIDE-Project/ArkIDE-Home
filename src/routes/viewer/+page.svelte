@@ -78,7 +78,7 @@
         isDarkMode = document.body.classList.contains('dark-mode');
 
         // Load emojis in parallel (don't await)
-        loadEmojis().catch(err => console.error("Emoji load error:", err));
+        await loadEmojis().catch(err => console.error("Emoji load error:", err));
 
         // Fetch project data if we don't have it yet
         if (!projectData && projectId && projectId.trim() !== "") {
@@ -302,7 +302,7 @@ function parseContent(text) {
      {#if showTitlePopup}
             <div class="title-popup-overlay" on:click={() => showTitlePopup = false}>
                 <div class="title-popup" on:click|stopPropagation>
-                    <p>{projectData.title}</p>
+                    <p>{@html parseEmojis(projectData.title)}</p>
                     <button on:click={() => showTitlePopup = false}>Close</button>
                 </div>
             </div>
@@ -317,7 +317,7 @@ function parseContent(text) {
                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect fill=%22%23cccccc%22 width=%2264%22 height=%2264%22/%3E%3C/svg%3E'"
                     />
                     <div class="title-text-section">
-                        <h1 class="project-title" on:click={() => showTitlePopup = true}>{projectData.title}</h1>
+                        <h1 class="project-title" on:click={() => showTitlePopup = true}>{@html parseEmojis(projectData.title)}</h1>
                         <a href="/profile?user={projectData.author.username}" class="title-author-link">
                             by {projectData.author.username}
                         </a>
