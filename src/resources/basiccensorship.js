@@ -1,4 +1,4 @@
-const token = ":w9pti:";
+const token = ":disgust2:";
 
 function t(count) {
   return Array(count).fill(token).join('');
