@@ -95,7 +95,7 @@ async function apiCensor(text) {
   }
 }
 
-export function censorSync(text) {
+function censorSync(text) {
   let result = String(text);
   for (const [pattern, len] of RULES) {
     result = result.replace(pattern, t(len));
@@ -103,7 +103,7 @@ export function censorSync(text) {
   return result;
 }
 
-export async function censor(text) {
+async function censor(text) {
   const localResult = censorSync(String(text));
   return await apiCensor(localResult);
 }

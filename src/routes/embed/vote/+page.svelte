@@ -304,7 +304,7 @@ async function postComment() {
     }
     
     try {
-        content = censor(content);
+        content = await censor(content);
         const response = await fetch(`${API_URL}/api/v1/projects/comments`, {
             method: "POST",
             headers: {
@@ -344,7 +344,7 @@ function startEdit(comment) {
 }
 
 async function saveEdit(commentId) {
-    editContent = censor(editContent);
+    editContent = await censor(editContent);
     try {
         const response = await fetch(`${API_URL}/api/v1/projects/comments/${commentId}`, {
             method: "PATCH",
