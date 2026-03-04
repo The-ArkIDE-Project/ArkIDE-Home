@@ -477,7 +477,7 @@ function parseContent(text) {
 
     .content-wrapper {
         width: 90%;
-        max-width: 1400px;
+        max-width: 8000px;
         margin: 0 auto;
         padding: 32px 0;
     }
@@ -651,7 +651,7 @@ function parseContent(text) {
         border: 1px solid rgba(0, 0, 0, 0.35);
         border-radius: 4px;
         background: rgba(255, 200, 100, 0.1);
-        font-size: 0.95rem;
+        font-size: 0.85rem;
     }
 
     :global(body.dark-mode) .remix-section {
