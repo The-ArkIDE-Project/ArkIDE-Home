@@ -4703,11 +4703,10 @@ const openStatusModal = () => {
     padding: 8px 14px;
     white-space: nowrap;
     max-width: 260px;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: all;
     display: flex;
     align-items: center;
-    gap: 6px;
 }
 
 :global(body:not(.dark-mode)) .status-bubble-inner {
@@ -4752,13 +4751,16 @@ const openStatusModal = () => {
     border-top-color: #ffffff;
 }
 
-/* Action buttons */
 .status-actions {
+    position: absolute;
+    top: -12px;
+    right: -8px;
     display: flex;
     gap: 3px;
     opacity: 0;
     transition: opacity 0.15s ease;
     flex-shrink: 0;
+    pointer-events: all;
 }
 
 .status-bubble-inner:hover .status-actions {
