@@ -4699,7 +4699,6 @@ const openStatusModal = () => {
 .status-bubble-inner {
     position: relative;
     background: #2a2a32;
-    border: 1px solid rgba(255,255,255,0.18);
     border-radius: 16px;
     padding: 8px 14px;
     white-space: nowrap;
