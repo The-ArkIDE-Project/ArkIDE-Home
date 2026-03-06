@@ -4762,7 +4762,7 @@ const openStatusModal = () => {
     pointer-events: all;
 }
 
-.status-bubble-inner:hover .status-actions {
+.status-bubble-speech:hover .status-actions {
     opacity: 1;
 }
 
