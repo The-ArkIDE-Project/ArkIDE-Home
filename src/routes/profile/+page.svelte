@@ -4768,7 +4768,7 @@ const openStatusModal = () => {
 }
 
 .status-action-btn {
-    background: rgba(255,255,255,0.1);
+    background: #2a2a32;
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 6px;
     color: rgba(255,255,255,0.8);
@@ -4791,5 +4791,101 @@ const openStatusModal = () => {
 .status-action-btn.delete:hover {
     background: rgba(220, 60, 60, 0.6);
     color: #fff;
+}
+/* Status modal */
+.status-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status-modal {
+    background: #1a1a1f;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 28px 32px;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible;
+}
+.status-modal h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #fff;
+}
+.status-modal-hint {
+    margin: 0;
+    font-size: 0.8em;
+    opacity: 0.5;
+    color: #fff;
+}
+.status-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95em;
+    padding: 10px 14px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.status-input:focus {
+    border-color: rgba(255,255,255,0.3);
+}
+.status-char-count {
+    font-size: 0.78em;
+    opacity: 0.4;
+    color: #fff;
+    text-align: right;
+    margin-top: -6px;
+}
+.status-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+.status-modal-cancel {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    border-radius: 9px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.15s;
+}
+.status-modal-cancel:hover {
+    background: rgba(255,255,255,0.12);
+}
+.status-modal-save {
+    background: #6c63ff;
+    border: none;
+    color: #fff;
+    border-radius: 9px;
+    padding: 8px 22px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background 0.15s, opacity 0.15s;
+}
+.status-modal-save:hover:not(:disabled) {
+    background: #5a52e0;
+}
+.status-modal-save:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 </style>
