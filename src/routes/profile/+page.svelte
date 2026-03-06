@@ -1918,7 +1918,6 @@ const openStatusModal = () => {
                                                 {/if}
                                                 {#if userStatus}
                                                     <div class="status-bubble">
-                                                        <span class="status-text">{@html parseEmojis(userStatus)}</span>
                                                         {#if isOwnProfile}
                                                             <div class="status-actions">
                                                                 <button class="status-action-btn edit" on:click|stopPropagation={openStatusModal} title="Edit status">
