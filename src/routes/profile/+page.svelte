@@ -55,6 +55,10 @@
     let followerCount = null;
     let fullProfile = {};
     let isRankingUpMenu = false;
+    let userStatus = null;
+    let showStatusModal = false;
+    let statusInput = '';
+    let statusLoading = false;
     let isAttemptingRankUp = false;
     let profileFeaturedProject = null;
     let backgroundImageUrl = '';
@@ -94,6 +98,7 @@ let emojisLoaded = false;
             backgroundImageUrl = '';
         }
     }
+    $: isOwnProfile = loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase();
 
     let followingList = [];
     let followerslist = [];
@@ -633,6 +638,50 @@ Promise.all([
             });
         }
     };
+let joinDate = null;
+let userCountry = null;
+
+const fetchJoinDate = async () => {
+    try {
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/joindate?target=${encodeURIComponent(user)}`);
+        const data = await response.json();
+        if (data.success) {
+            joinDate = data.joinDate;
+            userCountry = data.country ? new Intl.DisplayNames(['en'], { type: 'region' }).of(data.country) : null;
+        }
+    } catch (err) {
+        console.error("Failed to fetch join date:", err);
+    }
+};
+
+function formatJoinDate(isoString) {
+    const joined = new Date(isoString);
+    const now = new Date();
+
+    let years = now.getFullYear() - joined.getFullYear();
+    let months = now.getMonth() - joined.getMonth();
+    let days = now.getDate() - joined.getDate();
+
+    if (days < 0) {
+        months--;
+        days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    }
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+    
+    // only show days if under 1 month
+    if (years === 0 && months === 0) {
+        parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    }
+
+    return parts.join(', ');
+}
     const loggedInChange = async () => {
         if (!loggedIn) {
             isFollowingUser = false;
@@ -651,6 +700,8 @@ Promise.all([
             }
         }
         fetchProfile();
+        await fetchJoinDate();
+        await fetchStatus();
         
         await fetchCommentsStatus();
         await fetchProfileComments();
@@ -1496,6 +1547,54 @@ function insertEmoji(emojiName) {
     newCommentContent += emojiCode;
     showEmojiPicker = false;
 }
+const fetchStatus = async () => {
+    try {
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/status?target=${encodeURIComponent(user)}`);
+        const data = await response.json();
+        if (data.success) userStatus = data.status;
+    } catch (err) { console.error("Failed to fetch status:", err); }
+};
+
+const submitStatus = async () => {
+    if (!statusInput.trim()) return;
+    statusLoading = true;
+    try {
+        const token = localStorage.getItem("token");
+        const censored = await censor(statusInput.trim());
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, status: censored })
+        });
+        const data = await response.json();
+        if (data.success) {
+            userStatus = data.status;
+            showStatusModal = false;
+            statusInput = '';
+        }
+    } catch (err) { console.error("Failed to set status:", err); }
+    statusLoading = false;
+};
+
+const deleteStatus = async (targetUser) => {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`https://arkideapi.arc360hub.com/api/v1/users/status`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, target: targetUser })
+        });
+        const data = await response.json();
+        if (data.success) userStatus = null;
+    } catch (err) { console.error("Failed to delete status:", err); }
+};
+
+const openStatusModal = () => {
+    if (isOwnProfile) {
+        statusInput = userStatus || '';
+        showStatusModal = true;
+    }
+};
 </script>
 
 <svelte:head>
@@ -1746,21 +1845,79 @@ function insertEmoji(emojiName) {
                             <div class="section-user-header">
                                 <div class="subuser-section">
                                     <div class="user-username">
-                                        <div class="profile-picture-container">
-                                            <img
-                                                style="border-color:{isDonator ? '#ffe817' : '#efefef'}"
-                                                src={`${PUBLIC_API_URL}/api/v1/users/getpfp?username=${user}`}
-                                                alt="Profile"
-                                                class="profile-picture"
-                                            />
-                                        </div>
-                                        <div class="user-after-image">
-                                            {#if isDonator}
-                                                <h1 class="donator-color">{fullProfile.real_username || user}</h1>
-                                            {:else}
-                                                <h1>{fullProfile.real_username || user}</h1>
+                                    <div
+                                        class="profile-picture-wrapper"
+                                        class:clickable={isOwnProfile}
+                                        on:click={openStatusModal}
+                                        title={isOwnProfile ? (userStatus ? "Edit your status" : "Add a status") : ""}
+                                    >
+                                        <img
+                                            class="profile-image"
+                                            src="{PUBLIC_API_URL}/api/v1/users/getpfp?username={user}"
+                                            alt="profile"
+                                            draggable="false"
+                                            style="border-radius: 15px; height: 80px; width: 80px; border: 2px solid; object-fit: cover;"
+                                        />
+                                        {#if isOwnProfile}
+                                            <div class="pfp-status-hint">
+                                                {userStatus ? '✏️' : '💬'}
+                                            </div>
+                                        {/if}
+                                    </div>
+                                    {#if userStatus}
+                                    <div class="status-bubble-wrapper">
+                                        <div class="status-bubble" class:admin-hover={fullProfile.admin || isOwnProfile}>
+                                            <span class="status-text">{userStatus}</span>
+
+                                            {#if isOwnProfile}
+                                                <div class="status-actions">
+                                                    <button class="status-action-btn edit" on:click={openStatusModal} title="Edit status">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="status-action-btn delete" on:click={() => deleteStatus(user)} title="Delete status">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            {:else if fullProfile.admin}
+                                                <div class="status-actions">
+                                                    <button class="status-action-btn delete" on:click={() => deleteStatus(user)} title="Remove status (admin)">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             {/if}
-                                            
+                                        </div>
+                                        <div class="status-bubble-tail"></div>
+                                    </div>
+                                {/if}
+                                        <div class="user-after-image">
+                                            <div class="user-name-stack">
+                                                {#if isDonator}
+                                                    <h1 class="donator-color">{fullProfile.real_username || user}</h1>
+                                                {:else}
+                                                    <h1>{fullProfile.real_username || user}</h1>
+                                                {/if}
+                                                {#if joinDate}
+                                                    <p class="join-date">
+                                                        Joined: {formatJoinDate(joinDate)} ago
+                                                        {#if userCountry}
+                                                            <span class="join-date-separator">|</span>
+                                                            {userCountry}
+                                                        {/if}
+                                                    </p>
+                                                {/if}
+                                            </div>
+
                                             {#if isProfilePrivate && !loggedInAdmin && (!isBlocked || showAnyways)}
                                                 <img src="/account/lock.svg" alt="Private" title="This profile is private." />
                                             {/if}
@@ -2151,31 +2308,33 @@ function insertEmoji(emojiName) {
                                 />
                             </div>
                             <p class="small" style="margin-block:4px">
-                                {#if fullProfile.admin === true}
-                                    <LocalizedText
-                                        text="Keith Master"
-                                        key="profile.ranking.admin"
-                                        lang={currentLang}
-                                    />
-                                {:else if fullProfile.approver === true}
-                                    <LocalizedText
-                                        text="Guard Keith"
-                                        key="profile.ranking.mod"
-                                        lang={currentLang}
-                                    />
-                                {:else if fullProfile.rank === 1}
-                                    <LocalizedText
-                                        text="Butterfly"
-                                        key="profile.ranking.ranked"
-                                        lang={currentLang}
-                                    />
-                                {:else}
-                                    <LocalizedText
-                                        text="Moth"
-                                        key="profile.ranking.new"
-                                        lang={currentLang}
-                                    />
-                                {/if}
+{#if badges.includes("owner")}
+    Owner
+{:else if badges.includes("admin")}
+    <LocalizedText
+        text="Keith Master"
+        key="profile.ranking.admin"
+        lang={currentLang}
+    />
+{:else if fullProfile.approver === true}
+    <LocalizedText
+        text="Guard Keith"
+        key="profile.ranking.mod"
+        lang={currentLang}
+    />
+{:else if fullProfile.rank === 1}
+    <LocalizedText
+        text="Butterfly"
+        key="profile.ranking.ranked"
+        lang={currentLang}
+    />
+{:else}
+    <LocalizedText
+        text="Moth"
+        key="profile.ranking.new"
+        lang={currentLang}
+    />
+{/if}
                                 {#if loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase() && fullProfile.rank === 0}
                                     {#if !fullProfile.canrankup}
                                         <span style="opacity: 0.5;font-size:.7em;">
@@ -2730,6 +2889,29 @@ function insertEmoji(emojiName) {
         <div style="height:32px;" />
         <LoadingSpinner enableTips={true} />
     {/if}
+    {#if showStatusModal}
+    <div class="status-modal-backdrop" on:click|self={() => showStatusModal = false}>
+        <div class="status-modal">
+            <h3>Set your status</h3>
+            <p class="status-modal-hint">Let people know what you're up to. Max 100 characters.</p>
+            <textarea
+                class="status-input"
+                bind:value={statusInput}
+                maxlength="100"
+                placeholder="What's on your mind?"
+                rows="3"
+                autofocus
+            ></textarea>
+            <div class="status-char-count">{statusInput.length}/100</div>
+            <div class="status-modal-actions">
+                <button class="status-modal-cancel" on:click={() => showStatusModal = false}>Cancel</button>
+                <button class="status-modal-save" on:click={submitStatus} disabled={statusLoading || !statusInput.trim()}>
+                    {statusLoading ? 'Saving...' : 'Save'}
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
 </div>
 
 <style>
@@ -3280,10 +3462,6 @@ function insertEmoji(emojiName) {
     transition: opacity 0.5s ease-in-out;
 }
 
-.following-user-link:hover .following-user-pfp-glow {
-    opacity: 0.85;
-}
-
 .following-user-name {
     font-weight: bold;
     font-size: 1.4em;
@@ -3608,13 +3786,6 @@ function insertEmoji(emojiName) {
     .user-after-image img {
         margin: 0 8px;
         transform: scale(0.75);
-    }
-    .user-after-image > h1 {
-        font-size: 3em;
-        font-weight: bolder;
-        margin-block: 0.2rem;
-        margin-left: 20px;
-        margin-right: 20px;
     }
     .user-badge-container {
         margin: 0px;
@@ -4375,5 +4546,233 @@ function insertEmoji(emojiName) {
 .comment-input-box {
     position: relative;
 }
+.user-name-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.user-name-stack h1 {
+    margin-block: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.join-date {
+    font-size: 0.85em;
+    opacity: 0.6;
+    margin: 0;
+    margin-top: 2px;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.join-date-separator {
+    opacity: 0.4;
+}
+/* PFP wrapper */
+.profile-picture-wrapper {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+}
+.profile-picture-wrapper.clickable {
+    cursor: pointer;
+}
+.profile-picture-wrapper.clickable:hover .profile-image {
+    filter: brightness(0.75);
+    transition: filter 0.2s ease;
+}
+.pfp-status-hint {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.65);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+.profile-picture-wrapper.clickable:hover .pfp-status-hint {
+    opacity: 1;
+}
+
+/* Status bubble */
+.status-bubble-wrapper {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 10;
+    pointer-events: none;
+}
+.status-bubble {
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 14px;
+    padding: 8px 14px;
+    max-width: 280px;
+    pointer-events: all;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    transition: padding-right 0.2s ease;
+}
+.status-text {
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.92);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.4;
+}
+.status-bubble-tail {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(255, 255, 255, 0.08);
+    margin-left: 18px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+}
+
+/* Status action buttons (hidden until hover) */
+.status-actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+.status-bubble:hover .status-actions {
+    opacity: 1;
+}
+.status-action-btn {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 7px;
+    color: rgba(255,255,255,0.8);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.status-action-btn.edit:hover {
+    background: rgba(80, 140, 255, 0.45);
+    color: #fff;
+}
+.status-action-btn.delete:hover {
+    background: rgba(220, 60, 60, 0.5);
+    color: #fff;
+}
+/* nudge text left when actions are present */
+.status-bubble:has(.status-actions):hover .status-text {
+    padding-right: 68px;
+    display: block;
+}
+
+/* Status modal */
+.status-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status-modal {
+    background: #1a1a1f;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 28px 32px;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.status-modal h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #fff;
+}
+.status-modal-hint {
+    margin: 0;
+    font-size: 0.8em;
+    opacity: 0.5;
+    color: #fff;
+}
+.status-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95em;
+    padding: 10px 14px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+.status-input:focus {
+    border-color: rgba(255,255,255,0.3);
+}
+.status-char-count {
+    font-size: 0.78em;
+    opacity: 0.4;
+    color: #fff;
+    text-align: right;
+    margin-top: -6px;
+}
+.status-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+.status-modal-cancel {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    border-radius: 9px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.15s;
+}
+.status-modal-cancel:hover { background: rgba(255,255,255,0.12); }
+.status-modal-save {
+    background: #6c63ff;
+    border: none;
+    color: #fff;
+    border-radius: 9px;
+    padding: 8px 22px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background 0.15s, opacity 0.15s;
+}
+.status-modal-save:hover:not(:disabled) { background: #5a52e0; }
+.status-modal-save:disabled { opacity: 0.45; cursor: not-allowed; }
 
 </style>
