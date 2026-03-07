@@ -2924,16 +2924,16 @@ const openStatusModal = () => {
     <div class="status-modal-backdrop" on:click|self={() => showStatusModal = false}>
         <div class="status-modal">
             <h3>Set your status</h3>
-            <p class="status-modal-hint">Let people know what you're up to. Max 100 characters.</p>
+            <p class="status-modal-hint">Let people know what you're up to. Max 50 characters.</p>
             <textarea
                 class="status-input"
                 bind:value={statusInput}
-                maxlength="100"
+                maxlength="50"
                 placeholder="What's on your mind?"
                 rows="3"
                 autofocus
             ></textarea>
-            <div class="status-char-count">{statusInput.length}/100</div>
+            <div class="status-char-count">{statusInput.length}/50</div>
             <div class="status-modal-actions">
                 <button class="status-modal-cancel" on:click={() => showStatusModal = false}>Cancel</button>
                 <button class="status-modal-save" on:click={submitStatus} disabled={statusLoading || !statusInput.trim()}>
@@ -4610,6 +4610,7 @@ const openStatusModal = () => {
     position: relative;
     display: inline-block;
     flex-shrink: 0;
+    overflow: visible;
 }
 .profile-picture-wrapper.clickable {
     cursor: pointer;
@@ -4685,14 +4686,16 @@ const openStatusModal = () => {
 .status-bubble-speech {
     position: absolute;
     bottom: calc(100% + 12px);
-    left: 85%;
-    transform: translateX(-20%);
+    left: 0;
+    right: auto;
+    transform: none;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     pointer-events: none;
     z-index: 100;
     filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+    width: max-content;
 }
 
 .status-bubble-inner {
@@ -4886,5 +4889,13 @@ const openStatusModal = () => {
 .status-modal-save:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+}
+.status-bubble-speech:hover .status-bubble-inner {
+    max-width: 1000px;
+}
+
+.status-bubble-speech:hover .status-bubble-text {
+    max-width: 1060px;
+    text-overflow: unset;
 }
 </style>
