@@ -36,29 +36,7 @@
     let showTitlePopup = false;
 
     onMount(async () => {
-        // Save the original dark mode state
-        originalDarkModeState = document.body.classList.contains('dark-mode');
-        
-        // Force dark mode on this page only
-        document.body.classList.add('dark-mode');
-        
-        // Prevent light mode toggle on this page
-        darkModeObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'class') {
-                    if (!document.body.classList.contains('dark-mode')) {
-                        document.body.classList.add('dark-mode');
-                    }
-                }
-            });
-        });
-        
-        darkModeObserver.observe(document.body, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
 
-        // Get project ID from URL hash or from server data
         if (!projectId) {
             const hash = window.location.hash;
             console.log("Hash:", hash);
@@ -68,23 +46,12 @@
                 console.log("Project ID:", projectId);
             }
         }
-        
-        // Set thumbnail URL if not already set
-        if (projectId && !thumbnailUrl) {
-            thumbnailUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=thumbnail`;
-        }
 
-        // Check if dark mode is enabled
-        isDarkMode = document.body.classList.contains('dark-mode');
-
-        // Load emojis in parallel (don't await)
         await loadEmojis().catch(err => console.error("Emoji load error:", err));
 
-        // Fetch project data if we don't have it yet
         if (!projectData && projectId && projectId.trim() !== "") {
             await fetchProjectData();
         } else if (projectData) {
-            // We have project data from server, but still need to fetch remix data
             loading = false;
             await fetchRemixData();
         } else {
@@ -93,27 +60,11 @@
         }
     });
 
-
-    onDestroy(() => {
-        // Disconnect observer
-        if (darkModeObserver) {
-            darkModeObserver.disconnect();
-        }
-        
-        // Restore the original dark mode state
-        if (originalDarkModeState) {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
-    });
-
 let emojiMap = {};
 let emojisLoaded = false;
 
 async function loadEmojis() {
     try {
-        // Import the emoji list directly
         const { mockRequest } = await import("../../resources/emojis-compat.js");
         const emojis = mockRequest();
         
@@ -156,38 +107,32 @@ function parseHashtags(text) {
     });
 }
 
-// List of allowed link domains - add more as needed
 const allowedLinkDomains = [
     'arkide.site',
-    'arc360hub.com'
+    'arc360hub.com',
+    'scratch.mit.edu',
 ];
 
 function parseLinks(text) {
     if (!text) return text;
     
-    // Create regex pattern from allowed domains
-    // Escapes dots and joins with OR operator
     const domainsPattern = allowedLinkDomains
         .map(domain => domain.replace(/\./g, '\\.'))
         .join('|');
     
-    // Match any URL with allowed domains (with or without protocol/www, including subdomains)
     const linkRegex = new RegExp(
         `(?:https?:\\/\\/)?(?:www\\.)?(?:[a-zA-Z0-9-]+\\.)?(${domainsPattern})[^\\s<>]*`,
         'gi'
     );
     
     return text.replace(linkRegex, (match) => {
-        // Clean up trailing punctuation that might not be part of the URL
         let cleanMatch = match.replace(/[.,;!?]+$/, '');
         
-        // Ensure the URL has a protocol
         let url = cleanMatch;
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             url = 'https://' + url;
         }
         
-        // Create clickable link, preserving any trailing punctuation outside the link
         const trailingPunct = match.slice(cleanMatch.length);
         return `<a href="${url}" class="arkide-link" target="_blank" rel="noopener noreferrer">${cleanMatch}</a>${trailingPunct}`;
     });
@@ -228,7 +173,6 @@ function parseContent(text) {
 
     function formatText(text) {
         if (!text) return '';
-        // Replace \r\n and \n with <br> tags, then parse content
         let formatted = text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
         return parseContent(formatted);
     }

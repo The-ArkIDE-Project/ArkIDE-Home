@@ -45,7 +45,7 @@
         outline-color: rgba(0, 0, 0, 0.15);
         color: white;
         background-color: transparent;
-        cursor: url('link.png'), pointer;
+        cursor: pointer;
     }
     .button-highlight {
         outline: 0px;

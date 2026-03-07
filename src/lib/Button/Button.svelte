@@ -65,7 +65,7 @@
         outline-color: #5900ff95;
         color: white;
         background-color: #5900ff;
-        cursor: url('link.png'), pointer;
+        cursor: pointer;
         display: flex;
         flex-direction: row;
         align-items: center;

@@ -609,7 +609,6 @@
     min-width: auto; 
     max-width: 95%;
     z-index: 1000;
-    cursor: url('cur.png'), auto;
     border-radius: 2rem; 
     padding: 0 1rem; 
     padding-left: 82px;
@@ -617,13 +616,7 @@
     border: 4px solid rgba(120, 71, 255, 0.2);
 }
 
-    .bar :global(a) {
-        cursor: url('link.png'), pointer;
-    }
 
-    .bar :global(button) {
-        cursor: url('link.png'), pointer;
-    }
 	:global(body.launcher-mode) .bar {
 		width: 5rem;
 		height: 100%;

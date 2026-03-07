@@ -137,7 +137,7 @@ updateCursorStyle();
 <slot />
 
 <style>
-/* Global cursor styles - only apply when enabled */
+/* Global cursor styles - only apply when enabled 
 :global(body.custom-cursor-enabled *) {
     cursor: url('/cur.png'), auto !important;
 }
@@ -155,7 +155,6 @@ updateCursorStyle();
 :global(body.custom-cursor-enabled [onclick]) {
     cursor: url('/link.png'), pointer !important;
 }
-/* Default text cursor for text inputs */
 :global(body.custom-cursor-enabled input[type="text"]),
 :global(body.custom-cursor-enabled input[type="email"]),
 :global(body.custom-cursor-enabled input[type="password"]),
@@ -165,7 +164,6 @@ updateCursorStyle();
     cursor: url('/txt.png'), text !important;
 }
 
-/* When disabled, use default cursors */
 :global(body.custom-cursor-disabled *) {
     cursor: auto !important;
 }
@@ -191,4 +189,5 @@ updateCursorStyle();
 :global(body.custom-cursor-disabled .search-bar) {
     cursor: text !important;
 }
+*/
 </style>

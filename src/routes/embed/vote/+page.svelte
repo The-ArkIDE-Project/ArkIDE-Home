@@ -487,7 +487,6 @@ function parseEmojis(text) {
 function parseMentions(text) {
     if (!text) return text;
     
-    console.log("Before parsing mentions:", text);
     
     // Match @username pattern
     const result = text.replace(/@(\w+)/g, (match, username) => {
@@ -495,7 +494,6 @@ function parseMentions(text) {
         return `<a href="/profile?user=${username}" class="mention-link" target="_blank">@${username}</a>`;
     });
     
-    console.log("After parsing mentions:", result);
     return result;
 }
 
