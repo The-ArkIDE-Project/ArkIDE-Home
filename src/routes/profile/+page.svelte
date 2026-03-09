@@ -928,12 +928,6 @@ function formatJoinDate(isoString) {
     };
 
     // EMOJIS eae
-    // EMOJIS eae
-    // EMOJIS eae
-    // EMOJIS eae
-    // EMOJIS eae
-    // EMOJIS eae
-    // EMOJIS eae
 
     const emojiPickerRandomEmojis = [
         'angel',
@@ -1012,20 +1006,6 @@ function formatJoinDate(isoString) {
         });
     });
 
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
-    // markdown code
     // markdown code
     
     const md = new MarkdownIt({
@@ -2920,25 +2900,27 @@ const openStatusModal = () => {
         <div style="height:32px;" />
         <LoadingSpinner enableTips={true} />
     {/if}
-    {#if showStatusModal}
+{#if showStatusModal}
     <div class="status-modal-backdrop" on:click|self={() => showStatusModal = false}>
         <div class="status-modal">
             <h3>Set your status</h3>
-            <p class="status-modal-hint">Let people know what you're up to. Max 50 characters.</p>
-            <textarea
-                class="status-input"
-                bind:value={statusInput}
-                maxlength="50"
-                placeholder="What's on your mind?"
-                rows="3"
-                autofocus
-            ></textarea>
-            <div class="status-char-count">{statusInput.length}/50</div>
-            <div class="status-modal-actions">
-                <button class="status-modal-cancel" on:click={() => showStatusModal = false}>Cancel</button>
-                <button class="status-modal-save" on:click={submitStatus} disabled={statusLoading || !statusInput.trim()}>
-                    {statusLoading ? 'Saving...' : 'Save'}
-                </button>
+            <div class="status-modal-body">
+                <p class="status-modal-hint">Let people know what you're up to. Max 50 characters.</p>
+                <textarea
+                    class="status-input"
+                    bind:value={statusInput}
+                    maxlength="50"
+                    placeholder="What's on your mind?"
+                    rows="3"
+                    autofocus
+                ></textarea>
+                <div class="status-char-count">{statusInput.length}/50</div>
+                <div class="status-modal-actions">
+                    <button class="status-modal-cancel" on:click={() => showStatusModal = false}>Cancel</button>
+                    <button class="status-modal-save" on:click={submitStatus} disabled={statusLoading || !statusInput.trim()}>
+                        {statusLoading ? 'Saving...' : 'Save'}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -4794,108 +4776,113 @@ const openStatusModal = () => {
     background: rgba(220, 60, 60, 0.6);
     color: #fff;
 }
-/* Status modal */
 .status-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 10000;
+    background: rgba(0, 0, 0, 0.384);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10000;
 }
 .status-modal {
-    background: #1a1a1f;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 18px;
-    padding: 28px 32px;
-    width: 380px;
-    max-width: 90vw;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    background: rgba(17, 17, 17, 0.788);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 420px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    overflow: visible;
+    border: rgba(255, 255, 255, 0.15) 4px solid;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 .status-modal h3 {
     margin: 0;
-    font-size: 1.2em;
-    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-align: center;
+    color: white;
+    padding: 16px 20px;
+    background: #4c3bff;
 }
 .status-modal-hint {
     margin: 0;
-    font-size: 0.8em;
-    opacity: 0.5;
-    color: #fff;
+    font-size: 0.85rem;
+    color: #888;
+    line-height: 1.5;
+}
+.status-modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 .status-input {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 0.95em;
-    padding: 10px 14px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #0d0d0d;
+    color: #e0e0e0;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
     resize: none;
     outline: none;
     font-family: inherit;
-    transition: border-color 0.2s;
-    width: 100%;
-    box-sizing: border-box;
 }
 .status-input:focus {
-    border-color: rgba(255,255,255,0.3);
+    border-color: #4c3bff;
 }
 .status-char-count {
-    font-size: 0.78em;
-    opacity: 0.4;
-    color: #fff;
+    font-size: 0.8rem;
+    color: #888;
     text-align: right;
-    margin-top: -6px;
+    margin-top: -4px;
 }
 .status-modal-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    gap: 8px;
     margin-top: 4px;
+    padding-top: 16px;
+    border-top: 1px solid #444;
 }
 .status-modal-cancel {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.7);
-    border-radius: 9px;
-    padding: 8px 18px;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: transparent;
+    color: #999;
+    font-weight: 500;
+    font-size: 0.95rem;
     cursor: pointer;
-    font-size: 0.9em;
-    transition: background 0.15s;
+    transition: all 0.2s;
 }
 .status-modal-cancel:hover {
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #666;
+    color: #ccc;
 }
 .status-modal-save {
-    background: #6c63ff;
+    flex: 1;
+    padding: 10px;
     border: none;
-    color: #fff;
-    border-radius: 9px;
-    padding: 8px 22px;
+    border-radius: 4px;
+    background: #4c3bff;
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
     cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600;
-    transition: background 0.15s, opacity 0.15s;
+    transition: all 0.2s;
 }
 .status-modal-save:hover:not(:disabled) {
-    background: #5a52e0;
+    background: #3d2ecc;
 }
 .status-modal-save:disabled {
-    opacity: 0.45;
+    opacity: 0.5;
     cursor: not-allowed;
-}
-.status-bubble-speech:hover .status-bubble-inner {
-    max-width: 1000px;
-}
-
-.status-bubble-speech:hover .status-bubble-text {
-    max-width: 1060px;
-    text-overflow: unset;
 }
 </style>
