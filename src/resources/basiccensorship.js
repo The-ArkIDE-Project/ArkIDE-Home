@@ -4,8 +4,6 @@ function t(count) {
   return Array(count).fill(token).join('');
 }
 
-// Remove our own system, just use the API instead because its more robust.
-
 const apiCache = new Map();
 
 
@@ -14,6 +12,7 @@ function normalize(text) {
 }
 
 async function apiCensor(text) {
+  
   const cacheKey = normalize(text);
   if (apiCache.has(cacheKey)) return apiCache.get(cacheKey);
 
@@ -33,11 +32,12 @@ async function apiCensor(text) {
     apiCache.set(cacheKey, result);
     return result;
   } catch {
-    // If API fails, return original text untouched
     return text;
   }
 }
 
 export default async function censor(text) {
-  return await apiCensor(String(text));
+  const str = String(text).trim();
+  if (!str) return "";
+  return await apiCensor(str);
 }
