@@ -588,14 +588,17 @@
 
 .bar {
     position: fixed;
-    width: auto; 
-    left: 50%;
-    transform: translateX(-50%); 
-    top: 1rem; 
-    background: rgba(89, 0, 255, 0.7);
+    /* width: auto; */
+    width: 100%;
+    left: 0;
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
+    top: 0;
+    /* top: 1rem; */
+    background: rgba(89, 0, 255, 0.88);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    height: 3rem;
+    height: 3.2rem;
     color: white;
     display: flex;
     flex-direction: row;
@@ -606,14 +609,14 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.75rem;
     font-weight: bold;
-    min-width: auto; 
-    max-width: 95%;
+    /* min-width: auto; */
+    /* max-width: 95%; */
     z-index: 1000;
-    border-radius: 2rem; 
-    padding: 0 1rem; 
+    /* border-radius: 2rem; */
+    padding: 0 1rem;
     padding-left: 82px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    border: 4px solid rgba(120, 71, 255, 0.2);
+    /*box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 4px solid rgba(120, 71, 255, 0.2); */
 }
 
 
@@ -877,10 +880,9 @@
 	}
 
 .search-recommendations {
-    background: rgba(48, 62, 255, 0.7) !important;
+    background: rgba(89, 0, 255, 0.88) !important;
     position: fixed;
-    top: calc(3rem + 20px);
-    /* left and width set via inline style */
+    top: calc(3rem + 8px);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 8px;
@@ -891,7 +893,7 @@
 }
 
 :global(body.dark-mode) .search-recommendations {
-    background: rgba(48, 62, 255, 0.7) !important;
+    background: rgba(89, 0, 255, 0.88) !important;
     border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);

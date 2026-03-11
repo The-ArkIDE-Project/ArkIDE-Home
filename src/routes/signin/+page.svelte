@@ -72,13 +72,10 @@
         const token = await Authentication.verifyPassword(username, password, captcha_token);
 
         if (token) {
-            // Store in localStorage
             localStorage.setItem("username", username);
             localStorage.setItem("token", token);
             localStorage.setItem("tw:username", username);
             
-            // Set cookie that works across all arkide.site subdomains
-            // Cookie will last for 30 days
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 30);
 

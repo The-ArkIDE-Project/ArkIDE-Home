@@ -726,9 +726,9 @@
                             </p>
                             <h2>Newest Update: {latestCommit} (ArkIDE Home)</h2>
                             <ul>
-                                <li>Switch to hCaptcha from Cloudfalre Turnstile</li>
-                                <li>Fix the account switcher UI</li>
-                                <li>Finnaly make the captcha not randomly invalidate itself</li>
+                                <li>Revert the topbar back to its original design</li>
+                                <li>Fixed an issue with the editor where it would just randomly crash on the costume editor</li>
+                                <li>Updated keith's designs and models acrost the website to a new version!</li>
                                 <li>General bug fixing</li>
                             </ul>
 
@@ -1313,7 +1313,7 @@
     }
 
     .section-info {
-        background: #5900ff;
+        background: #3c00ff;
         height: 24rem;
         color: white;
         display: flex;

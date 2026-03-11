@@ -76,6 +76,8 @@
         { name: "statement", url: "https://extras.arkide.site/arkide-images/Statement.svg" },
         { name: "statement2", url: "https://extras.arkide.site/arkide-images/Statement2.svg" },
         { name: "why-is-this-so-mad", url: "https://extras.arkide.site/arkide-images/why-is-this-so-mad.svg" },
+        { name: "ppl-js-be-sayin-anything", url: "https://extras.arkide.site/arkide-images/ppl-js-be-sayin-anything.svg" },
+        { name: "shut-it", url: "https://extras.arkide.site/arkide-images/shut-it.svg" },
     ];
 
     export let projectId = "";

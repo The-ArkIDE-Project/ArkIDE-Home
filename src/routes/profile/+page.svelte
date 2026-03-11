@@ -4693,19 +4693,39 @@ const openStatusModal = () => {
     align-items: center;
 }
 
-:global(body:not(.dark-mode)) .status-bubble-inner {
-    background: #ffffff;
-    border-color: rgba(0,0,0,0.15);
-}
-
 .status-bubble-text {
     font-size: 0.88em;
     color: rgba(255,255,255,0.93);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    max-width: 800px;
     line-height: 1.4;
+}
+
+.status-bubble-speech:hover .status-bubble-text {
+    overflow: visible;
+    text-overflow: unset;
+    white-space: nowrap;
+    max-width: unset;
+}
+
+.status-bubble-speech:hover .status-bubble-inner {
+    max-width: unset;
+}
+
+.status-bubble-speech:hover .status-actions {
+    opacity: 1;
+    position: relative;
+    top: unset;
+    right: unset;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+:global(body:not(.dark-mode)) .status-bubble-inner {
+    background: #ffffff;
+    border-color: rgba(0,0,0,0.15);
 }
 
 :global(body:not(.dark-mode)) .status-bubble-text {
