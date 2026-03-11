@@ -199,7 +199,7 @@
 				accountMenu.style.display = "none";
 				accountMenu.classList.remove('closing');
 				accountMenuIsOpen = false;
-			}, 150);
+			}, 0);
 			return;
 		}
 		accountMenu.style.display = "";
