@@ -121,12 +121,11 @@
 	let accountButton;
 
 	function logout() {
-		accountMenu.classList.remove('open');
-		accountMenuIsOpen = false;
+		accountMenu.style.display = "none";
 		Authentication.logout().then(() => {
-			loggedIn = false;
-			canRankUp = false;
-			messageCount = 0;
+		    loggedIn = false;
+		    canRankUp = false;
+		    messageCount = 0;
 		});
 	}
 	function login() {
@@ -195,21 +194,21 @@
 		const buttonRect = accountButton.getBoundingClientRect();
 		event = event.detail;
 		if (accountMenuIsOpen) {
-			accountMenu.classList.remove('open');
 			accountMenu.classList.add('closing');
 			setTimeout(() => {
+				accountMenu.style.display = "none";
 				accountMenu.classList.remove('closing');
 				accountMenuIsOpen = false;
 			}, 150);
 			return;
 		}
+		accountMenu.style.display = "";
 		accountMenu.style.right = `${window.innerWidth - buttonRect.right - 8}px`;
 		accountMenu.style.top = `3.2rem`;
-		accountMenu.classList.add('open');
 		accountMenuIsOpen = true;
 	}
 	function openAccountSwitcher() {
-		accountMenu.classList.remove('open');
+		accountMenu.style.display = "none";
 		accountMenuIsOpen = false;
 		if (accountSwitcherModal) {
 			accountSwitcherModal.open();
@@ -294,9 +293,9 @@
 			if (accountMenu && accountButton) {
 				if (!HTMLUtility.isDescendantOf(accountMenu, e.target) && !HTMLUtility.isDescendantOf(accountButton, e.target)) {
 					if (accountMenuIsOpen) {
-						accountMenu.classList.remove('open');
 						accountMenu.classList.add('closing');
 						setTimeout(() => {
+							accountMenu.style.display = "none";
 							accountMenu.classList.remove('closing');
 							accountMenuIsOpen = false;
 						}, 150);
@@ -304,11 +303,6 @@
 				}
 			}
 		});
-	});
-	onMount(() => {
-		if (accountMenu) {
-			accountMenu.classList.remove('open');
-		}
 	});
 </script>
 
@@ -369,6 +363,7 @@
 	{/each}
 </div>
 <div
+	style="display: none;"
 	class="profile-dropdown-menu"
 	bind:this={accountMenu}
 >
@@ -830,30 +825,8 @@
     width: 200px;
     min-width: 210px;
     transform-origin: top center;
+    animation: dropdown-roll-down 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     overflow: hidden;
-    opacity: 0;
-    transform: scaleY(0.6) translateY(-8px);
-    pointer-events: none;
-    visibility: hidden;
-    transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0s linear 0.15s;
-}
-
-.profile-dropdown-menu.open {
-    opacity: 1;
-    transform: scaleY(1) translateY(0);
-    pointer-events: all;
-    visibility: visible;
-    transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0s linear 0s;
-}
-
-.profile-dropdown-menu.closing {
-    opacity: 0;
-    transform: scaleY(0.6) translateY(-8px);
-    pointer-events: none;
 }
 
 @keyframes dropdown-roll-down {
@@ -865,20 +838,6 @@
         opacity: 1;
         transform: scaleY(1) translateY(0);
     }
-}
-@keyframes dropdown-roll-up {
-    from {
-        opacity: 1;
-        transform: scaleY(1) translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: scaleY(0.6) translateY(-8px);
-    }
-}
-
-.profile-dropdown-menu.closing {
-    animation: dropdown-roll-up 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .profile-dropdown-menu button {
