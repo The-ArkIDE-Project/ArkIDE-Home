@@ -202,7 +202,7 @@
 		accountMenu.style.right = `${
 			window.innerWidth - buttonRect.right - 8
 		}px`;
-		accountMenu.style.top = `4rem`;
+		accountMenu.style.top = `3.2rem`;
 		accountMenuIsOpen = true;
 	}
 	function openAccountSwitcher() {
