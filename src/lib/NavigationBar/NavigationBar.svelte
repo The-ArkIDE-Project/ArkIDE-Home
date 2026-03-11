@@ -194,14 +194,16 @@
 		const buttonRect = accountButton.getBoundingClientRect();
 		event = event.detail;
 		if (accountMenuIsOpen) {
-			accountMenu.style.display = "none";
-			accountMenuIsOpen = false;
+			accountMenu.classList.add('closing');
+			setTimeout(() => {
+				accountMenu.style.display = "none";
+				accountMenu.classList.remove('closing');
+				accountMenuIsOpen = false;
+			}, 150);
 			return;
 		}
 		accountMenu.style.display = "";
-		accountMenu.style.right = `${
-			window.innerWidth - buttonRect.right - 8
-		}px`;
+		accountMenu.style.right = `${window.innerWidth - buttonRect.right - 8}px`;
 		accountMenu.style.top = `3.2rem`;
 		accountMenuIsOpen = true;
 	}
@@ -290,10 +292,16 @@
 			}
 			if (accountMenu && accountButton) {
 				if (!HTMLUtility.isDescendantOf(accountMenu, e.target) && !HTMLUtility.isDescendantOf(accountButton, e.target)) {
-					accountMenu.style.display = "none";
+					if (accountMenuIsOpen) {
+						accountMenu.classList.add('closing');
+						setTimeout(() => {
+							accountMenu.style.display = "none";
+							accountMenu.classList.remove('closing');
+							accountMenuIsOpen = false;
+						}, 150);
+					}
 				}
 			}
-			// Removed the searchBarElement click-away detection
 		});
 	});
 </script>
@@ -830,6 +838,20 @@
         opacity: 1;
         transform: scaleY(1) translateY(0);
     }
+}
+@keyframes dropdown-roll-up {
+    from {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scaleY(0.6) translateY(-8px);
+    }
+}
+
+.profile-dropdown-menu.closing {
+    animation: dropdown-roll-up 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .profile-dropdown-menu button {
