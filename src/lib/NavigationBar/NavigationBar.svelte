@@ -121,11 +121,12 @@
 	let accountButton;
 
 	function logout() {
-		accountMenu.style.display = "none";
+		accountMenu.classList.remove('open');
+		accountMenuIsOpen = false;
 		Authentication.logout().then(() => {
-		    loggedIn = false;
-		    canRankUp = false;
-		    messageCount = 0;
+			loggedIn = false;
+			canRankUp = false;
+			messageCount = 0;
 		});
 	}
 	function login() {
@@ -208,7 +209,7 @@
 		accountMenuIsOpen = true;
 	}
 	function openAccountSwitcher() {
-		accountMenu.style.display = "none";
+		accountMenu.classList.remove('open');
 		accountMenuIsOpen = false;
 		if (accountSwitcherModal) {
 			accountSwitcherModal.open();
@@ -303,6 +304,11 @@
 				}
 			}
 		});
+	});
+	onMount(() => {
+		if (accountMenu) {
+			accountMenu.classList.remove('open');
+		}
 	});
 </script>
 
