@@ -803,7 +803,7 @@
 
 .profile-dropdown-menu {
     position: fixed;
-    background: rgba(48, 62, 255, 0.7);
+    background: rgba(89, 0, 255, 0.88);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 4px;
@@ -816,6 +816,20 @@
     z-index: 9999;
     width: 200px;
     min-width: 210px;
+    transform-origin: top center;
+    animation: dropdown-roll-down 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    overflow: hidden;
+}
+
+@keyframes dropdown-roll-down {
+    from {
+        opacity: 0;
+        transform: scaleY(0.6) translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
 }
 
 .profile-dropdown-menu button {
