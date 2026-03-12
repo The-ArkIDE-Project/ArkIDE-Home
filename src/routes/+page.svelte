@@ -235,10 +235,11 @@
             loggedIn = false;
             loggedInAdminOrMod = false;
         } else {
-            const {isAdmin, isApprover} = Authentication.usernameFromCode(username, token)
+            const {isAdmin, isApprover} = await Authentication.usernameFromCode(username, token)
                 .catch((err) => {
                     loggedIn = false;
                     loggedInAdminOrMod = false;
+                    return { isAdmin: false, isApprover: false };
                 });
 
             loggedInUsername = username;
@@ -634,7 +635,7 @@
                                 <UserDisplay
                                     link={commit.html_url}
                                     userLink={commit.author ? commit.author.html_url : ""}
-                                    text={censor(commit.commit.message)}
+                                    text={typeof commit.commit.message === 'string' ? censor(commit.commit.message) : ''}
                                     author={commit.author ? commit.author.login : ""}
                                     image={commit.author ? commit.author.avatar_url : ""}
                                 />
