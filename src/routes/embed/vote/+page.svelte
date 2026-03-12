@@ -234,11 +234,11 @@
         });
     });
 
-    // used for algorithm
+
     function registerView() {
         ProjectClient.registerView(projectId);
     }
-// Comment state
+
 let comments = [];
 let commentCount = 0;
 let commentPage = 0;
@@ -249,6 +249,7 @@ let editContent = "";
 let replyingTo = null;
 let commentCooldown = 0;
 let cooldownInterval = null;
+let isPosting = false; 
 
 const API_URL = "https://arkideapi.arc360hub.com";
 
@@ -272,30 +273,26 @@ async function loadComments() {
     }
 }
 async function postComment() {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || commentCooldown > 0 || isPosting) return;
     
-    // Check cooldown
-    if (commentCooldown > 0) {
-        alert(`Please wait ${commentCooldown} seconds before posting another comment.`);
-        return;
-    }
+    isPosting = true;
+    const contentSnapshot = newComment;
+    newComment = "";
     
-    // Check if we're replying to a specific comment
     let parentId = null;
-    let content = newComment.trim();
+    let content = contentSnapshot.trim();
+    const currentReplyingTo = replyingTo;
+    replyingTo = null;
     
-    if (replyingTo && replyingTo.commentId) {
-        parentId = replyingTo.commentId;
+    if (currentReplyingTo && currentReplyingTo.commentId) {
+        parentId = currentReplyingTo.commentId;
         const mentionMatch = content.match(/^@\w+\s+(.+)/);
-        if (mentionMatch) {
-            content = mentionMatch[1];
-        }
+        if (mentionMatch) content = mentionMatch[1];
     } else {
         const mentionMatch = content.match(/^@(\w+)\s+(.+)/);
         if (mentionMatch) {
             const mentionedUser = mentionMatch[1];
             const restOfComment = mentionMatch[2];
-            
             const userComments = comments.filter(c => c.username === mentionedUser && !c.parentId);
             const parentComment = userComments[0];
             if (parentComment) {
@@ -313,20 +310,13 @@ async function postComment() {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
-            body: JSON.stringify({
-                projectId: projectId,
-                content: content,
-                parentId: parentId
-            })
+            body: JSON.stringify({ projectId, content, parentId })
         });
         
         if (response.ok) {
-            newComment = "";
-            replyingTo = null;
             commentPage = 0;
             await loadComments();
             
-            // Start 30 second cooldown
             const endTime = Date.now() + 15000;
             localStorage.setItem('commentCooldownEnd', endTime.toString());
             commentCooldown = 15;
@@ -334,9 +324,13 @@ async function postComment() {
         } else {
             const error = await response.json();
             alert(error.error || "Failed to post comment");
+            newComment = contentSnapshot;
         }
     } catch (err) {
         alert("Failed to post comment");
+        newComment = contentSnapshot; 
+    } finally {
+        isPosting = false;
     }
 }
 
@@ -737,11 +731,13 @@ function startCooldown() {
                     <button 
                         class="post-btn" 
                         on:click={postComment} 
-                        disabled={newComment.trim().length === 0 || commentCooldown > 0}
-                        title={commentCooldown > 0 ? `Wait ${commentCooldown}s` : "Post Comment"}
+                        disabled={newComment.trim().length === 0 || commentCooldown > 0 || isPosting}
+                        title={commentCooldown > 0 ? `Wait ${commentCooldown}s` : isPosting ? "Posting..." : "Post Comment"}
                     >
                         {#if commentCooldown > 0}
                             {commentCooldown}s
+                        {:else if isPosting}
+                            ...
                         {:else}
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
