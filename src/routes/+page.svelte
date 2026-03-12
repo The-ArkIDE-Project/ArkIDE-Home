@@ -635,7 +635,7 @@
                                 <UserDisplay
                                     link={commit.html_url}
                                     userLink={commit.author ? commit.author.html_url : ""}
-                                    text={typeof commit.commit.message === 'string' ? censor(commit.commit.message) : ''}
+                                    text={commit.commit.message}
                                     author={commit.author ? commit.author.login : ""}
                                     image={commit.author ? commit.author.avatar_url : ""}
                                 />
