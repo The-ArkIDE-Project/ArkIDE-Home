@@ -637,7 +637,7 @@
                                     userLink={commit.author ? commit.author.html_url : ""}
                                     text={commit.commit.message}
                                     author={commit.author ? commit.author.login : ""}
-                                    image={commit.author ? `${LINK.basicApi}${commit.author.avatar_url.startsWith('/') ? commit.author.avatar_url.slice(1) : commit.author.avatar_url}` : ""}
+                                    image={commit.author ? commit.author.avatar_url : ""}
                                 />
                             {/if}
                         {/each}
