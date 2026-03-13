@@ -95,17 +95,17 @@
 <style>
     .alert-banner {
         position: fixed; 
-        top: 4.5rem; 
-        left: 50%; 
-        transform: translateX(-50%); 
-        width: auto; 
-        max-width: calc(100% - 2rem); 
-        background: rgba(255, 251, 0, 0.7) !important; 
+        top: 3.2rem; 
+        /* left: 50%; */
+        /* transform: translateX(-50%); */ 
+        width: 100%; 
+        /* max-width: calc(100% - 2rem); */ 
+        background: rgba(255, 251, 0, 0.88) !important; 
         font-weight: bold;
         text-align: center;
         padding: 12px 20px; 
         color: white;
-        border-radius: 2rem; 
+        /* border-radius: 2rem; */
         z-index: 999; 
         backdrop-filter: blur(10px); 
         -webkit-backdrop-filter: blur(10px); 
