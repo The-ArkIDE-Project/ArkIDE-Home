@@ -693,10 +693,10 @@
                                 author={update.authorName}
                                 image={`${LINK.basicApi}${update.authorImage.startsWith('/') ? update.authorImage.slice(1) : update.authorImage}`}
                             />
-                            <a target="_blank" href={update.image}>
+                            <a target="_blank" href={`${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`}>
                                 <button class="update-image-wrapper">
                                     <img
-                                        `${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`
+                                        src={`${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`}
                                         alt="Screenshot"
                                         class="update-image"
                                     />
