@@ -637,7 +637,7 @@
                                     userLink={commit.author ? commit.author.html_url : ""}
                                     text={commit.commit.message}
                                     author={commit.author ? commit.author.login : ""}
-                                    image={commit.author ? commit.author.avatar_url : ""}
+                                    image={commit.author ? `${LINK.basicApi}${commit.author.avatar_url.startsWith('/') ? commit.author.avatar_url.slice(1) : commit.author.avatar_url}` : ""}
                                 />
                             {/if}
                         {/each}
@@ -691,12 +691,12 @@
                                 userLink={`https://discord.com/channels/1428107671730393101/1428110015813910705`}
                                 text={update.cleanContent}
                                 author={update.authorName}
-                                image={update.authorImage}
+                                image={`${LINK.basicApi}${update.authorImage.startsWith('/') ? update.authorImage.slice(1) : update.authorImage}`}
                             />
                             <a target="_blank" href={update.image}>
                                 <button class="update-image-wrapper">
                                     <img
-                                        src={update.image}
+                                        `${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`
                                         alt="Screenshot"
                                         class="update-image"
                                     />
