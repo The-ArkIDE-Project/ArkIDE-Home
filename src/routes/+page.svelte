@@ -691,12 +691,12 @@
                                 userLink={`https://discord.com/channels/1428107671730393101/1428110015813910705`}
                                 text={update.cleanContent}
                                 author={update.authorName}
-                                image={`${LINK.basicApi}${update.authorImage.startsWith('/') ? update.authorImage.slice(1) : update.authorImage}`}
+                                image={`${LINK.basicApi}${update.authorImage.slice(1)}`}
                             />
-                            <a target="_blank" href={`${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`}>
+                            <a target="_blank" href={`${LINK.basicApi}${update.image.slice(1)}`}>
                                 <button class="update-image-wrapper">
                                     <img
-                                        src={`${LINK.basicApi}${update.image.startsWith('/') ? update.image.slice(1) : update.image}`}
+                                        src={`${LINK.basicApi}${update.image.slice(1)}`}
                                         alt="Screenshot"
                                         class="update-image"
                                     />
