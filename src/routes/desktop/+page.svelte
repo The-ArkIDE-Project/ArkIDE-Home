@@ -17,7 +17,7 @@
         currentLang = lang;
     });
 
-let version = "2.13.7";
+let version = "2.13.8";
 // Download links - replace these with your actual download URLs
 const downloads = {
     windows: {
@@ -46,10 +46,9 @@ const downloads = {
     function getFileName(os, arch) {
     const url = downloads[os]?.[arch];
     if (!url) return '';
-    // Extract filename from URL (everything after the last /)
     return url.split('/').pop();
 }
-// Reactive filename — auto updates any time OS or Arch changes
+
 $: fileName = getFileName(selectedOS, selectedArch);
 
 </script>
@@ -359,12 +358,6 @@ $: fileName = getFileName(selectedOS, selectedArch);
 
     .download-action {
         margin-top: 24px;
-    }
-
-    .version-text {
-        margin-top: 16px;
-        font-size: 0.9rem;
-        opacity: 0.7;
     }
 
     .content-section {
