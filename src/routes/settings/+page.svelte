@@ -677,20 +677,7 @@ accountInformation.settings.customCursor = cursorSetting === null ? false : curs
                                 />
                             </label>
                         </p>
-                        <p>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    bind:checked={accountInformation.settings.customCursor}
-                                    on:change={updateCustomCursor}
-                                >
-                                <LocalizedText
-                                    text="Use custom cursor"
-                                    key="account.settings.account.toggles.customcursor"
-                                    lang={currentLang}
-                                />
-                            </label>
-                        </p>
+
                         <p class="small">
                             <i>
                                 <LocalizedText
