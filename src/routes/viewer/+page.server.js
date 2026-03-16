@@ -19,7 +19,7 @@ export async function load({ url, setHeaders }) {
         }
         
         const projectData = await response.json();
-        const thumbnailUrl = `https://arkideapi.arc360hub.com/api/v1/projects/getproject?projectID=${projectId}&requestType=thumbnail`;
+        const thumbnailUrl = `/api/thumbnail?id=${projectId}`;
         
         // Set cache headers so Discord can cache the result
         setHeaders({
