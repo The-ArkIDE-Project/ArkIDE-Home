@@ -39,6 +39,9 @@
         const bodyHTML = md.renderer.render(tokens, md.options, env);
         return bodyHTML;
     };
+    let kofiPopupOpen = false;
+    const showKofiPopup = () => { kofiPopupOpen = true; };
+    const closeKofiPopup = () => { kofiPopupOpen = false; };
 </script>
 
 <svelte:head>
@@ -95,8 +98,8 @@
                         currentLang,
                         "In the last month, ***$1 new people found ArkIDE*** and we sent our website to ***$2*** returning users."
                     )
-                    .replace('$1', (25000).toLocaleString())
-                    .replace('$2', (55000).toLocaleString())}`)}
+                    .replace('$1', (20).toLocaleString())
+                    .replace('$2', (10).toLocaleString())}`)}
 
                     {@html generateMarkdown(`${TranslationHandler.textSafe(
                         "donate.people2",
@@ -186,7 +189,52 @@
                                 </span>
                             </button>
                         </a>
-                        <p>I'm sorry that there's no donation options right now, I'm working on getting one working.</p>
+                        <br />
+                        <a
+                            target="_blank"
+                                href="https://ko-fi.com/arc360"
+                                class="donation"
+                                style="text-decoration: none !important;"
+                                on:click|preventDefault={showKofiPopup}
+                            >
+                                <button
+                                    class="donation-container"
+                                    title="KoFi Tip - Buy me a coffee!"
+                                >
+                                    <img src="/kofi.png" alt="KoFi" />
+                                    <span>
+                                        <LocalizedText
+                                            text="Ko-Fi (Minimum 5$)"
+                                            key="donation.kofi"
+                                            lang={currentLang}
+                                        />
+                                    </span>
+                                </button>
+                            </a>
+
+                            {#if kofiPopupOpen}
+                            <div class="popup-overlay" on:click={closeKofiPopup}>
+                                <div class="popup-card" on:click|stopPropagation>
+                                    <h2>Before you donate!</h2>
+                                    <p>To receive your <strong>Donator badge</strong> and benefits on ArkIDE, include the following in your Ko-fi tip message:</p>
+                                    <div class="popup-example">
+                                        <span class="popup-label">Required</span>
+                                        <code>ArkIDE: YourUsername</code>
+                                        <span class="popup-label optional">Optional</span>
+                                        <code>Discord: @yourdiscord</code>
+                                    </div>
+                                    <p class="popup-note">Example message: <em>"ArkIDE: verycooldonator, Discord: @verycooldonator"</em></p>
+                                    <div class="popup-buttons">
+                                        <button class="popup-cancel" on:click={closeKofiPopup}>Cancel</button>
+                                        <a href="https://ko-fi.com/arc360" target="_blank" on:click={closeKofiPopup}>
+                                            <button class="popup-confirm">Got it, take me to Ko-fi →</button>
+                                        </a>
+                                    </div>
+                                    <h3>You will not instantly get the badge, it may take a few hours.</h3> (everything will be done manualy, so please be patient)
+                                </div>
+                            </div>
+                            {/if}
+                        <strong class="e">If you donate in KoFi and want benifits on ArkIDE, Donate 5$ or more and we will reward you with the Donator badge wich will give you lots of Benifits!</strong>
                     </div>
                     <div class="donation-images">
                         <img
@@ -438,4 +486,103 @@
     :global(body.dark-mode) a {
         color: dodgerblue;
     }
+    .e {
+        margin-top: 16px;
+        display: block;
+    }
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(3px);
+    }
+    .popup-card {
+        background: white;
+        border-radius: 12px;
+        padding: 32px 28px;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        text-align: center;
+    }
+    .popup-card h2 {
+        margin: 0 0 12px;
+        font-size: 22px;
+    }
+    .popup-card p {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 16px;
+    }
+    .popup-example {
+        background: #f4f4f4;
+        border-radius: 8px;
+        padding: 16px 16px;
+        padding-right: 34px;
+        margin: 16px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        text-align: left;
+    }
+    .popup-example code {
+        font-size: 15px;
+        font-weight: bold;
+        color: #111;
+        background: #e0e0e0;
+        padding: 4px 10px;
+        border-radius: 4px;
+        width: 100%;
+    }
+    .popup-label {
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #e06000;
+    }
+    .popup-label.optional { color: #888; }
+    .popup-note {
+        font-size: 12px !important;
+        color: #888 !important;
+    }
+    .popup-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .popup-cancel {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .popup-cancel:hover { background: #f0f0f0; }
+    .popup-confirm {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        background: #ff5e5b;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .popup-confirm:hover { opacity: 0.88; }
+    :global(body.dark-mode) .popup-card {
+        background: #1e1e2e;
+        color: white;
+    }
+    :global(body.dark-mode) .popup-card p { color: #ccc; }
+    :global(body.dark-mode) .popup-example { background: #2a2a3a; }
+    :global(body.dark-mode) .popup-example code { background: #333348; color: #eee; }
+    :global(body.dark-mode) .popup-cancel { background: #2a2a3a; border-color: #444; color: white; }
 </style>

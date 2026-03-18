@@ -81,7 +81,7 @@
 
             document.cookie = `arkide_username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
             document.cookie = `arkide_token=${encodeURIComponent(token)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
-            document.cookie = `tw:username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`; // Add this line
+            document.cookie = `tw:username=${encodeURIComponent(username)}; domain=.arkide.site; path=/; expires=${expiryDate.toUTCString()}; SameSite=None; Secure`;
             
             return true;
         }
