@@ -1236,11 +1236,6 @@
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-.footer-note {
-    font-size: 0.8em;
-    margin-top: 24px;
-    color: gray;
-}
 
     /* Chrismas stuff :D 
 .profile-picture-container {
@@ -1604,21 +1599,4 @@
         display: flex;
         flex-direction: row;
     }
-    .countdown-banner {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 1rem;
-    margin: 0;
-    font-weight: bold;
-}
-.countdown-timer {
-    font-size: 2rem;
-    margin-top: 0.5rem;
-    font-family: 'Courier New', monospace;
-}
 </style>
