@@ -53,7 +53,8 @@
     let ghcommitsLoaded = false;
     let projectsLoaded = false;
     let projectsFailed = false;
-    let latestCommit = 'Failed To Fetch'; // fallback commit
+    let latestCommit = 'AAAAAAAAAAAAAHHHHHHHHHHH';
+    let currentEvent = { active: false, htmlBody: "" };
 
     async function fetchLatestCommit() {
         try {
@@ -276,6 +277,15 @@
                 updates = [updatess];
             });
         });
+
+        fetch(`${LINK.basicApi}event`).then((res) => {
+            res.json().then((evt) => {
+                currentEvent = evt;
+                if (evt.active) {
+                    selectedFrontTabSelected = "event";
+                }
+            }).catch(() => {});
+        }).catch(() => {});
 
         async function findPopularTag() {
             try {
@@ -650,6 +660,13 @@
                     {/if}
                 </div>
             </ContentCategory>
+        {:else if selectedFrontTabSelected === "event" && currentEvent.active}
+            <ContentCategory header={currentEvent.title}>
+                <div class="category-content">
+                    {@html currentEvent.htmlBody}
+                </div>
+            </ContentCategory>
+
                 {:else if loggedIn && selectedFrontTabSelected === "vote"}
             <!-- 
             <ContentCategory header="Keithmas 2025 event">
@@ -762,6 +779,13 @@
                 </div>
             </ContentCategory>
         {/if}
+            {#if !loggedIn && currentEvent.active}
+                <ContentCategory header={currentEvent.title}>
+                    <div class="category-content">
+                        {@html currentEvent.htmlBody}
+                    </div>
+                </ContentCategory>
+            {/if}
     </div>
     {#if loggedIn}
         <div class="section-category-toggles">
@@ -819,6 +843,15 @@
                         lang={currentLang}
                     />
                 </button>
+                {#if currentEvent.active}
+                    <button
+                        class="section-toggle-button"
+                        data-active={selectedFrontTabSelected === "event"}
+                        on:click={() => { selectedFrontTabSelected = "event"; }}
+                    >
+                        {currentEvent.title}
+                    </button>
+                {/if}
                 <!--
                 <button
                     class="section-toggle-button"
