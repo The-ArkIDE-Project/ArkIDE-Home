@@ -413,16 +413,6 @@ function handleHeightChange(event) {
         gap: 8px;
     }
 
-    .slider-labels {
-        display: flex;
-        justify-content: space-between;
-        padding: 0 4px;
-    }
-
-    .slider-label {
-        font-size: 0.85rem;
-        color: #888;
-    }
 
     .scale-slider {
         width: 100%;

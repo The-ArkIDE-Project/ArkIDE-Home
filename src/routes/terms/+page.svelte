@@ -116,7 +116,7 @@
                 Violating these terms may result in punishments such as:
             </p>
             <li>Violation 1: Temporary Ban (1-7 Days depending on violation)</li>
-            <li>Violation 2: Temporary Ban ban of 1-2 Months and your PFP will be changed to a sonic fetish PFP (dont ask)</li>
+            <li>Violation 2: Temporary Ban and removal of all custom titles and badges if you have any.</li>
             <button on:click={playTomato} class="tomato-button">inconspicuous red button</button>
 
             <audio bind:this={audioElement} src="/tomato.mp3" preload="auto"></audio>

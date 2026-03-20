@@ -12,6 +12,7 @@
     import BlobAndDataUrl from "../../resources/blobanddataurl.js";
     import FileTypes from "./filetypes.js";
     import Stats from "../../lib/statsComponent/stats.svelte";
+    import ProfileTitles from "../../resources/titles.js";
 
     const ProjectClient = new ProjectApi();
 
@@ -37,6 +38,101 @@
         const error = loggedOut ? 401 : 403;
         location.href = location.origin + `/error?error=${error}`;
     }
+
+    let userTitleInfo = {
+    isEditingMulti: false,
+ 
+    targetUsername: "",
+    areTitlesLoaded: false,
+    currentUserTitles: {},    
+ 
+    targetUsernamesBox: "",  
+    isRevokingTitles: false,
+    targetFilterTitles: {},  
+};
+ 
+const loadUserTitles = async () => {
+    userTitleInfo.areTitlesLoaded = false;
+    if (!userTitleInfo.targetUsername) return;
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+            `${PUBLIC_API_URL}/api/v1/users/titles/granted?username=${encodeURIComponent(userTitleInfo.targetUsername)}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const data = await res.json();
+        const granted = new Set(data.grantedTitles || []);
+        userTitleInfo.currentUserTitles = {};
+        for (const titleId in ProfileTitles) {
+            userTitleInfo.currentUserTitles[titleId] = granted.has(titleId);
+        }
+        userTitleInfo.areTitlesLoaded = true;
+        userTitleInfo = userTitleInfo; // trigger reactivity
+    } catch (err) {
+        console.error("Failed to load titles:", err);
+        alert("Failed to load titles: " + err);
+    }
+};
+ 
+const applyUserTitles = async () => {
+    const token = localStorage.getItem("token");
+    const endpoint = userTitleInfo.isRevokingTitles
+        ? '/api/v1/users/titles/revoke'
+        : '/api/v1/users/titles/grant';
+ 
+    let usernames;
+    let titles;
+ 
+    if (!userTitleInfo.isEditingMulti) {
+        if (!confirm("Apply title changes to this user?")) return;
+        usernames = [userTitleInfo.targetUsername];
+        titles = Object.keys(userTitleInfo.currentUserTitles)
+            .filter(k => userTitleInfo.currentUserTitles[k]);
+        const toGrant  = Object.keys(userTitleInfo.currentUserTitles).filter(k =>  userTitleInfo.currentUserTitles[k]);
+        const toRevoke = Object.keys(userTitleInfo.currentUserTitles).filter(k => !userTitleInfo.currentUserTitles[k]);
+        if (toGrant.length > 0) {
+            await fetch(`${PUBLIC_API_URL}/api/v1/users/titles/grant`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, usernames, titles: toGrant })
+            });
+        }
+        if (toRevoke.length > 0) {
+            await fetch(`${PUBLIC_API_URL}/api/v1/users/titles/revoke`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, usernames, titles: toRevoke })
+            });
+        }
+        alert("Titles updated!");
+        return;
+    }
+ 
+    usernames = userTitleInfo.targetUsernamesBox
+        .split("\n")
+        .map(u => u.trim().toLowerCase())
+        .filter(Boolean);
+    titles = Object.keys(userTitleInfo.targetFilterTitles)
+        .filter(k => userTitleInfo.targetFilterTitles[k]);
+ 
+    if (!confirm(`${userTitleInfo.isRevokingTitles ? "Revoke" : "Grant"} ${titles.length} title(s) for ${usernames.length} user(s)?`)) return;
+ 
+    try {
+        const res = await fetch(`${PUBLIC_API_URL}${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, usernames, titles })
+        });
+        if (res.ok) {
+            alert("Done!");
+        } else {
+            const err = await res.json();
+            alert("Error: " + (err.error || "Unknown"));
+        }
+    } catch (err) {
+        alert("Error: " + err);
+    }
+};
 
     onMount(() => {
         const username = localStorage.getItem("username");
@@ -2037,6 +2133,126 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
             </div>
             
             <br/>
+
+            <br />
+<div class="card">
+    <h2 style="margin-block-start:0">Titles</h2>
+ 
+    <button on:click={() => { userTitleInfo.isEditingMulti = false; userTitleInfo = userTitleInfo; }}>
+        Specific User
+    </button>
+    <button on:click={() => { userTitleInfo.isEditingMulti = true; userTitleInfo = userTitleInfo; }}>
+        Multiple Users
+    </button>
+ 
+    {#if !userTitleInfo.isEditingMulti}
+        <p>Type username:</p>
+        <input
+            type="text"
+            size="50"
+            placeholder="ArkIDE username..."
+            on:change={() => { userTitleInfo.areTitlesLoaded = false; userTitleInfo = userTitleInfo; }}
+            bind:value={userTitleInfo.targetUsername}
+        />
+        <div class="user-action-row">
+            <Button on:click={loadUserTitles}>Load Titles</Button>
+        </div>
+        <br />
+        {#if userTitleInfo.areTitlesLoaded}
+            <p>Toggle titles for this user. Dark = not granted. Green = granted.</p>
+            <div class="user-badges-list">
+                {#each Object.keys(ProfileTitles) as titleId}
+                    <button
+                        class="user-badge-button"
+                        on:click={() => {
+                            userTitleInfo.currentUserTitles[titleId] =
+                                !userTitleInfo.currentUserTitles[titleId];
+                            userTitleInfo = userTitleInfo;
+                        }}
+                        data-active={userTitleInfo.currentUserTitles[titleId]}
+                        title={titleId}
+                    >
+                        {ProfileTitles[titleId].label}
+                        {#if ProfileTitles[titleId].default}
+                            <span style="font-size:0.7em; opacity:0.7;">(default)</span>
+                        {/if}
+                    </button>
+                {/each}
+            </div>
+        {:else}
+            <p>Titles not loaded yet.</p>
+        {/if}
+    {:else}
+        <p>Type usernames (one per line):</p>
+        <textarea
+            style="width:80%; height:120px;"
+            placeholder="Paste ArkIDE usernames, one per line."
+            bind:value={userTitleInfo.targetUsernamesBox}
+        />
+        <br />
+        <label>
+            <input type="checkbox" bind:checked={userTitleInfo.isRevokingTitles}
+                on:change={() => userTitleInfo = userTitleInfo} />
+            Revoke titles instead of granting
+        </label>
+        <br />
+        <p>
+            {#if userTitleInfo.isRevokingTitles}
+                Selected titles will be <strong>removed</strong> from each user.
+            {:else}
+                Selected titles will be <strong>added</strong> to each user.
+            {/if}
+        </p>
+        <div class="user-badges-list">
+            {#each Object.keys(ProfileTitles) as titleId}
+                <button
+                    class="user-badge-button"
+                    on:click={() => {
+                        userTitleInfo.targetFilterTitles[titleId] =
+                            !userTitleInfo.targetFilterTitles[titleId];
+                        userTitleInfo = userTitleInfo;
+                    }}
+                    data-active={userTitleInfo.targetFilterTitles[titleId]}
+                    title={titleId}
+                >
+                    {ProfileTitles[titleId].label}
+                </button>
+            {/each}
+        </div>
+    {/if}
+ 
+    <br />
+    <div class="user-action-row">
+        <Button color="remix" on:click={applyUserTitles}>Apply Titles</Button>
+    </div>
+ 
+    <br />
+    <h3>Seed Default Titles</h3>
+    <p>Grant all default titles to a user (e.g. when they rank up).</p>
+    <input
+        type="text"
+        size="50"
+        placeholder="ArkIDE username..."
+        bind:value={userTitleInfo.targetUsername}
+    />
+    <div class="user-action-row" style="margin-top:8px;">
+        <Button color="orange" on:click={async () => {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${PUBLIC_API_URL}/api/v1/users/titles/seedDefaults`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, username: userTitleInfo.targetUsername })
+            });
+            if (res.ok) alert("Default titles seeded!");
+            else {
+                const err = await res.json();
+                alert("Error: " + (err.error || "Unknown"));
+            }
+        }}>
+            Seed Defaults
+        </Button>
+    </div>
+</div>
             <div class="card">
                 <h2>Profanity Filter JSON</h2>
                 <textarea bind:value={filterJSONStuff.text}></textarea>
@@ -2769,6 +2985,18 @@ const loadUserPerms = () => ProjectClient.getAllPermitedUsers()
     :global(body.dark-mode) .user-list-id {
         color: #aaa;
     }
+
+.user-badges-list button.user-badge-button {
+    min-width: 110px;
+    padding: 8px 12px;
+    font-size: 0.85em;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    margin: 4px;
+    color: white;
+}
 
     
 </style>

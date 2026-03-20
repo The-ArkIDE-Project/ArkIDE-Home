@@ -31,6 +31,9 @@
     import TranslationHandler from "../../resources/translations.js";
     import Language from "../../resources/language.js";
 
+    // titles
+    import ProfileTitles from "../../resources/titles.js";
+
     // Icons
     import PenguinConfusedSVG from "../../resources/icons/Penguin/confused.svelte";
     import SearchSVG from "../../resources/icons/Search/icon.svelte";
@@ -65,6 +68,10 @@
     let profileComments = [];
     let commentPage = 0;
     let commentCount = 0;
+    let grantedTitles = [];
+    let activeTitle = null;
+    let isEditingTitle = false;
+    let isTitleSaving = false;
     let isLoadingComments = false;
     let newCommentContent = '';
     let showEmojiPicker = false;
@@ -706,6 +713,7 @@ function formatJoinDate(isoString) {
         await fetchCommentsStatus();
         await fetchProfileComments();
         await loadEmojis();
+        await fetchTitles();
         
         // Check if user can toggle comments
         if (loggedIn && (String(user).toLowerCase() === String(loggedInUser).toLowerCase() || loggedInAdmin)) {
@@ -1535,6 +1543,101 @@ const fetchStatus = async () => {
     } catch (err) { console.error("Failed to fetch status:", err); }
 };
 
+const fetchTitles = async () => {
+    const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/titles/granted?username=${encodeURIComponent(user)}`);
+    if (response.ok) {
+        const data = await response.json();
+        grantedTitles = data.grantedTitles || [];
+        activeTitle = data.activeTitle || null;
+    }
+};
+
+const getEffectiveTitleId = () => {
+    if (activeTitle && ProfileTitles[activeTitle] && activeTitle !== "moth") return activeTitle;
+    if (badges.includes("owner"))      return "owner";
+    if (badges.includes("admin"))      return "admin";
+    if (fullProfile.approver === true) return "moderator";
+    if (fullProfile.rank >= 1)         return "butterfly";
+    return "moth";
+};
+
+$: effectiveTitleId = (() => {
+    if (activeTitle && ProfileTitles[activeTitle] && activeTitle !== "moth") return activeTitle;
+    if (badges.includes("owner"))      return "owner";
+    if (badges.includes("admin"))      return "admin";
+    if (fullProfile.approver === true) return "moderator";
+    if (fullProfile.rank >= 1)         return "butterfly";
+    return "moth";
+})();
+
+$: availableTitles = (() => {
+    const available = [];
+    if (badges.includes("owner"))      available.push("owner");
+    if (badges.includes("admin"))      available.push("admin");
+    if (fullProfile.approver === true) available.push("moderator");
+    if (fullProfile.rank >= 1)         available.push("butterfly");
+    for (const t of grantedTitles) {
+        if (ProfileTitles[t] && !available.includes(t)) available.push(t);
+    }
+    return available;
+})();
+
+const getAvailableTitles = () => {
+    const available = [];
+    if (badges.includes("owner"))      available.push("owner");
+    if (badges.includes("admin"))      available.push("admin");
+    if (fullProfile.approver === true) available.push("moderator");
+    if (fullProfile.rank >= 1)         available.push("butterfly");
+    for (const t of grantedTitles) {
+        if (ProfileTitles[t] && !available.includes(t)) available.push(t);
+    }
+    return available;
+};
+
+const getTitleStyle = (titleId) => {
+    const t = ProfileTitles[titleId];
+    if (!t) return "";
+    if (t.gradient) return `background:${t.gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:bold;`;
+    if (t.color)    return `color:${t.color};font-weight:bold;`;
+    return "";
+};
+
+const setActiveTitle = async (titleId) => {
+    isTitleSaving = true;
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${PUBLIC_API_URL}/api/v1/users/titles/set`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, titleId: titleId ?? null })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            activeTitle = data.activeTitle;
+        } else {
+            const err = await response.json();
+            alert("Failed to set title: " + (err.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Failed to set title:", err);
+        alert("Failed to set title");
+    }
+    isTitleSaving = false;
+    isEditingTitle = false;
+};
+ 
+const getActiveTitleLabel = () => {
+    if (activeTitle && ProfileTitles[activeTitle]) {
+        return ProfileTitles[activeTitle].label;
+    }
+    if (fullProfile.badges?.includes("owner"))  return "Owner";
+    if (fullProfile.badges?.includes("admin"))  return "Keith Master";
+    if (fullProfile.approver === true)           return "Guard Keith";
+    if (fullProfile.rank === 1)                  return "Butterfly";
+    return "Moth"; 
+};
+ 
+
 const submitStatus = async () => {
     if (!statusInput.trim()) return;
     statusLoading = true;
@@ -2312,69 +2415,61 @@ const openStatusModal = () => {
                     <div class="section-user-stats">
                         <div class="user-stat-box" style="border-bottom: 1px solid rgba(0, 0, 0, 0.15);">
                             <div class="user-stat-box-inner">
-                                <LocalizedText
-                                    text="Rank"
-                                    key="profile.ranking.title"
-                                    lang={currentLang}
-                                />
+                                Title
                             </div>
-                            <p class="small" style="margin-block:4px">
-{#if badges.includes("owner")}
-    Owner
-{:else if badges.includes("admin")}
-    <LocalizedText
-        text="Keith Master"
-        key="profile.ranking.admin"
-        lang={currentLang}
-    />
-{:else if fullProfile.approver === true}
-    <LocalizedText
-        text="Guard Keith"
-        key="profile.ranking.mod"
-        lang={currentLang}
-    />
-{:else if fullProfile.rank === 1}
-    <LocalizedText
-        text="Butterfly"
-        key="profile.ranking.ranked"
-        lang={currentLang}
-    />
-{:else}
-    <LocalizedText
-        text="Moth"
-        key="profile.ranking.new"
-        lang={currentLang}
-    />
-{/if}
-                                {#if loggedIn && String(user).toLowerCase() === String(loggedInUser).toLowerCase() && fullProfile.rank === 0}
-                                    {#if !fullProfile.canrankup}
-                                        <span style="opacity: 0.5;font-size:.7em;">
-                                            <br>
-                                            <LocalizedText
-                                                text="Cannot rank up yet"
-                                                key="profile.rankup.cannot"
-                                                lang={currentLang}
-                                            />
-                                        </span>
-                                    {:else}
-                                        <!-- svelte-ignore a11y-invalid-attribute -->
-                                        <a
-                                            href="#"
-                                            style="color:dodgerblue;font-size:.6em;"
-                                            on:click={() => {
-                                                isRankingUpMenu = true;
-                                            }}
+                            <p class="small" style="margin-block:4px; position:relative;">
+                    
+                                {#if isEditingTitle}
+                                    <!-- Title picker dropdown -->
+                                    <div class="title-picker">
+                                        {#if isTitleSaving}
+                                            <span style="opacity:0.6">Saving...</span>
+                                        {:else}
+                                            <select
+                                                class="title-select"
+                                                value={activeTitle ?? ""}
+                                                on:change={(e) => setActiveTitle(e.target.value || null)}
+                                            >
+                                            <option value="">— No title —</option>
+                                            {#each availableTitles as titleId}
+                                                <option value={titleId}>{ProfileTitles[titleId].label}</option>
+                                            {/each}
+                                            </select>
+                                            <button
+                                                class="title-cancel-btn"
+                                                on:click={() => isEditingTitle = false}
+                                            >
+                                                Cancel
+                                            </button>
+                                        {/if}
+                                    </div>
+                                {:else}
+                                    <span class="active-title-label" style={getTitleStyle(effectiveTitleId)}>
+                                        {ProfileTitles[effectiveTitleId].label}
+                                    </span>
+                                    {#if isOwnProfile && (fullProfile.rank >= 1 || fullProfile.admin || fullProfile.approver)}
+                                        <button
+                                            class="edit-link"
+                                            style="vertical-align:middle;"
+                                            on:click={() => isEditingTitle = true}
+                                            title="Change your title"
                                         >
-                                            <br>
-                                            <LocalizedText
-                                                text="Rank up"
-                                                key="profile.rankup.title"
-                                                lang={currentLang}
-                                            />
-                                            <div class="rankup-badge">
-                                                !
-                                            </div>
-                                        </a>
+                                            <img src="/pencil.png" alt="Edit title" style="height:1.5em;" />
+                                        </button>
+                                    {/if}
+                                    {#if isOwnProfile && fullProfile.rank === 0 && !fullProfile.admin && !fullProfile.approver}
+                                        {#if !fullProfile.canrankup}
+                                            <span style="opacity:0.5; font-size:.7em; display:block; margin-top:4px;">
+                                                <LocalizedText text="Cannot rank up yet" key="profile.rankup.cannot" lang={currentLang} />
+                                            </span>
+                                        {:else}
+                                            <!-- svelte-ignore a11y-invalid-attribute -->
+                                            <a href="#" style="color:dodgerblue; font-size:.6em; display:block;"
+                                            on:click={() => { isRankingUpMenu = true; }}>
+                                                <LocalizedText text="Rank up" key="profile.rankup.title" lang={currentLang} />
+                                                <div class="rankup-badge">!</div>
+                                            </a>
+                                        {/if}
                                     {/if}
                                 {/if}
                             </p>
@@ -4905,4 +5000,52 @@ const openStatusModal = () => {
     opacity: 0.5;
     cursor: not-allowed;
 }
+.active-title-label {
+    font-size: 0.95em;
+    font-weight: bold;
+}
+ 
+.title-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+}
+ 
+.title-select {
+    width: 90%;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 0.9em;
+    background: white;
+    color: #111;
+    cursor: pointer;
+}
+ 
+:global(body.dark-mode) .title-select {
+    background: #1a1a1a;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+ 
+.title-cancel-btn {
+    font-size: 0.8em;
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.title-cancel-btn:hover {
+    opacity: 1;
+}
+:global(body.dark-mode) .title-cancel-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+ 
 </style>
