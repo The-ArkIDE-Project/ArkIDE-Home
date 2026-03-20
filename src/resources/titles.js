@@ -103,15 +103,15 @@ const ProfileTitles = {
         gradient: "linear-gradient(90deg, #24fbe2, #7297f4)",
     },
     "spring-event-win": {
-        label: "Spring Event Winner",
+        label: "Easter Event Winner",
         gradient: "linear-gradient(90deg, #ffc021, #f48872)",
     },
     "spring-event-nomenee": {
-        label: "Spring Event Nominee",
+        label: "Easter Event Nominee",
         gradient: "linear-gradient(90deg, #ffd260, #ffa795)",
     },
     "spring-event-participation": {
-        label: "Spring Event Participant",
+        label: "Easter Event Participant",
     },
 };
 
