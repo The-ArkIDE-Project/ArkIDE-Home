@@ -98,7 +98,7 @@ $: fileName = getFileName(selectedOS, selectedArch);
                         selectedArch = 'x86';   // FORCE rerender for Windows
                         showFlatpak = false; 
                     }}>
-                        <span class:selected-indicator={selectedOS === 'windows'}>Windows</span>
+                        <span class:selected-indicator={selectedOS === 'windows'}>Microslop Windows</span>
                     </Button>
 
                     <Button on:click={() => { selectedOS = 'linux'; showFlatpak = false; }}>
@@ -182,13 +182,13 @@ $: fileName = getFileName(selectedOS, selectedArch);
         <p><strong>Step 3:</strong> Drag the ArkIDE icon to your Applications folder.</p>
         <p><strong>Step 4:</strong> Launch ArkIDE from your Applications folder. On first launch, you may need to right-click the app and select "Open" to bypass Gatekeeper security warnings.</p>
         <p><strong>Alternative:</strong> If you see "ArkIDE cannot be opened because it is from an unidentified developer," go to <strong>System Preferences → Security & Privacy → General</strong> and click "Open Anyway".</p>
-        <p class="note-text"><strong>Note:</strong> macOS 10.13 (High Sierra) or later is required. For Apple Silicon Macs (M1/M2/M3), select ARM64. For Intel Macs, select x86-64.</p>
+        <p class="note-text"><strong>Note:</strong> macOS 10.13 (High Sierra) or later is required. For Apple Silicon Macs (M1/M2/M3/M4), select ARM64. For Intel Macs, select x86-64.</p>
     {/if}
 
     {#if selectedOS === 'linux' && showFlatpak}
         <h3>Flatpak Installation</h3>
         <p><strong>Step 1:</strong> Ensure Flatpak is installed:</p>
-        <p class="code-block">sudo apt install flatpak</p>
+        <p class="code-block">sudo apt install flatpak</p> This command will be diffrent depending on what OS you have, google it first or use the <a href="https://flathub.org/en/setup">flathub.org</a> website to check your install command.
 
         <p><strong>Step 2:</strong> Add our own Flatpak repo:</p>
         <p class="code-block">flatpak remote-add --user --if-not-exists --no-gpg-verify arkide https://the-arkide-project.github.io/ArkIDE-Desktop/repo</p>
