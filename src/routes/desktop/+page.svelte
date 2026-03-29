@@ -21,17 +21,17 @@ let version = "2.14.1";
 // Download links - replace these with your actual download URLs
 const downloads = {
     windows: {
-        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE.Setup.${version}.exe`,
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/ArkIDE.Setup.${version}.exe`,
         // arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/arkide-windows-arm64.exe`
     },
     linux: {
-        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}.AppImage`,
-        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}-arm64.AppImage`,
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/ArkIDE-${version}.AppImage`,
+        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/ArkIDE-${version}-arm64.AppImage`,
         flatpak: "https://github.com/The-ArkIDE-Project/ArkIDE-Desktop"
     },
     MacOS: {
-        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}.dmg`,
-        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/Ark.IDE-${version}-arm64.dmg`
+        x86: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/ArkIDE-${version}.dmg`,
+        arm64: `https://github.com/The-ArkIDE-Project/ArkIDE-Desktop/releases/download/v${version}/ArkIDE-${version}-arm64.dmg`
     }
 };
 
