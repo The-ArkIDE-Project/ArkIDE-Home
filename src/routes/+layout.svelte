@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import AnnouncementModal from "$lib/AnnouncementModal/AnnouncementModal.svelte";
 let customCursorEnabled = true;
 
 // List of verified usernames
@@ -133,7 +134,7 @@ updateCursorStyle();
     }
 </script>
 
-<!-- The slot is where your page content appears -->
+<AnnouncementModal /> 
 <slot />
 
 <style>
