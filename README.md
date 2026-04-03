@@ -1,3 +1,4 @@
+This project is being phased out. Please read our latest devpost.
 # ArkIDE-Home
 The main home page for ArkIDE, which has community-made projects and other content. Now featuring comments and other new features!
 
